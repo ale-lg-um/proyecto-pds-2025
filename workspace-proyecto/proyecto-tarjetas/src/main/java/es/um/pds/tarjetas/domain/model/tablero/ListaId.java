@@ -1,8 +1,8 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tablero;
 
-public record TarjetaId(Long codigo) {
+public record ListaId(Long codigo) {
 	// Constructor compacto
-	public TarjetaId {
+	public ListaId {
 		if(codigo == null) {
 			throw new IllegalArgumentException("Codigo no puede ser nulo.");
 		}
