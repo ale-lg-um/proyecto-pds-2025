@@ -1,0 +1,24 @@
+package inf.pds.tpv.domain.model.producto;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import inf.pds.tpv.domain.model.producto.ProductoId.IdentificadorProductoException;
+
+class ProductoIdTest {
+
+	@Test
+	void testProductoNoValido() {
+		assertThrows(IdentificadorProductoException.class, () -> {
+			ProductoId.of(101L);
+		});
+	}
+
+	@Test
+	void testProductoValido() throws IdentificadorProductoException {
+		ProductoId identificador = ProductoId.of(Long.valueOf(101));
+		assertNotNull(identificador);
+		assertEquals(101L, identificador.getCodigoNumerico());
+	}
+}
