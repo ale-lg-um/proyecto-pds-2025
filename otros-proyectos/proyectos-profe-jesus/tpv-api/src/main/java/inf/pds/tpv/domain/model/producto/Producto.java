@@ -60,5 +60,23 @@ public class Producto {
 	public void setPrecio(double precio) {
 		this.precio = precio;		
 	}
+	
+	public boolean tieneDescuento() {
+		if (this.cantidad < 3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public int getDescuento() {
+		if (cantidad == 1) {
+			return 20;
+		} else if (cantidad == 2 || cantidad == 3) {
+			return 10;
+		} else {
+			return 0;
+		}
+	}
 
 }
