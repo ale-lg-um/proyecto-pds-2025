@@ -1,0 +1,3 @@
+Las clases válidas en este caso son aquellos productos en los que su valor es mayor que 100.
+
+Las clases inválidas con aquellas en las que el valor del código de producto es menor o igual que 100.

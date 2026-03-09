@@ -1,0 +1,26 @@
+----- PARTE 2 -----
+
+- Clases Inválidas (no tienen descuento): productos con cantidad mayor que 3 y menor que 1
+
+- Clases válidas (tienen descuento): productos con cantidad entre 1 y 3, inclusive.
+
+El método assertEquals utilizado en ProductoTest sirve para comparar un valor esperado con un valor calculado, con un cierto margen de error.
+
+El margen de error es porque el ordenador puede no tener el nivel de precisión requerido (a lo mejor el valor real es 2,49999999999999 y el PC lo redondea a 2,5)
+
+La sintaxis del método assertEquals invocado es:
+
+	assertEquals(valor_esperado, valor_real, margen_error)
+	
+Si valor_esperado = valor_real (teniendo en cuenta el margen de error), entonces test exitoso.
+
+Si valor_esperado != valor_real, entonces test fallido.
+
+Soluciones en:
+
+	- Producto.java
+	- ProductoTest.java
+	- ProductoIdTest.java
+
+----- PARTE 3 -----
+

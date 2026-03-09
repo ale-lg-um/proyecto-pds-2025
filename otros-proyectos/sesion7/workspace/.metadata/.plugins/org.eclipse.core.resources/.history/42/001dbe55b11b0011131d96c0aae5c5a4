@@ -1,0 +1,8 @@
+package inf.pds.tpv.domain.model.producto;
+
+import org.junit.jupiter.api.Test;
+
+@Test
+public class ProductoTest {
+	
+}

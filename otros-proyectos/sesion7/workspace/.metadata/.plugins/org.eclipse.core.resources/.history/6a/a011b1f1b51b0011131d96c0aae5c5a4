@@ -1,0 +1,26 @@
+package inf.pds.tpv.domain.model.producto;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import inf.pds.tpv.domain.model.producto.ProductoId.IdentificadorProductoException;
+
+class ProductoTest {
+
+	@Test
+	void testProductoConDescuento() throws IdentificadorProductoException {
+		Producto P = new Producto(ProductoId.of(Long.valueOf(131)), "Berenjena", 3, 25);
+		int descuento = P.getDescuento();
+		
+		assertEquals(10, descuento, 0);
+		fail("No implementado");
+	}
+
+   @Test
+	void testProductoSinDescuento() {
+		fail("No implementado");
+	}
+	
+	
+}
