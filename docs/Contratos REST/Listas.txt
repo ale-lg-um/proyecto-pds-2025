@@ -1,0 +1,68 @@
+CREAR LISTA
+--------------------------------------------------------
+POST  /tableros/{tableroId}
+
+Body:
+{ "nombre": "PENDIENTES" }
+
+Respuesta (201):
+{ "listaId": "uuid" }
+
+Servicio:
+ServicioGestionTablero.crearLista(tableroId, nombre, actor)
+
+
+RENOMBRAR LISTA
+--------------------------------------------------------
+PUT /tableros/{tableroId}/listas/{listaId}/nombre
+
+Body:
+{ "nuevoNombre": "EN PROCESO" }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.renombrarLista(tableroId, listaId, nuevoNombre, actor)
+
+
+ELIMINAR LISTA
+--------------------------------------------------------
+DELETE /tableros/{tableroId}/listas/{listaId}
+
+Respuesta (204)
+
+Servicio:
+Servicio: ServicioGestionTablero.eliminarLista(tableroId, listaId, actor)
+
+
+CONFIGURAR LÍMITE N
+--------------------------------------------------------
+PUT /tableros/{tableroId}/listas/{listaId}/limite
+
+Body:
+{ "limiteN": 5 }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.configurarLimiteLista(tableroId, listaId, limiteN, actor)
+
+
+CONFIGURAR PRERREQUISITOS DE LISTA
+--------------------------------------------------------
+PUT /tableros/{tableroId}/listas/{listaId}/prerrequisitos
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.configurarPrerrequisitosLista(tableroId, listaId, listasPrevias, actor)
+
+
+DEFINIR LISTA ESPECIAL DE COMPLETADAS
+--------------------------------------------------------
+PUT /tableros/{tableroId}/listas/{listaId}/especial-completadas
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.definirListaEspecial(tableroId, listaId, actor)

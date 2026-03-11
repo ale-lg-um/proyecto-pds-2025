@@ -1,0 +1,25 @@
+SOLICITAR CÓDIGO LOGIN
+--------------------------------------------------------
+POST /auth/solicitar-codigo
+
+Body:
+{ "email": "user@email.com" }
+
+Respuesta (204)
+
+Servicio:
+ServicioAutenticacion.enviarCodigoLogin(email)
+
+
+VERIFICAR CÓDIGO LOGIN
+--------------------------------------------------------
+POST /auth/verificar-codigo
+
+Body:
+{ "email": "user@email.com", "codigo": "123456" }
+
+Respuesta (200)(ejemplo):
+{ "token": "jwt-o-token-de-sesion" }
+
+Servicio:
+ServicioAutenticacion.verificarCodigoLogin(email, codigo)

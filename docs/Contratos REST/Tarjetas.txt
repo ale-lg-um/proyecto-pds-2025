@@ -1,0 +1,137 @@
+CREAR TARJETA (tarea/checklist)
+--------------------------------------------------------
+POST  /tableros/{tableroId}/listas/{listaId}/tarjetas
+
+Body (tarea):
+{
+  "tipo": "TAREA",
+  "contenido": { "descripcion": "Hacer..." }
+}
+
+Body (checklist):
+{
+  "tipo": "CHECKLIST",
+  "contenido": { "items": ["A", "B", "C"] }
+}
+
+Respuesta (201)
+
+Servicio:
+ServicioGestionTablero.crearTarjeta(tableroId, listaId, contenido, actor)
+
+
+EDITAR CONTENIDO DE LA TARJETA
+--------------------------------------------------------
+PUT /tableros/{tableroId}/tarjetas/{tarjetaId}/contenido
+
+Body:
+{
+  "tipo": "TAREA",
+  "contenido": { "descripcion": "Nueva descripción" }
+}
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.editarTarjeta(tableroId, tarjetaId, nuevoContenido, actor)
+
+
+ELIMINAR TARJETA
+--------------------------------------------------------
+DELETE /tableros/{tableroId}/tarjetas/{tarjetaId}
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.eliminarTarjeta(tableroId, tarjetaId, actor)
+
+
+MOVER TARJETA
+--------------------------------------------------------
+POST /tableros/{tableroId}/tarjetas/{tarjetaId}/mover
+
+Body:
+{ "listaDestinoId": "uuid" }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.moverTarjeta(tableroId, tarjetaId, listaDestinoId, actor)
+
+
+MARCAR TARJETA COMO COMPLETADA
+--------------------------------------------------------
+POST /tableros/{tableroId}/tarjetas/{tarjetaId}/completar
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.completarTarjeta(tableroId, tarjetaId, actor)
+
+
+AÑADIR ETIQUETA A TARJETA
+--------------------------------------------------------
+POST /tableros/{tableroId}/tarjetas/{tarjetaId}/etiquetas
+
+Body:
+{ "nombre": "Urgente", "color": "rojo" }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.addEtiquetaATarjeta(tableroId, tarjetaId, nombre, color, actor)
+
+
+ELIMINAR ETIQUETA DE TARJETA
+--------------------------------------------------------
+DELETE /tableros/{tableroId}/tarjetas/{tarjetaId}/etiquetas
+
+Body:
+{ "nombre": "Urgente", "color": "rojo" }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.eliminarEtiquetaDeTarjeta(tableroId, tarjetaId, nombre, color, actor)
+
+
+MODIFICAR ETIQUETA EN TARJETA
+--------------------------------------------------------
+PUT /tableros/{tableroId}/tarjetas/{tarjetaId}/etiquetas
+
+Body:
+{
+  "antigua": { "nombre": "Urgente", "color": "rojo" },
+  "nueva": { "nombre": "Muy urgente", "color": "rojo" }
+}
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.modificarEtiquetaEnTarjeta(tableroId, tarjetaId, ... , actor)
+
+
+FILTRADO DE TARJETAS POR ETIQUETAS
+--------------------------------------------------------
+GET /tableros/{tableroId}/tarjetas/filtrar?etiquetas=A&etiquetas=B&etiquetas=C&modo=OR&page=0&size=20
+Donde etiquetas es una lista de nombres de etiquetas y el modo es AND u OR (por defecto OR)
+
+Respuesta (200)(ejemplo):
+{
+  "contenido": [
+    {
+      "tarjetaId": "uuid",
+      "listaId": "uuid",
+      "contenido": { "tipo": "TAREA", "descripcion": "..." },
+      "etiquetas": [{ "nombre": "A", "color": "rojo" }],
+      "completada": false
+    }
+  ],
+  "pagina": 0,
+  "tamano": 20,
+  "totalPaginas": 3,
+  "totalElementos": 45
+}
+
+Servicio:
+ServicioFiltradoTarjetas.filtrarPorEtiquetas(tableroId, etiquetas, modo, page)

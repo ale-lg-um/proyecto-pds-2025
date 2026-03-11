@@ -1,0 +1,24 @@
+CONSULTAR HISTORIAL DEL TABLERO
+--------------------------------------------------------
+GET /tableros/{tableroId}/historial?page=0&size=20
+
+Respuesta (200)(ejemplo):
+{
+  "contenido": [
+    {
+      "entryId": "uuid",
+      "tableroId": "uuid",
+      "tipo": "TARJETA_MOVIDA",
+      "emailActor": "user@email.com",
+      "timestamp": "2026-03-10T12:00:00Z",
+      "detalles": { "tarjetaId": "...", "fromListaId": "...", "toListaId": "..." }
+    }
+  ],
+  "pagina": 0,
+  "tamano": 20,
+  "totalPaginas": 10,
+  "totalElementos": 200
+}
+
+Servicio:
+ServicioHistorial.consultarPorTablero(tableroId, pageRequest)
