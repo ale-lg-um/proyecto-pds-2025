@@ -1,0 +1,124 @@
+CREAR TABLERO
+--------------------------------------------------------
+POST /tableros
+
+Body:
+{
+  "nombre": "Mi tablero",
+  "plantillaId": "opcional"
+}
+
+Respuesta (201):
+{
+  "tableroId": "uuid",
+  "urlCompartir": "https://.../tableros/{tableroId}"
+}
+
+Servicio:
+ServicioGestionTablero.crearTablero(cmd);
+
+
+CONSULTAR TABLERO
+--------------------------------------------------------
+GET /tableros/{tableroId}
+
+Respuesta(200) (ejemplo):
+{
+  "tableroId": "uuid",
+  "nombre": "Mi tablero",
+  "urlCompartir": "https://.../tableros/{tableroId}",
+  "bloqueo": { "activo": true, "desde": "…", "hasta": "…" },
+  "listaEspecialCompletadasId": "opcional",
+  "listas": [
+    {
+      "listaId": "uuid",
+      "nombre": "TODO",
+      "limiteN": 5,
+      "prerrequisitos": ["..."]
+    }
+  ]
+}
+
+
+RENOMBRAR TABLERO
+--------------------------------------------------------
+PUT /tableros{tableroId}/nombre
+
+Body:
+{ "nuevoNombre": "Nuevo nombre" }
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.renombrarTablero(tableroId, nuevoNombre, actor)
+
+
+BLOQUEAR TABLERO
+--------------------------------------------------------
+POST /tableros/{tableroId}/bloqueo
+
+Body:
+{ "desde": "yyyy-mm-ddT00:00:00Z", "hasta": "yyyy-mm-ddT00:00:00Z" }
+
+
+DESBLOQUEAR TABLERO
+--------------------------------------------------------
+DELETE /tableros/{tableroId}/bloqueo
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.desbloquearTablero(tableroId, actor)
+
+
+ELIMINAR TABLERO
+--------------------------------------------------------
+DELETE /tableros/{tableroId}
+
+Respuesta (204)
+
+Servicio:
+ServicioGestionTablero.eliminarTablero(tableroId, actor)
+
+
+LISTAR TABLEROS DISPONIBLES
+--------------------------------------------------------
+GET /tableros
+
+Respuesta (200) (ejemplo):
+[
+  { "tableroId": "uuid", "nombre": "Tablero A" },
+  { "tableroId": "uuid", "nombre": "Tablero B" }
+]
+
+
+CREAR PLANTILLA DE TABLERO
+--------------------------------------------------------
+POST /plantillas
+
+Body:
+{ "yaml": "..." }
+
+Respuesta (201)(ejemplo):
+{ "plantillaId": "uuid" }
+
+Servicio:
+ServicioPlantilla.crearPlantilla(yaml, actor)
+
+
+CREAR TABLERO DESDE PLANTILLA
+--------------------------------------------------------
+POST /tableros/desde-plantilla/{plantillaId}
+
+Body:
+{ "nombre": "Tablero desde plantilla" }
+
+Respuesta (201)(ejemplo):
+{
+  "tableroId": "uuid",
+  "urlCompartir": "https://.../tableros/{tableroId}"
+}
+
+Servicios:
+ServicioPlantilla.parsearPlantilla(plantillaId)
+ServicioPlantilla.parsearPlantilla(plantillaId)
