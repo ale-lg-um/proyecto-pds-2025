@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class TarjetaId {
 	// Atributos
-	public Long id;
+	private Long id;
 	
 	// Excepción
 	public static class TarjetaInvalidaException extends Exception {
@@ -24,6 +24,11 @@ public class TarjetaId {
 			throw new TarjetaInvalidaException("El identificador de la tarjeta debe ser mayor que 0.");
 		}
 		return new TarjetaId(id);
+	}
+	
+	// Getters
+	public Long getid() {
+		return this.id;
 	}
 	
 	// Overrides
