@@ -6,7 +6,7 @@ public class TarjetaId {
 	// Atributos
 	public Long id;
 	
-	// Excepcion
+	// Excepción
 	public static class TarjetaInvalidaException extends Exception {
 		public TarjetaInvalidaException(String mensaje) {
 			super(mensaje);
