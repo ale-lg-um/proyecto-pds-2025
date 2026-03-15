@@ -39,7 +39,7 @@ public class Lista {
 		return Collections.unmodifiableList(this.listaTarjetas);
 	}
 	
-	public int getlimite() {
+	public Integer getLimite() {
 		return this.limite;
 	}
 	
@@ -54,6 +54,10 @@ public class Lista {
 	// Funcionalidades
 	public void anadirTarjeta(Tarjeta nueva) {
 		this.listaTarjetas.add(nueva);
+	}
+	
+	public void quitarTarjeta(Tarjeta tarjeta) {
+		this.listaTarjetas.remove(tarjeta);
 	}
 	
 	public void renombrar(String nombre) {
