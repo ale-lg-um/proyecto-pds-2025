@@ -6,18 +6,23 @@ import es.um.pds.tarjetas.domain.model.tablero.EspecBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.Tablero;
 import es.um.pds.tarjetas.domain.model.tablero.TableroId;
+import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.tablero.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.output.tablero.RepositorioTableros;
+import es.um.pds.tarjetas.domain.services.PoliticaTarjetas;
 import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
 
 public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
+	private final PoliticaTarjetas politicaTarjetas;
 	
 	// Constructor
-	public ServicioGestionTableroImpl(RepositorioTableros repoTableros) {
+	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, PoliticaTarjetas politica) {
 		this.repoTableros = repoTableros;
+		this.politicaTarjetas = politica;
 	}
 	
 	// Métodos heredados de la clase padre
@@ -138,5 +143,91 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 		
 		tab.configurarPrerrequisitosLista(lista, prerrequisitos, user);
 		this.repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		politicaTarjetas.validarCreacion(tab, lista);
+		TarjetaId nueva = TarjetaId.of(System.currentTimeMillis());
+		
+		tab.anadirTarjetaALista(lista, nueva, contenido, user);
+		repoTableros.guardar(tab);
+		return nueva;
+	}
+	
+	@Override
+	public void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta nuevoCont, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		tab.editarTarjeta(tarjeta, nuevoCont, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		tab.eliminarTarjeta(tarjeta, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		politicaTarjetas.validarMovimiento(tab, tarjeta, lista);
+		tab.moverTarjeta(tarjeta, lista, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		politicaTarjetas.validarCompletar(tab, tarjeta);
+		tab.completarTarjeta(tarjeta, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void addEtiquetaATarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		tab.addEtiqueta(tarjeta, nombre, color, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void eliminarEtiquetaDeTarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		tab.eliminarEtiqueta(tarjeta, nombre, color, user);
+		repoTableros.guardar(tab);
+	}
+	
+	@Override
+	public void modificarEtiquetaEnTarjeta(TableroId tablero, TarjetaId tarjeta, String nombreOld, String colorOld, String nombreNuevo, String colorNuevo, String correoUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(correoUsuario);
+		Tablero tab = this.repoTableros.buscarPorId(tablero)
+				.orElseThrow(() -> new Exception("Tablero no encontrado"));
+		
+		tab.modificarEtiqueta(tarjeta, nombreOld, colorOld, nombreNuevo, colorNuevo, user);
+		repoTableros.guardar(tab);
 	}
 }
