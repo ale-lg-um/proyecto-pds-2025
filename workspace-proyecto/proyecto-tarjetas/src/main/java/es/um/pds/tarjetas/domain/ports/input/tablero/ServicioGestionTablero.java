@@ -2,8 +2,8 @@ package es.um.pds.tarjetas.domain.ports.input.tablero;
 
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.tablero.EspecBloqueo;
-import es.um.pds.tarjetas.domain.model.tablero.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
@@ -16,7 +16,7 @@ public interface ServicioGestionTablero {
 	TableroId crearTablero(CrearTableroCmd cmd) throws Exception;											// Se trata de una operación compleja, por lo que se usa un Command
 	void renombrarTablero(TableroId tablero, String nombreNuevo, String emailUsuario) throws Exception;		// Renombrar el tablero
 	void eliminarTablero(TableroId tablero, String emailUsuario) throws Exception;							// Eliminar el tablero
-	void bloquearTablero(TableroId tablero, EspecBloqueo espec, String emailUsuario) throws Exception;		// Bloquear el tablero
+	void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String emailUsuario) throws Exception;		// Bloquear el tablero
 	void desbloquearTablero(TableroId tablero, String emailUsuario) throws Exception;						// Desbloquear un tablero bloqueado
 	
 	// Listas

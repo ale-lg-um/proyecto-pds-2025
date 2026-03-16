@@ -1,7 +1,7 @@
 package es.um.pds.tarjetas.domain.model.tablero;
 
 // Value Object
-public class EspecBloqueo {
+public class EstadoBloqueo {
 	// Atributos
 	private String motivo; // El motivo por el que se bloquea el tablero
 	
@@ -13,16 +13,16 @@ public class EspecBloqueo {
 	}
 	
 	// Constructor
-	private EspecBloqueo(String motivo) {
+	private EstadoBloqueo(String motivo) {
 		this.motivo = motivo;
 	}
 	
 	// Método 'of'
-	public static EspecBloqueo of(String motivo) throws EspecBloqueoInvalidaException {
+	public static EstadoBloqueo of(String motivo) throws EspecBloqueoInvalidaException {
 		if(motivo == null || motivo.isBlank()) {
 			throw new EspecBloqueoInvalidaException("El motivo del bloqueo no puede ser nulo");
 		}
 		
-		return new EspecBloqueo(motivo);
+		return new EstadoBloqueo(motivo);
 	}
 }

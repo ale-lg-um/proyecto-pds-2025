@@ -6,8 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import es.um.pds.tarjetas.domain.model.etiqueta.Etiqueta;
-import es.um.pds.tarjetas.domain.model.tarea.Tarea;
+import es.um.pds.tarjetas.domain.model.lista.ListaId;
 
 //@Entity
 public class Tarjeta {
@@ -17,6 +16,7 @@ public class Tarjeta {
 	private List<Tarea> tareas;			// Lista de tareas que contiene la tarjeta.
 	private Set<Etiqueta> etiquetas;	// Conjunto de etiquetas de la tarjeta.
 	private boolean completada;
+	private Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta.
 	
 	// Excepción
 	public static class TarjetaInvalidaException extends Exception {

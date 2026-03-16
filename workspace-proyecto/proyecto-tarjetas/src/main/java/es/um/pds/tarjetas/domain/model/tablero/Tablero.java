@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.etiqueta.Etiqueta;
+import es.um.pds.tarjetas.domain.model.lista.Lista;
+import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.Etiqueta;
 import es.um.pds.tarjetas.domain.model.tarjeta.Tarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
@@ -18,7 +20,7 @@ public class Tablero {
 	private String url;							// URL del tablero
 	private TableroId identificador;			// Identificador del tablero
 	private List<Lista> listas;					// Aquí se guardan las listas del tablero
-	private EspecBloqueo especificacionBloqueo;	// Motivo por el cual se bloquea el tablero
+	private EstadoBloqueo especificacionBloqueo;	// Motivo por el cual se bloquea el tablero
 	
 	// Constructor
 	public Tablero(TableroId id, String nombre, UsuarioId usuarioCreador) {
@@ -73,7 +75,7 @@ public class Tablero {
 		this.listas.add(nueva);
 	}
 	
-	public void bloquear(EspecBloqueo motivo, UsuarioId user) throws Exception{
+	public void bloquear(EstadoBloqueo motivo, UsuarioId user) throws Exception{
 		if(!this.usuarioCreador.equals(user)) {
 			throw new Exception("El usuario no es el creador de este tablero. El bloqueo se ha cancelado");
 		} else if(this.isBloqueado()) {

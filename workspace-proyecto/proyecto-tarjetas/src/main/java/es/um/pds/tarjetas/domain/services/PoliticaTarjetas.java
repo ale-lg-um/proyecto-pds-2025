@@ -1,7 +1,7 @@
 package es.um.pds.tarjetas.domain.services;
 
-import es.um.pds.tarjetas.domain.model.tablero.Lista;
-import es.um.pds.tarjetas.domain.model.tablero.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.Lista;
+import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.Tablero;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 

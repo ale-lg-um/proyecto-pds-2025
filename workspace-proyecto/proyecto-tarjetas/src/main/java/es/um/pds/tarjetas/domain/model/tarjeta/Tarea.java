@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarea;
+package es.um.pds.tarjetas.domain.model.tarjeta;
 
 import java.util.Objects;
 

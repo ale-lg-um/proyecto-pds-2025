@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.etiqueta;
+package es.um.pds.tarjetas.domain.model.tarjeta;
 
 // Value object
 public record Etiqueta(String nombre, String color) {

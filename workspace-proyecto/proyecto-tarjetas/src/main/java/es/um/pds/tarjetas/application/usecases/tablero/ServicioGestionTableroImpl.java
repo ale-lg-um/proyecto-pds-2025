@@ -2,8 +2,8 @@ package es.um.pds.tarjetas.application.usecases.tablero;
 
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.tablero.EspecBloqueo;
-import es.um.pds.tarjetas.domain.model.tablero.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.Tablero;
 import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
@@ -64,7 +64,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void bloquearTablero(TableroId tablero, EspecBloqueo espec, String correoUsuario) throws Exception {
+	public void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String correoUsuario) throws Exception {
 		UsuarioId user = UsuarioId.of(correoUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));

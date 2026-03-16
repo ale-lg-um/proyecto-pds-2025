@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import es.um.pds.tarjetas.domain.model.tarea.Tarea;
-
 public class ContenidoTarjeta {
 	// Atributos
 	private final String tipo;					// Puede ser 'TAREA' o 'CHECKLIST'
