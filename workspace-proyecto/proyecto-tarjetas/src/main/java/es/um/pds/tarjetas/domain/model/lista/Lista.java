@@ -5,13 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 import es.um.pds.tarjetas.domain.model.tarjeta.Tarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 
 //@Entity
 public class Lista {
 	// Atributos
 	private ListaId id;
 	private String nombreLista;
-	private List<Tarjeta> listaTarjetas;
+	private List<TarjetaId> listaTarjetas;
 	private boolean especial;
 	private Integer limite; // Lo pongo como Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private List<ListaId> prerrequisitos;
@@ -35,7 +36,7 @@ public class Lista {
 		return this.nombreLista;
 	}
 	
-	public List<Tarjeta> getListaTarjetas() {
+	public List<TarjetaId> getListaTarjetas() {
 		return Collections.unmodifiableList(this.listaTarjetas);
 	}
 	
@@ -52,11 +53,11 @@ public class Lista {
 	}
 	
 	// Funcionalidades
-	public void anadirTarjeta(Tarjeta nueva) {
+	public void anadirTarjeta(TarjetaId nueva) {
 		this.listaTarjetas.add(nueva);
 	}
 	
-	public void quitarTarjeta(Tarjeta tarjeta) {
+	public void quitarTarjeta(TarjetaId tarjeta) {
 		this.listaTarjetas.remove(tarjeta);
 	}
 	

@@ -12,10 +12,9 @@ import es.um.pds.tarjetas.domain.model.lista.ListaId;
 public class Tarjeta {
 	// Atributos
 	private TarjetaId identificador;
-	private String tipo;				// Puede ser una lista de tareas o un checklist.
-	private List<Tarea> tareas;			// Lista de tareas que contiene la tarjeta.
+	private ContenidoTarjeta tipo;				// Puede ser una lista de tareas o un checklist.
 	private Set<Etiqueta> etiquetas;	// Conjunto de etiquetas de la tarjeta.
-	private boolean completada;
+	//private boolean completada; Una tarjeta está completada si está en la lista especial.
 	private Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta.
 	
 	// Excepción

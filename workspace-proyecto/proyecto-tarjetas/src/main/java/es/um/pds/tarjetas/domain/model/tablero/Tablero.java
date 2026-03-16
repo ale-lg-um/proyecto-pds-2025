@@ -2,7 +2,9 @@ package es.um.pds.tarjetas.domain.model.tablero;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import es.um.pds.tarjetas.domain.model.lista.Lista;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
@@ -16,19 +18,17 @@ import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
 public class Tablero {
 	// Atributos
 	private String nombre;						// Nombre del tablero
-	private UsuarioId usuarioCreador;			// Email del usuario que ha creado el tablero
-	private String url;							// URL del tablero
+	private String url;							// URL que se genera del tablero
 	private TableroId identificador;			// Identificador del tablero
-	private List<Lista> listas;					// Aquí se guardan las listas del tablero
-	private EstadoBloqueo especificacionBloqueo;	// Motivo por el cual se bloquea el tablero
+	private Set<ListaId> listas;					// Aquí se guardan las listas del tablero
+	private EstadoBloqueo estadoBloqueo;	// 
 	
 	// Constructor
 	public Tablero(TableroId id, String nombre, UsuarioId usuarioCreador) {
 		this.nombre = nombre;
-		this.usuarioCreador = usuarioCreador;
 		this.identificador = id;
-		this.listas = new ArrayList<>();
-		this.especificacionBloqueo = null;
+		this.listas = new HashSet<>();
+		this.estadoBloqueo = null;
 	}
 	
 	// Getters y setters
@@ -37,15 +37,8 @@ public class Tablero {
 	}
 	
 	public void setNombre(String nuevoNombre, UsuarioId creador) throws Exception {
-		if(!usuarioCreador.equals(creador)) {
-			throw new Exception("El usuario no es el creador de este tablero. El renombrado ha fallado.");
-		}
 		
 		this.nombre = nuevoNombre;
-	}
-	
-	public UsuarioId getUsuarioCreador() {
-		return this.usuarioCreador;
 	}
 	
 	public String getUrl() {
@@ -56,51 +49,43 @@ public class Tablero {
 		return this.identificador;
 	}
 	
-	public List<Lista> getListas() {
-		return Collections.unmodifiableList(listas);
+	public Set<ListaId> getListas() {
+		return Collections.unmodifiableSet(listas);
 	}
 	
 	public boolean isBloqueado() {
-		return (this.especificacionBloqueo != null);
+		return (this.estadoBloqueo != null);
 	}
 	
 	// Funcionalidades
 	public void anadirLista(ListaId lista, String nombre, UsuarioId user) throws Exception {
 		if(this.isBloqueado()) {
 			throw new Exception("No se pueden añadir listas porque el tablero está bloqueado.");
-		} else if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. Abortando");
 		}
+		
 		Lista nueva = new Lista(nombre, lista);
 		this.listas.add(nueva);
 	}
 	
 	public void bloquear(EstadoBloqueo motivo, UsuarioId user) throws Exception{
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. El bloqueo se ha cancelado");
-		} else if(this.isBloqueado()) {
+		if(this.isBloqueado()) {
 			throw new Exception("El tablero ya está bloqueado");
 		} else if(motivo == null) {
 			throw new IllegalArgumentException("El motivo no puede ser nulo");
 		} else {
-			this.especificacionBloqueo = motivo;
+			this.estadoBloqueo = motivo;
 		}
 	}
 	
 	public void desbloquear(UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. El desbloqueo se ha cancelado");
-		} else if(!this.isBloqueado()) {
+		if(!this.isBloqueado()) {
 			throw new Exception("El tablero ya está desbloqueado");
 		} else {
-			this.especificacionBloqueo = null;
+			this.estadoBloqueo = null;
 		}
 	}
 	
 	public void renombrarLista(ListaId lista, String nuevoNombre, UsuarioId user) throws Exception{
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
 		
 		Lista destino = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -111,9 +96,7 @@ public class Tablero {
 	}
 	
 	public void eliminarLista(ListaId lista, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista eliminada = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -124,9 +107,6 @@ public class Tablero {
 	}
 	
 	public void definirListaEspecial(ListaId lista, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
 		
 		Lista seleccionada = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -137,9 +117,6 @@ public class Tablero {
 	}
 	
 	public void configurarLimiteLista(ListaId lista, int limite, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
 		
 		Lista seleccionada = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -150,9 +127,7 @@ public class Tablero {
 	}
 	
 	public void configurarPrerrequisitosLista(ListaId lista, List<ListaId> prerrequisitos, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista seleccionada = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -163,9 +138,7 @@ public class Tablero {
 	}
 	
 	public void anadirTarjetaALista (ListaId lista, TarjetaId tarjeta, ContenidoTarjeta contenido, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista seleccionada = this.listas.stream()
 				.filter(l -> l.getId().equals(lista))
@@ -177,9 +150,6 @@ public class Tablero {
 	}
 	
 	public void moverTarjeta(TarjetaId tarjeta, ListaId destino, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
 		
 		Lista dest = this.listas.stream()
 				.filter(l -> l.getId().equals(destino))
@@ -202,9 +172,6 @@ public class Tablero {
 	}
 	
 	public void editarTarjeta(TarjetaId tarjeta, ContenidoTarjeta nuevoCont, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
@@ -223,9 +190,7 @@ public class Tablero {
 	}
 	
 	public void eliminarTarjeta(TarjetaId tarjeta, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
@@ -242,9 +207,7 @@ public class Tablero {
 	}
 	
 	public void completarTarjeta(TarjetaId tarjeta, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
@@ -268,9 +231,7 @@ public class Tablero {
 	}
 	
 	public void addEtiqueta(TarjetaId tarjeta, String nombre, String color, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
@@ -288,9 +249,7 @@ public class Tablero {
 	}
 	
 	public void eliminarEtiqueta(TarjetaId tarjeta, String nombre, String color, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
@@ -312,9 +271,7 @@ public class Tablero {
 	}
 	
 	public void modificarEtiqueta(TarjetaId tarjeta, String nombreOld, String colorOld, String nombreNuevo, String colorNuevo, UsuarioId user) throws Exception {
-		if(!this.usuarioCreador.equals(user)) {
-			throw new Exception("El usuario no es el creador de este tablero. No se modificará la lista");
-		}
+
 		
 		Lista origen = this.listas.stream()
 				.filter(l -> l.getListaTarjetas().stream()
