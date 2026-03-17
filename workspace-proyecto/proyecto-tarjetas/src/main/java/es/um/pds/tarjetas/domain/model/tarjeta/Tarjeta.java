@@ -1,96 +1,160 @@
 package es.um.pds.tarjetas.domain.model.tarjeta;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
+import es.um.pds.tarjetas.domain.exceptions.TarjetaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 
 //@Entity
 public class Tarjeta {
 	// Atributos
-	private TarjetaId identificador;
-	private ContenidoTarjeta tipo;				// Puede ser una lista de tareas o un checklist.
-	private Set<Etiqueta> etiquetas;	// Conjunto de etiquetas de la tarjeta.
-	//private boolean completada; Una tarjeta está completada si está en la lista especial.
-	private Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta.
-	
-	// Excepción
-	public static class TarjetaInvalidaException extends Exception {
-		public TarjetaInvalidaException(String mensaje) {
-			super(mensaje);
-		}
-	}
+	private final TarjetaId identificador;		
+	private String titulo;					
+	private final LocalDate fechaCreacion;
+	private ListaId listaActual;
+	private int posicionEnLista;
+	private final ContenidoTarjeta contenido;	// Puede ser una Tarea o un Checklist
+	private final List<Etiqueta> etiquetas;		// Lista de etiquetas de la tarjeta (puede haber repetidas)
+	private final Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta
 	
 	// Constructor
-	private Tarjeta(TarjetaId identificador, String tipo, List<Tarea> tareas) {
+	private Tarjeta(TarjetaId identificador, String titulo, ListaId listaActual, int posicionEnLista, ContenidoTarjeta contenido) {
 		this.identificador = identificador;
-		this.tipo = tipo;
-		this.tareas = new ArrayList<>(tareas);
-		this.etiquetas = new HashSet<>();
-		this.completada = false;
+		this.titulo = titulo;
+		this.fechaCreacion = LocalDate.now();
+		this.listaActual = listaActual;
+		this.posicionEnLista = posicionEnLista;
+		this.contenido = contenido;
+		this.etiquetas = new ArrayList<Etiqueta>();
+		this.listasVisitadas = new HashSet<ListaId>();
+		
+		this.listasVisitadas.add(listaActual);
 	}
 	
 	// Método factoría
-	public static Tarjeta of(TarjetaId identificador, String tipo, List<Tarea> tareas) throws TarjetaInvalidaException {
+	public static Tarjeta of(TarjetaId identificador, String titulo, ListaId listaActual, int posicionEnLista, ContenidoTarjeta contenido) throws TarjetaInvalidaException {
         if (identificador == null) {
-            throw new TarjetaInvalidaException("La tarjeta debe tener un identificador.");
-        }
-        if (!tipo.equals("TAREA") && !tipo.equals("CHECKLIST")) {
-            throw new TarjetaInvalidaException("El tipo debe ser TAREA o CHECKLIST.");
-        }
-        if (tareas == null || tareas.isEmpty()) {
-            throw new TarjetaInvalidaException("La tarjeta debe contener al menos una tarea.");
-        }
-        if (tipo.equals("TAREA") && tareas.size() > 1) {
-            throw new TarjetaInvalidaException("Una tarjeta de tipo TAREA solo puede tener 1 tarea.");
+            throw new TarjetaInvalidaException("La tarjeta debe tener un identificador");
         }
         
-        return new Tarjeta(identificador, tipo, tareas);
+        // La tarjeta puede no tener título, no comprobamos el título == null
+        
+        if (contenido == null) {
+            throw new TarjetaInvalidaException("La tarjeta no puede estar vacía, debe contener una tarea o una checklist");
+        }
+        
+        if (listaActual == null) {
+        	throw new TarjetaInvalidaException("La tarjeta tiene que ser creada dentro de una lista");
+        }
+        
+        if (posicionEnLista < 0) {
+        	throw new TarjetaInvalidaException("La posición de la tarjeta no puede ser negativa");
+        }
+        
+        if (!(contenido instanceof Tarea) && !(contenido instanceof Checklist)) {
+            throw new TarjetaInvalidaException("El contenido de la tarjeta debe ser una TAREA o una CHECKLIST.");
+        }
+         
+        return new Tarjeta(identificador, titulo, listaActual, posicionEnLista, contenido);
     }
 	
-	// Getters y setters
+	// Getters
 	public TarjetaId getIdentificador() {
 		return this.identificador;
 	}
 	
-	public String getTipo() {
-		return this.tipo;
+	public String getTitulo() {
+		return this.titulo;
 	}
 	
-	public List<Tarea> getTareas() {
-		return this.tareas;
+	public LocalDate getFechaCreacion() {
+		return this.fechaCreacion;
 	}
 	
-	public void setContenido(ContenidoTarjeta contenido) {
-		this.tipo = contenido.getTipo();
-		this.tareas = new ArrayList<>(contenido.getElementos());
+	public ListaId getListaActual() {
+		return this.listaActual;
 	}
 	
-	public Set<Etiqueta> getEtiquetas() {
-		return Collections.unmodifiableSet(this.etiquetas);
+	public int getPosicionEnLista() {
+		return this.posicionEnLista;
 	}
 	
-	public boolean isCompletada() {
-		return this.completada;
+	public ContenidoTarjeta getContenido() {
+		return this.contenido;
 	}
+	
+	public List<Etiqueta> getEtiquetas() {
+		return Collections.unmodifiableList(etiquetas);
+	}
+	
+	public Set<ListaId> getListasVisitadas() {
+		return Collections.unmodifiableSet(listasVisitadas);
+	}
+	
+	// Overrides
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) return true;
+	    if (!(obj instanceof Tarjeta other)) return false;
+	    return Objects.equals(this.identificador, other.identificador);
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(identificador);
+	}
+	
 	
 	// Funcionalidades
-	public void completar() {
-		this.completada = true;
+	public void cambiarListaActual(ListaId nuevaLista) {
+		if (nuevaLista == null) {
+			throw new IllegalArgumentException("La lista en la que se desea colocar la tarjeta no puede ser nula");
+		}
+		this.listaActual = nuevaLista;
+		this.listasVisitadas.add(nuevaLista);
 	}
 	
+	// El servicio de aplicación debe llamar a este método después de haber reorganizado el resto de tarjetas
+    public void cambiarPosicionEnLista(int nuevaPosicion) {
+        if (nuevaPosicion < 0) throw new IllegalArgumentException("La posición no puede ser negativa");
+        this.posicionEnLista = nuevaPosicion;
+    }
+	
 	public void anadirEtiqueta(Etiqueta nueva) {
-		if(this.isCompletada()) {
-			throw new IllegalStateException("No es posible  añadir etiquetas a una tarjeta completada");
+		if (nueva == null) {
+			throw new IllegalArgumentException("La etiqueta que se desea añadir no puede ser nula");
 		}
-		
 		this.etiquetas.add(nueva);
 	}
 	
 	public void eliminarEtiqueta(Etiqueta eliminada) {
+		if (eliminada == null) {
+			throw new IllegalArgumentException("La etiqueta que se desea eliminar no puede ser nula");
+		}
 		this.etiquetas.remove(eliminada);
 	}
+	
+	public void cambiarTitulo(String nuevoTitulo) {
+		titulo = nuevoTitulo;
+	}
+    
+    /** Operaciones como servicios de aplicación orquestadores:
+     * TarjetaId crearTarjeta(TableroId id, ListaId listaId, ContenidoTarjeta contenido, Actor actor);
+     * void editarTarjeta(TableroId id, TarjetaId tarjetaId, ContenidoTarjeta nuevoContenido, Actor actor);
+     * void eliminarTarjeta(TableroId id, TarjetaId tarjetaId, Actor actor);
+     * void moverTarjeta(TableroId id, TarjetaId tarjetaId, ListaId
+     * listaDestino, Actor actor);
+     * // completarTarjeta realmente es mover una tarjeta a la lista especial
+     * void completarTarjeta(TableroId id, TarjetaId id, Actor actor);
+
+     */
+    
+	
 }

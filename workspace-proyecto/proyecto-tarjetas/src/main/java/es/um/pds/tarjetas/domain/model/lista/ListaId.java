@@ -6,8 +6,11 @@ public class ListaId {
 	// Atributos
 	private Long id;
 	
-	// Excepcion
+	// Excepción
 	public static class ListaInvalidaException extends Exception {
+		// Identificador de versión para que no salga el warning
+		private static final long serialVersionUID = 1L;
+
 		public ListaInvalidaException(String mensaje) {
 			super(mensaje);
 		}
@@ -21,7 +24,7 @@ public class ListaId {
 	// Método 'of' aplicando patrón creador y método factoría
 	public static ListaId of(Long id) throws ListaInvalidaException {
 		if(id == null || id <= 0) {
-			throw new ListaInvalidaException("El identificador de la lista debe ser mayor que 0.");
+			throw new ListaInvalidaException("El identificador de la lista debe ser mayor que 0");
 		}
 		return new ListaId(id);
 	}

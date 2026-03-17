@@ -2,16 +2,11 @@ package es.um.pds.tarjetas.domain.model.tarjeta;
 
 import java.util.Objects;
 
+import es.um.pds.tarjetas.domain.exceptions.TarjetaInvalidaException;
+
 public class TarjetaId {
 	// Atributos
 	private Long id;
-	
-	// Excepción
-	public static class TarjetaInvalidaException extends Exception {
-		public TarjetaInvalidaException(String mensaje) {
-			super(mensaje);
-		}
-	}
 	
 	// Constructor
 	private TarjetaId(Long id) {
@@ -21,7 +16,7 @@ public class TarjetaId {
 	// Método 'of' aplicando patrón creador y método factoría
 	public static TarjetaId of(Long id) throws TarjetaInvalidaException{
 		if(id == null || id <= 0) {
-			throw new TarjetaInvalidaException("El identificador de la tarjeta debe ser mayor que 0.");
+			throw new TarjetaInvalidaException("El identificador de la tarjeta debe ser mayor que 0");
 		}
 		return new TarjetaId(id);
 	}

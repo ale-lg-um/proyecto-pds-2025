@@ -29,7 +29,7 @@ public interface ServicioGestionTablero {
 	
 	// Tarjetas
 	TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String correoUsuario) throws Exception;		// Creamos la tarjeta
-	void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta contenidoNuevo, String correoUsuario) throws Exception;	// Modificar el contenido de la tarjeta
+	void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta contenidoNuevo, String correoUsuario) throws Exception;	// Modificar el contenido de la tarjeta. No se puede cambiar de Tarea a Checklist o viceversa
 	void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Eliminar una tarjeta
 	void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String correoUsuario) throws Exception;						// Mover la tarjeta a una lista especial
 	void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Marcar una tarjeta como completada
