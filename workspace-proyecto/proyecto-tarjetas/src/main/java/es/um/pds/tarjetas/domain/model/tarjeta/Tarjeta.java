@@ -98,7 +98,6 @@ public class Tarjeta {
 	}
 	
 	// Overrides
-	
 	@Override
 	public boolean equals(Object obj) {
 	    if (this == obj) return true;
@@ -121,7 +120,7 @@ public class Tarjeta {
 		this.listasVisitadas.add(nuevaLista);
 	}
 	
-	// El servicio de aplicación debe llamar a este método después de haber reorganizado el resto de tarjetas
+	// El servicio de aplicación debe llamar a este método después de haber reorganizado el resto de tarjetas dentro de la lista
     public void cambiarPosicionEnLista(int nuevaPosicion) {
         if (nuevaPosicion < 0) throw new IllegalArgumentException("La posición no puede ser negativa");
         this.posicionEnLista = nuevaPosicion;
@@ -138,6 +137,11 @@ public class Tarjeta {
 		if (eliminada == null) {
 			throw new IllegalArgumentException("La etiqueta que se desea eliminar no puede ser nula");
 		}
+		
+		if (!etiquetas.contains(eliminada)) {
+			throw new IllegalArgumentException("La etiqueta que se desea eliminar no existe");
+		}
+		
 		this.etiquetas.remove(eliminada);
 	}
 	
