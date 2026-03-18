@@ -37,7 +37,7 @@ public class Tarjeta {
 		this.listasVisitadas.add(listaActual);
 	}
 	
-	// Método factoría
+	// Método 'of' aplicando patrón creador y método factoría
 	public static Tarjeta of(TarjetaId identificador, String titulo, ListaId listaActual, int posicionEnLista, ContenidoTarjeta contenido) throws TarjetaInvalidaException {
         if (identificador == null) {
             throw new TarjetaInvalidaException("La tarjeta debe tener un identificador");

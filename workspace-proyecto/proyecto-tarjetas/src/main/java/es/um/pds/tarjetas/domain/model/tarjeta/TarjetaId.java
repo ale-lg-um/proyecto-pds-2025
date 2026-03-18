@@ -6,7 +6,7 @@ import es.um.pds.tarjetas.domain.exceptions.TarjetaInvalidaException;
 
 public class TarjetaId {
 	// Atributos
-	private Long id;
+	private final Long id;
 	
 	// Constructor
 	private TarjetaId(Long id) {
@@ -22,7 +22,7 @@ public class TarjetaId {
 	}
 	
 	// Getters
-	public Long getid() {
+	public Long getId() {
 		return this.id;
 	}
 	

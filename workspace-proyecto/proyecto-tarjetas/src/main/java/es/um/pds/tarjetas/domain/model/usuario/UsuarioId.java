@@ -1,29 +1,36 @@
 package es.um.pds.tarjetas.domain.model.usuario;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
+
+import es.um.pds.tarjetas.domain.exceptions.UsuarioInvalidoException;
 
 public class UsuarioId {
-	// Atributos
-	private String correo;
+	// Constantes
+	// Regex para correos electrónicos
+	private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 	
-	// Excepción
-	public static class IdentificadorUsuarioException extends Exception {
-		public IdentificadorUsuarioException(String mensaje) {
-			super(mensaje);
-		}
-	}
+	// Atributos
+	private final String correo;
 	
 	// Constructor
 	private UsuarioId(String correo) {
 		this.correo = correo;
 	}
 	
-	// Método 'of'
-	public static UsuarioId of(String correo) throws IdentificadorUsuarioException {
-		if(correo == null || correo.isBlank() || !correo.contains("@")) {
-			throw new IdentificadorUsuarioException("El correo no tiene el formato correcto.");
+	// Método factoría
+	public static UsuarioId of(String correo) throws UsuarioInvalidoException {
+		if(correo == null || correo.isBlank()) {
+			throw new UsuarioInvalidoException("El correo no puede ser nulo o vacío");
 		}
-		return new UsuarioId(correo);
+		
+		String correoNormalizado = correo.trim().toLowerCase();
+
+		if (!EMAIL_PATTERN.matcher(correoNormalizado).matches()) {
+			throw new UsuarioInvalidoException("El correo no tiene un formato válido.");
+		}
+
+		return new UsuarioId(correoNormalizado);
 	}
 	
 	// Getters
@@ -33,11 +40,6 @@ public class UsuarioId {
 	
 	// Overrides
 	@Override
-	public int hashCode() {
-		return Objects.hash(correo);
-	}
-	
-	@Override
 	public boolean equals(Object obj) {
 		if(this == obj) {
 			return true;
@@ -46,5 +48,10 @@ public class UsuarioId {
 		}
 		UsuarioId other = (UsuarioId) obj;
 		return Objects.equals(this.correo, other.correo);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(correo);
 	}
 }

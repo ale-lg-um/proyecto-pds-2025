@@ -2,19 +2,11 @@ package es.um.pds.tarjetas.domain.model.lista;
 
 import java.util.Objects;
 
+import es.um.pds.tarjetas.domain.exceptions.ListaInvalidaException;
+
 public class ListaId {
 	// Atributos
-	private Long id;
-	
-	// Excepción
-	public static class ListaInvalidaException extends Exception {
-		// Identificador de versión para que no salga el warning
-		private static final long serialVersionUID = 1L;
-
-		public ListaInvalidaException(String mensaje) {
-			super(mensaje);
-		}
-	}
+	private final Long id;
 	
 	// Constructor
 	private ListaId(Long id) {

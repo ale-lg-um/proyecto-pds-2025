@@ -1,28 +1,42 @@
 package es.um.pds.tarjetas.domain.model.tablero;
 
-// Value Object
-public class EstadoBloqueo {
-	// Atributos
-	private String motivo; // El motivo por el que se bloquea el tablero
-	
-	// Excepción
-	public static class EspecBloqueoInvalidaException extends Exception {
-		public EspecBloqueoInvalidaException(String mensaje) {
-			super(mensaje);
-		}
-	}
-	
+import java.time.LocalDateTime;
+
+// Value object
+public record EstadoBloqueo(LocalDateTime desde, LocalDateTime hasta, String descripcion) {
 	// Constructor
-	private EstadoBloqueo(String motivo) {
-		this.motivo = motivo;
-	}
-	
-	// Método 'of'
-	public static EstadoBloqueo of(String motivo) throws EspecBloqueoInvalidaException {
-		if(motivo == null || motivo.isBlank()) {
-			throw new EspecBloqueoInvalidaException("El motivo del bloqueo no puede ser nulo");
+	public EstadoBloqueo {
+		if (desde == null) {
+			desde = LocalDateTime.now();
 		}
 		
-		return new EstadoBloqueo(motivo);
+		// Si no se especifica hasta (hasta == null) es un bloqueo indefinido
+		
+		// No hacer esta comprobación para cuando carguemos un bloqueo no dé problemas, con la persistencia
+		/*
+		if (desde.isBefore(LocalDateTime.now())) {
+			throw new IllegalArgumentException("La fecha de comienzo del bloqueo no puede ser anterior a la fecha actual");
+		}
+		*/
+		
+		if (hasta!= null && hasta.isBefore(desde)) {
+			throw new IllegalArgumentException("La fecha de fin del bloqueo no puede ser anterior a la fecha de comienzo");
+		}
+	}
+	
+	// Funcionalidades
+	public boolean estaActivoEn(LocalDateTime fecha) {
+		if (fecha == null) {
+			throw new IllegalArgumentException("La fecha no puede ser nula");
+		}
+
+		boolean empiezaYa = !fecha.isBefore(desde);
+		boolean noHaTerminado = (hasta == null) || !fecha.isAfter(hasta);
+
+		return empiezaYa && noHaTerminado;
+	}
+	
+	public boolean estaActivoAhora() {
+		return estaActivoEn(LocalDateTime.now());
 	}
 }

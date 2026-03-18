@@ -2,44 +2,34 @@ package es.um.pds.tarjetas.domain.model.tablero;
 
 import java.util.Objects;
 
+import es.um.pds.tarjetas.domain.exceptions.TableroInvalidoException;
+
 public class TableroId {
 	// Atributos
-	private Long codigo;
-	
-	// Excepción
-	public static class IdentificadorTableroException extends Exception {
-		// Identificador de versión para que no salga el warning
-		private static final long serialVersionUID = 1L;
-		public IdentificadorTableroException(String mensaje) {
-			super(mensaje);
-		}
-		public IdentificadorTableroException(String mensaje, Exception e) {
-			super(mensaje, e);
-		}
-	}
+	private final Long id;
 	
 	// Constructor
-	private TableroId(Long codigo) {
-		this.codigo = codigo;
+	private TableroId(Long id) {
+		this.id = id;
 	}
 	
-	// Método 'of' que aplica patrón creador y método factoría
-	public static TableroId of(Long codigo) throws IdentificadorTableroException {
-		if(codigo == null || codigo <= 0) {
-			throw new IdentificadorTableroException("El código del tablero debe ser mayor que 0");
+	// Método factoría
+	public static TableroId of(Long id) throws TableroInvalidoException {
+		if(id == null || id <= 0) {
+			throw new TableroInvalidoException("El código del tablero debe ser mayor que 0");
 		}
-		return new TableroId(codigo);
+		return new TableroId(id);
 	}
 	
 	// Getters
-	public Long getCodigo() {
-		return this.codigo;
+	public Long getId() {
+		return this.id;
 	}
 	
 	// Overrides
 	@Override
 	public int hashCode() {
-		return Objects.hash(codigo);
+		return Objects.hash(id);
 	}
 	
 	@Override
@@ -50,6 +40,6 @@ public class TableroId {
 			return false;
 		}
 		TableroId other = (TableroId) obj;
-		return Objects.equals(this.codigo, other.codigo);
+		return Objects.equals(this.id, other.id);
 	}
 }

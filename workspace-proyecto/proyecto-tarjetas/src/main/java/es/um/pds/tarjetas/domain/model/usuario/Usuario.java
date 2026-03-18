@@ -2,37 +2,43 @@ package es.um.pds.tarjetas.domain.model.usuario;
 
 import java.util.Objects;
 
+import es.um.pds.tarjetas.domain.exceptions.UsuarioInvalidoException;
+
 //@Entity
 public class Usuario {
 	// Atributos
-	private UsuarioId id;
+	private final UsuarioId identificador;
 	private String nombre;
 	
 	// Constructor
-	public Usuario(UsuarioId id, String nombre) {
-		this.id = id;
+	private Usuario(UsuarioId identificador, String nombre) {
+		this.identificador = identificador;
 		this.nombre = nombre;
 	}
 	
+	// Método factoría
+	public static Usuario of(UsuarioId identificador, String nombre) throws UsuarioInvalidoException {
+		if (identificador == null) {
+			throw new UsuarioInvalidoException("El usuario debe tener un correo electrónico");
+		}
+		
+		if (nombre == null || nombre.isBlank()) {
+			throw new UsuarioInvalidoException("El nombre de usuario no puede estar vacío");
+		}
+		
+		return new Usuario(identificador, nombre);
+	}
+	
 	// Getters
-	public UsuarioId getId() {
-		return this.id;
+	public UsuarioId getIdentificador() {
+		return this.identificador;
 	}
 	
 	public String getNombre() {
 		return this.nombre;
 	}
 	
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	
 	// Overrides
-	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if(this == obj) {
@@ -41,6 +47,19 @@ public class Usuario {
 			return false;
 		}
 		Usuario other = (Usuario) obj;
-		return Objects.equals(this.id, other.id);
+		return Objects.equals(this.identificador, other.identificador);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(identificador);
+	}
+	
+	// Funcionalidades
+	public void cambiarNombre(String nombre) {
+		if (nombre == null || nombre.isBlank()) {
+			throw new IllegalArgumentException("El nombre de usuario no puede estar vacío");
+		}
+		this.nombre = nombre;
 	}
 }
