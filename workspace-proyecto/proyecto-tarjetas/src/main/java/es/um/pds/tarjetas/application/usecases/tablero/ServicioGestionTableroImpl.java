@@ -9,10 +9,10 @@ import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.tablero.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.output.tablero.RepositorioTableros;
 import es.um.pds.tarjetas.domain.services.PoliticaTarjetas;
-import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
 
 public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	// Inyectamos dependencias estrictas (patrón fachada)
