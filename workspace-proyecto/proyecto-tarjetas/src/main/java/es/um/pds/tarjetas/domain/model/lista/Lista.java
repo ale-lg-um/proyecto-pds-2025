@@ -2,8 +2,10 @@ package es.um.pds.tarjetas.domain.model.lista;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import es.um.pds.tarjetas.domain.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
@@ -16,7 +18,7 @@ public class Lista {
 	private final List<TarjetaId> listaTarjetas;
 	private boolean especial;
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
-	private final List<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
+	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
 	
 	// Constructor
 	private Lista(ListaId identificador, String nombre) {
@@ -25,7 +27,7 @@ public class Lista {
 		this.listaTarjetas = new ArrayList<>();
 		this.especial = false;	// Cuando se crea una lista aún no es especial
 		this.limite = null; // Al principio, una lista puede ser infinita
-		this.prerrequisitos = new ArrayList<>();
+		this.prerrequisitos = new HashSet<>();
 	}
 	
 	// Método factoría
@@ -40,7 +42,7 @@ public class Lista {
 	}
 	
 	// Getters
-	public ListaId getId() {
+	public ListaId getIdentificador() {
 		return this.identificador;
 	}
 	
@@ -56,8 +58,8 @@ public class Lista {
 		return this.limite;
 	}
 	
-	public List<ListaId> getPrerrequisitos() {
-		return Collections.unmodifiableList(prerrequisitos);
+	public Set<ListaId> getPrerrequisitos() {
+		return Collections.unmodifiableSet(prerrequisitos);
 	}
 	
 	public boolean isEspecial() {

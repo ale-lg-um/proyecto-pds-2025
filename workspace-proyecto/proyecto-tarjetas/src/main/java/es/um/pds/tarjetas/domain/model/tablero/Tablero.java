@@ -14,10 +14,10 @@ import es.um.pds.tarjetas.domain.model.lista.ListaId;
 public class Tablero {
 	// Atributos
 	private final TableroId identificador;			// Identificador del tablero
-	private String nombre;						// Nombre del tablero
+	private String nombre;							// Nombre del tablero
 	private final String tokenUrl;					// Token de la URL que se genera del tablero
 	private final Set<ListaId> listas;				// Aquí se guardan las listas del tablero
-	private EstadoBloqueo estadoBloqueo;		// Desde, Hasta y Descripción
+	private EstadoBloqueo estadoBloqueo;			// Desde, Hasta y Descripción
 	
 	// Constructor
 	private Tablero(TableroId identificador, String nombre, String tokenUrl) {
@@ -60,6 +60,10 @@ public class Tablero {
 	
 	public Set<ListaId> getListas() {
 		return Collections.unmodifiableSet(listas);
+	}
+	
+	public EstadoBloqueo getEstadoBloqueo() {
+		return this.estadoBloqueo;
 	}
 	
 	public boolean isBloqueado() {

@@ -28,11 +28,11 @@ public interface ServicioGestionTablero {
 	void configurarPrerrequisitosLista(TableroId tablero, ListaId lista, List<ListaId> prerrequisitos, String correoUsuario) throws Exception;	// Configuramos los prerrequisitos de una lista
 	
 	// Tarjetas
-	TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String correoUsuario) throws Exception;		// Creamos la tarjeta
+	TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String correoUsuario) throws Exception;		// Crear una tarjeta dentro de una lista
 	void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta contenidoNuevo, String correoUsuario) throws Exception;	// Modificar el contenido de la tarjeta. No se puede cambiar de Tarea a Checklist o viceversa
-	void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Eliminar una tarjeta
+	void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Eliminar una tarjeta de una lista
 	void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String correoUsuario) throws Exception;						// Mover la tarjeta a una lista especial
-	void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Marcar una tarjeta como completada
+	void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception;									// Marcar una tarjeta como completada (en realidad es moverla a la lista especial)
 	
 	// Etiquetas
 	void addEtiquetaATarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String correoUsuario) throws Exception;																// Añadir una etiqueta (nombre y color) a una tarjeta de un tablero

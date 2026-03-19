@@ -115,6 +115,11 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 		this.repoTableros.guardar(tab);
 	}
 	
+	/**
+	 * Marca una lista en el tablero como especial. Solo puede haber una lista especial en el tablero
+	 * La lista que se declare como especial no puede tener límite N configurado. Si lo tenía de antes, el límite
+	 * N se suprimirá. Sí que puede tener prerrequisitos de haber pasado por otras listas
+	 */
 	@Override
 	public void definirListaEspecial(TableroId tablero, ListaId lista, String correoUsuario) throws Exception {
 		UsuarioId user = UsuarioId.of(correoUsuario);
