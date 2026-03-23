@@ -1,28 +1,35 @@
 package es.um.pds.tarjetas.domain.model.lista;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.um.pds.tarjetas.domain.exceptions.ListaInvalidaException;
 
 public class ListaId {
 	// Atributos
-	private final Long id;
+	private final String id;
 	
 	// Constructor
-	private ListaId(Long id) {
+	private ListaId(String id) {
 		this.id = id;
 	}
 	
-	// Método 'of' aplicando patrón creador y método factoría
-	public static ListaId of(Long id) throws ListaInvalidaException {
-		if(id == null || id <= 0) {
-			throw new ListaInvalidaException("El identificador de la lista debe ser mayor que 0");
+	// Método 'of' aplicando patrón creador y método factoría con identificador
+	public static ListaId of(String id) throws ListaInvalidaException {
+		if(id == null) {
+			throw new ListaInvalidaException("El identificador de la lista no puede ser nulo");
 		}
 		return new ListaId(id);
 	}
 	
+	// Método 'of' aplicando patrón creador y método factoría sin identificador
+	public static ListaId of() throws ListaInvalidaException {
+		String id = UUID.randomUUID().toString();
+		return new ListaId(id);
+	}
+	
 	// Getters
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 	

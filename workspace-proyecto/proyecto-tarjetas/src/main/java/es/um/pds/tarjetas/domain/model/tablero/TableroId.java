@@ -1,28 +1,35 @@
 package es.um.pds.tarjetas.domain.model.tablero;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.um.pds.tarjetas.domain.exceptions.TableroInvalidoException;
 
 public class TableroId {
 	// Atributos
-	private final Long id;
+	private final String id;
 	
 	// Constructor
-	private TableroId(Long id) {
+	private TableroId(String id) {
 		this.id = id;
 	}
 	
-	// Método factoría
-	public static TableroId of(Long id) throws TableroInvalidoException {
-		if(id == null || id <= 0) {
-			throw new TableroInvalidoException("El código del tablero debe ser mayor que 0");
+	// Método factoría con identificador
+	public static TableroId of(String id) throws TableroInvalidoException {
+		if(id == null) {
+			throw new TableroInvalidoException("El código del tablero no puede ser nulo");
 		}
 		return new TableroId(id);
 	}
 	
+	// Método factoría sin identificador
+	public static TableroId of() throws TableroInvalidoException {
+		String id = UUID.randomUUID().toString();
+		return new TableroId(id);
+	}
+	
 	// Getters
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 	

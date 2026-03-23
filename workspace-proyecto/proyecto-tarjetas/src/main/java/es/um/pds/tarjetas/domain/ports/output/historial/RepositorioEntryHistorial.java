@@ -7,7 +7,7 @@ import es.um.pds.tarjetas.application.common.PageRequest;
 
 public interface RepositorioEntryHistorial {
 
-	void append(EntryHistorial entry);
+	void guardar(EntryHistorial entry);
 
 	// TODO
 	Page<EntryHistorial> consultarPorTablero(TableroId tableroId, PageRequest pageRequest);

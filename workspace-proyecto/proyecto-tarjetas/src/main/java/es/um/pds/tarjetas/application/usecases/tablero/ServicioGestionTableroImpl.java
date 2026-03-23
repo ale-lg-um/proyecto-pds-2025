@@ -1,8 +1,13 @@
 package es.um.pds.tarjetas.application.usecases.tablero;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorialId;
+import es.um.pds.tarjetas.application.usecases.historial.ServicioHistorialImpl;
+import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorial;
+import es.um.pds.tarjetas.domain.model.lista.Lista;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.Tablero;
@@ -10,19 +15,26 @@ import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.ports.input.historial.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.tablero.commands.CrearTableroCmd;
+import es.um.pds.tarjetas.domain.ports.output.lista.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.tablero.RepositorioTableros;
 import es.um.pds.tarjetas.domain.services.PoliticaTarjetas;
+
+// TODO Eventos de dominio para las entries del historial
+// TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?
 
 public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
+	private final RepositorioListas repoListas;
 	private final PoliticaTarjetas politicaTarjetas;
 	
 	// Constructor
-	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, PoliticaTarjetas politica) {
+	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas, PoliticaTarjetas politica) {
 		this.repoTableros = repoTableros;
+		this.repoListas = repoListas;
 		this.politicaTarjetas = politica;
 	}
 	
@@ -30,7 +42,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	@Override
 	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {	
 		// Generar id del tablero
-		TableroId nuevoId = TableroId.of(System.currentTimeMillis()); // Valor de ejemplo que devuelve un Long, se puede cambiar
+		TableroId nuevoId = TableroId.of(); // Valor de ejemplo que devuelve un Long, se puede cambiar
 		
 		// Generar URL del tablero
 		String tokenUrl = UUID.randomUUID().toString();
@@ -47,69 +59,68 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	
 	@Override
 	public void renombrarTablero(TableroId tablero, String nombreNuevo, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.renombrar(nombreNuevo, user);
+		tab.renombrar(nombreNuevo);
 		this.repoTableros.guardar(tab);
 		
-		// TODO
-		// Creación de la EntryHistorial
-		EntryHistorialId
+		// TODO Evento de dominio creación de la entrada del historial
 	}
 	
 	@Override
 	public void eliminarTablero(TableroId tablero, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
 		this.repoTableros.eliminarPorId(tablero);
+		
+		// TODO Evento de dominio creación de la entrada del historial
 	}
 	
 	@Override
 	public void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.bloquear(espec, user);
+		tab.bloquear(espec);
 		this.repoTableros.guardar(tab);
 	}
 	
 	@Override
 	public void desbloquearTablero(TableroId tablero, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.desbloquear(user);
+		tab.desbloquear();
 		this.repoTableros.guardar(tab);
 	}
 	
+	// TODO
 	@Override
 	public ListaId crearLista(TableroId tablero, String nombre, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		ListaId nuevaLista = ListaId.of(System.currentTimeMillis());
-		tab.anadirLista(nuevaLista, nombre, user);
-		this.repoTableros.guardar(tab);
+		ListaId nuevaLista = ListaId.of();
+		tab.anadirLista(nuevaLista);
+		this.repoListas.guardar();
 		return nuevaLista;
 	}
 	
 	@Override
 	public void renombrarLista(TableroId tablero, ListaId lista, String nombreNuevo, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.renombrarLista(lista, nombreNuevo, user); // Lo tengo que hacer llamando a Tablero, que es la raíz del agregado
-		this.repoTableros.guardar(tab);
+		Lista lis = this.repoListas.buscarPorId(lista)
+				.orElseThrow(() -> new Exception("Lista no encontrada"));
+		
+		lis.renombrar(nombreNuevo); // Lo tengo que hacer llamando a Lista, que es la raíz del agregado
+		this.repoListas.guardar(lis);
 	}
 	
+	// TODO
 	@Override
 	public void eliminarLista(TableroId tablero, ListaId lista, String emailUsuario) throws Exception {
 		UsuarioId user = UsuarioId.of(emailUsuario);

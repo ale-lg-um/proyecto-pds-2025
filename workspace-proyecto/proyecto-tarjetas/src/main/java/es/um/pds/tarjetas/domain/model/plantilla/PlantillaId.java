@@ -1,28 +1,35 @@
 package es.um.pds.tarjetas.domain.model.plantilla;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.um.pds.tarjetas.domain.exceptions.PlantillaInvalidaException;
 
 public class PlantillaId {
 	// Atributos
-	private final Long id;
+	private final String id;
 	
 	// Constructor
-	private PlantillaId(Long id) {
+	private PlantillaId(String id) {
 		this.id = id;
 	}
 	
-	// Método factoría
-	public static PlantillaId of(Long id) throws PlantillaInvalidaException {
-		if (id == null || id <= 0) {
-			throw new PlantillaInvalidaException("El identificador de la plantilla debe ser mayor que 0");
+	// Método factoría con identificador
+	public static PlantillaId of(String id) throws PlantillaInvalidaException {
+		if (id == null) {
+			throw new PlantillaInvalidaException("El identificador de la plantilla no puede ser nulo");
 		}
 		return new PlantillaId(id);
 	}
 	
+	// Método factoría sin identificador
+	public static PlantillaId of() throws PlantillaInvalidaException {
+		String id = UUID.randomUUID().toString();
+		return new PlantillaId(id);
+	}
+	
 	// Getters
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 	

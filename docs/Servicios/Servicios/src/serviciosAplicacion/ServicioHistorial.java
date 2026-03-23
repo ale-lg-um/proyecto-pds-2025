@@ -1,6 +1,6 @@
 package serviciosAplicacion;
 
 public interface ServicioHistorial {
-	void append(EntryHistorial entry);
+	EntryHistorialId crear(TableroId tableroId, TipoEntryHistorial tipo, String detalles, UsuarioId usuario);
 	Page<EntryHistorial> consultarPorTablero(TableroId tableroId, PageRequest pageRequest);
 }

@@ -18,7 +18,7 @@ public class UsuarioId {
 		this.correo = correo;
 	}
 	
-	// Método factoría
+	// Método factoría con identificador
 	public static UsuarioId of(String correo) throws UsuarioInvalidoException {
 		if(correo == null || correo.isBlank()) {
 			throw new UsuarioInvalidoException("El correo no puede ser nulo o vacío");

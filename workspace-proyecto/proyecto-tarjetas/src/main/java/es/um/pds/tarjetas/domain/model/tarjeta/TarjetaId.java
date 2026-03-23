@@ -1,28 +1,35 @@
 package es.um.pds.tarjetas.domain.model.tarjeta;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import es.um.pds.tarjetas.domain.exceptions.TarjetaInvalidaException;
 
 public class TarjetaId {
 	// Atributos
-	private final Long id;
+	private final String id;
 	
 	// Constructor
-	private TarjetaId(Long id) {
+	private TarjetaId(String id) {
 		this.id = id;
 	}
 	
-	// Método 'of' aplicando patrón creador y método factoría
-	public static TarjetaId of(Long id) throws TarjetaInvalidaException{
-		if(id == null || id <= 0) {
-			throw new TarjetaInvalidaException("El identificador de la tarjeta debe ser mayor que 0");
+	// Método 'of' aplicando patrón creador y método factoría con identificador
+	public static TarjetaId of(String id) throws TarjetaInvalidaException{
+		if(id == null) {
+			throw new TarjetaInvalidaException("El identificador de la tarjeta no puede ser nulo");
 		}
 		return new TarjetaId(id);
 	}
 	
+	// Método 'of' aplicando patrón creador y método factoría sin identificador
+	public static TarjetaId of() throws TarjetaInvalidaException{
+		String id = UUID.randomUUID().toString();
+		return new TarjetaId(id);
+	}
+	
 	// Getters
-	public Long getId() {
+	public String getId() {
 		return this.id;
 	}
 	
