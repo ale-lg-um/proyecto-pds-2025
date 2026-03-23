@@ -1,6 +1,6 @@
 package serviciosAplicacion;
 
-public class ServicioHistorial {
+public interface ServicioHistorial {
 	void append(EntryHistorial entry);
 	Page<EntryHistorial> consultarPorTablero(TableroId tableroId, PageRequest pageRequest);
 }

@@ -139,6 +139,29 @@ public class EntryHistorial {
 	    );
 	}
 	
+	// TABLERO RENOMBRADO
+	public static EntryHistorial tableroRenombrado(
+			EntryHistorialId id,
+	        TableroId tableroId,
+	        UsuarioId usuario,
+	        LocalDateTime timestamp,
+	        String nombreAnterior,
+	        String nombreNuevo
+	) throws EntryHistorialInvalidaException {
+
+		String detalles = "antiguo=" + nombreAnterior +
+	    		", nuevo=" + nombreNuevo;
+	
+	    return of(
+	    		id,
+	            tableroId,
+	            TipoEntryHistorial.TABLERO_RENOMBRADO,
+	            usuario,
+	            timestamp,
+	            detalles
+	    );
+	}
+	
 	// LISTA CREADA
 	public static EntryHistorial listaCreada(
 	        EntryHistorialId id,

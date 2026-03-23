@@ -1,6 +1,6 @@
 package serviciosAplicacion;
 
-public class ServicioAutenticacion {
+public interface ServicioAutenticacion {
 	void enviarCodigoLogin(Email email);
 	AuthToken verificarCodigoLogin(Email email, Codigo codigo);
 }

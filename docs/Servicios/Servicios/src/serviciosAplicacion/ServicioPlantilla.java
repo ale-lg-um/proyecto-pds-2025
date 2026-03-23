@@ -1,6 +1,6 @@
 package serviciosAplicacion;
 
-public class ServicioPlantilla {
+public interface ServicioPlantilla {
 	// Valida el esquema
 	PlantillaId crearPlantilla(String yaml, Actor actor);
 	

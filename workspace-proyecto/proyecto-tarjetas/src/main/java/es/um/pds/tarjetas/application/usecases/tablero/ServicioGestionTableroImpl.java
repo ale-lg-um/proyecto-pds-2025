@@ -1,6 +1,7 @@
 package es.um.pds.tarjetas.application.usecases.tablero;
 
 import java.util.List;
+import java.util.UUID;
 
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
@@ -27,15 +28,15 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	
 	// Métodos heredados de la clase padre
 	@Override
-	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {
-		// Traducir datos a los VOs del dominio
-		UsuarioId creador = UsuarioId.of(cmd.emailCreador()); // Sacamos el email del creador del Record
-		
+	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {	
 		// Generar id del tablero
 		TableroId nuevoId = TableroId.of(System.currentTimeMillis()); // Valor de ejemplo que devuelve un Long, se puede cambiar
 		
+		// Generar URL del tablero
+		String tokenUrl = UUID.randomUUID().toString();
+		
 		// Crear la entidad a partir del dominio (patrón creador)
-		Tablero nuevo = new Tablero(nuevoId, cmd.nombreTablero(), creador);
+		Tablero nuevo = Tablero.of(nuevoId, cmd.nombreTablero(), tokenUrl);
 		
 		// Guardar el tablero
 		this.repoTableros.guardar(nuevo);
@@ -45,18 +46,22 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void renombrarTablero(TableroId tablero, String nuevoNombre, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void renombrarTablero(TableroId tablero, String nombreNuevo, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.setNombre(nuevoNombre, user);
+		tab.renombrar(nombreNuevo, user);
 		this.repoTableros.guardar(tab);
+		
+		// TODO
+		// Creación de la EntryHistorial
+		EntryHistorialId
 	}
 	
 	@Override
-	public void eliminarTablero(TableroId tablero, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void eliminarTablero(TableroId tablero, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -64,8 +69,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -74,8 +79,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void desbloquearTablero(TableroId tablero, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void desbloquearTablero(TableroId tablero, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -84,8 +89,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public ListaId crearLista(TableroId tablero, String nombre, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public ListaId crearLista(TableroId tablero, String nombre, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -96,18 +101,18 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void renombrarLista(TableroId tablero, ListaId lista, String nuevoNombre, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void renombrarLista(TableroId tablero, ListaId lista, String nombreNuevo, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
-		tab.renombrarLista(lista, nuevoNombre, user); // Lo tengo que hacer llamando a Tablero, que es la raíz del agregado
+		tab.renombrarLista(lista, nombreNuevo, user); // Lo tengo que hacer llamando a Tablero, que es la raíz del agregado
 		this.repoTableros.guardar(tab);
 	}
 	
 	@Override
-	public void eliminarLista(TableroId tablero, ListaId lista, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void eliminarLista(TableroId tablero, ListaId lista, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -121,8 +126,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	 * N se suprimirá. Sí que puede tener prerrequisitos de haber pasado por otras listas
 	 */
 	@Override
-	public void definirListaEspecial(TableroId tablero, ListaId lista, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void definirListaEspecial(TableroId tablero, ListaId lista, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -131,8 +136,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void configurarLimiteLista(TableroId tablero, ListaId lista, int limite, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void configurarLimiteLista(TableroId tablero, ListaId lista, int limite, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -141,8 +146,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void configurarPrerrequisitosLista(TableroId tablero, ListaId lista, List<ListaId> prerrequisitos, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void configurarPrerrequisitosLista(TableroId tablero, ListaId lista, List<ListaId> prerrequisitos, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -151,8 +156,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -165,8 +170,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta nuevoCont, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta nuevoCont, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -175,8 +180,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -185,8 +190,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -196,8 +201,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -207,8 +212,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void addEtiquetaATarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void addEtiquetaATarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -217,8 +222,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void eliminarEtiquetaDeTarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void eliminarEtiquetaDeTarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		
@@ -227,8 +232,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	}
 	
 	@Override
-	public void modificarEtiquetaEnTarjeta(TableroId tablero, TarjetaId tarjeta, String nombreOld, String colorOld, String nombreNuevo, String colorNuevo, String correoUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(correoUsuario);
+	public void modificarEtiquetaEnTarjeta(TableroId tablero, TarjetaId tarjeta, String nombreOld, String colorOld, String nombreNuevo, String colorNuevo, String emailUsuario) throws Exception {
+		UsuarioId user = UsuarioId.of(emailUsuario);
 		Tablero tab = this.repoTableros.buscarPorId(tablero)
 				.orElseThrow(() -> new Exception("Tablero no encontrado"));
 		

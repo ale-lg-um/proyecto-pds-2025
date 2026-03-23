@@ -1,6 +1,6 @@
 package serviciosAplicacion;
 
-public class ServicioGestionTablero {
+public interface ServicioGestionTablero {
 	
 	// TABLERO
 	TableroId crearTablero(CrearTableroCmd cmd);
