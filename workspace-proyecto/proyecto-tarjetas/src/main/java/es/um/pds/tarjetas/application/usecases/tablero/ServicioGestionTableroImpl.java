@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorialId;
 import es.um.pds.tarjetas.application.usecases.historial.ServicioHistorialImpl;
 import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorial;
@@ -15,16 +17,17 @@ import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
-import es.um.pds.tarjetas.domain.ports.input.historial.ServicioHistorial;
-import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
-import es.um.pds.tarjetas.domain.ports.input.tablero.commands.CrearTableroCmd;
-import es.um.pds.tarjetas.domain.ports.output.lista.RepositorioListas;
-import es.um.pds.tarjetas.domain.ports.output.tablero.RepositorioTableros;
+import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
+import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.services.PoliticaTarjetas;
 
 // TODO Eventos de dominio para las entries del historial
 // TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?
 
+@Service
 public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
