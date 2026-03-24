@@ -3,11 +3,11 @@ package es.um.pds.tarjetas.domain.ports.output;
 import java.util.List;
 import java.util.Optional;
 
-import es.um.pds.tarjetas.domain.model.tarjeta.Etiqueta;
-import es.um.pds.tarjetas.domain.model.tarjeta.Tarjeta;
-import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.application.common.Page;
 import es.um.pds.tarjetas.application.common.PageRequest;
 

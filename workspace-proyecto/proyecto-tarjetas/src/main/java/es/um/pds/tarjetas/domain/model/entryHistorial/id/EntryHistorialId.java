@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.entryHistorial;
+package es.um.pds.tarjetas.domain.model.entryHistorial.id;
 
 import java.util.Objects;
 import java.util.UUID;

@@ -2,7 +2,7 @@ package es.um.pds.tarjetas.application.common;
 
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 
 //TODO Revisar
 public class EspecificacionTableroPlantilla {

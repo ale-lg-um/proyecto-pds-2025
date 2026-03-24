@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import ch.qos.logback.core.util.Loader;
-import es.um.pds.tarjetas.domain.model.lista.Lista;
+import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

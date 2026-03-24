@@ -6,22 +6,22 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorialId;
-import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorial;
-import es.um.pds.tarjetas.domain.model.lista.Lista;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
-import es.um.pds.tarjetas.domain.model.tablero.Tablero;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
-import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
-import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
-import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
+import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
+import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
+import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
-import es.um.pds.tarjetas.domain.services.PoliticaTarjetas;
+import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
 
 // TODO Eventos de dominio para las entries del historial
 // TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?

@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.services;
+package es.um.pds.tarjetas.domain.rules;
 
 import java.util.List;
 import java.util.Set;
@@ -9,11 +9,11 @@ import es.um.pds.tarjetas.application.common.exceptions.NoExisteListaEspecialExc
 import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
 import es.um.pds.tarjetas.application.common.exceptions.TarjetaYaCompletadaException;
-import es.um.pds.tarjetas.domain.model.lista.Lista;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
-import es.um.pds.tarjetas.domain.model.tablero.Tablero;
-import es.um.pds.tarjetas.domain.model.tarjeta.Tarjeta;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
+import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 
 public class PoliticaTarjetas {
 	

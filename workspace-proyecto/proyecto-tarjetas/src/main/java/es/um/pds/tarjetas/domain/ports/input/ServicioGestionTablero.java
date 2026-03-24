@@ -2,11 +2,11 @@ package es.um.pds.tarjetas.domain.ports.input;
 
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
-import es.um.pds.tarjetas.domain.model.tarjeta.ContenidoTarjeta;
-import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
+import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 
 public interface ServicioGestionTablero {

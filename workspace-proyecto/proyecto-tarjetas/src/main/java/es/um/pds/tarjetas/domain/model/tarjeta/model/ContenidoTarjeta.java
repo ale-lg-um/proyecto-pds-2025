@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
 public abstract class ContenidoTarjeta {
 	

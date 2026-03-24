@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.usuario;
+package es.um.pds.tarjetas.domain.model.usuario.id;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

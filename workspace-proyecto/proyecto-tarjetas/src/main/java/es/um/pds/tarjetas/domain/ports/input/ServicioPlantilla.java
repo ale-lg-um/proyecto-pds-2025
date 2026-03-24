@@ -1,7 +1,7 @@
 package es.um.pds.tarjetas.domain.ports.input;
 
 import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla;
-import es.um.pds.tarjetas.domain.model.plantilla.PlantillaId;
+import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
 
 public interface ServicioPlantilla {
 	// Valida el esquema de la plantilla

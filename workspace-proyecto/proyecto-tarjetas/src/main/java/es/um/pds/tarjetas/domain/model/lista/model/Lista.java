@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.lista;
+package es.um.pds.tarjetas.domain.model.lista.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,7 +8,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
-import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
 //@Entity
 public class Lista {

@@ -1,10 +1,10 @@
-package es.um.pds.tarjetas.domain.services;
+package es.um.pds.tarjetas.domain.rules;
 
 import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.Tablero;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 
 public class PoliticaListas {
 	// Validar que todas las listas que se quieran configurar como prerrequisitos existan en el tablero (R10)

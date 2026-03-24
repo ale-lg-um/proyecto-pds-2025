@@ -3,9 +3,9 @@ package es.um.pds.tarjetas.domain.ports.output;
 import java.util.List;
 import java.util.Optional;
 
-import es.um.pds.tarjetas.domain.model.lista.Lista;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 
 public interface RepositorioListas {
 

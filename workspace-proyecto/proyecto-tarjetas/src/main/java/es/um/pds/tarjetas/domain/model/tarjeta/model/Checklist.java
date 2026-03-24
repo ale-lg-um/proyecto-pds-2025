@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -2,11 +2,8 @@ package es.um.pds.tarjetas.domain.ports.input;
 
 import es.um.pds.tarjetas.application.common.Page;
 import es.um.pds.tarjetas.application.common.PageRequest;
-import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorial;
-import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorialId;
-import es.um.pds.tarjetas.domain.model.entryHistorial.TipoEntryHistorial;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
-import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 
 public interface ServicioHistorial {
 	// Generar la EntryHistorial (quizá innecesario)

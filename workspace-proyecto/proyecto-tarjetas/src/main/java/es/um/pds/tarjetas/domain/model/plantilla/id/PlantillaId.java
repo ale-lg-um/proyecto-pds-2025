@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.plantilla;
+package es.um.pds.tarjetas.domain.model.plantilla.id;
 
 import java.util.Objects;
 import java.util.UUID;

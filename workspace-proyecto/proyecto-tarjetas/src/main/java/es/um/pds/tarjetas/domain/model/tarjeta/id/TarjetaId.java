@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tarjeta.id;
 
 import java.util.Objects;
 import java.util.UUID;

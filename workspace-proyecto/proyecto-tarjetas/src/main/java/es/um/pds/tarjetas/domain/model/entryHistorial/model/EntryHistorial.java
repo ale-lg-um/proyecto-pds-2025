@@ -1,14 +1,15 @@
-package es.um.pds.tarjetas.domain.model.entryHistorial;
+package es.um.pds.tarjetas.domain.model.entryHistorial.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 import es.um.pds.tarjetas.application.common.exceptions.EntryHistorialInvalidaException;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.TableroId;
-import es.um.pds.tarjetas.domain.model.tarjeta.Etiqueta;
-import es.um.pds.tarjetas.domain.model.tarjeta.TarjetaId;
-import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
+import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
 public class EntryHistorial {
 	

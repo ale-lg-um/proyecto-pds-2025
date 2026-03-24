@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
 public class Tarea extends ContenidoTarjeta{
 	// Atributos

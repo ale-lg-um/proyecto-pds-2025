@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tablero;
+package es.um.pds.tarjetas.domain.model.tablero.model;
 
 import java.time.LocalDateTime;
 

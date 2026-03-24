@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tablero;
+package es.um.pds.tarjetas.domain.model.tablero.model;
 
 
 import java.util.Collections;
@@ -7,7 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.TableroInvalidoException;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 
 
 //@Entity

@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tablero;
+package es.um.pds.tarjetas.domain.model.tablero.id;
 
 import java.util.Objects;
 import java.util.UUID;

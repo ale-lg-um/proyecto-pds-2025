@@ -3,11 +3,11 @@ package es.um.pds.tarjetas.ui.controllers;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.tarjeta.Checklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.Etiqueta;
-import es.um.pds.tarjetas.domain.model.tarjeta.ItemChecklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.Tarea;
-import es.um.pds.tarjetas.domain.model.tarjeta.Tarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;

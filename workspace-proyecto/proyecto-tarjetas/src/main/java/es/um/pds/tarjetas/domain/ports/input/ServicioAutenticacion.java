@@ -1,6 +1,6 @@
 package es.um.pds.tarjetas.domain.ports.input;
 
-import es.um.pds.tarjetas.domain.model.usuario.UsuarioId;
+import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
 public interface ServicioAutenticacion {
 	// Envía el código de login al email del usuario

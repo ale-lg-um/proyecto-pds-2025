@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.model.tarjeta;
+package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,7 +9,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.TarjetaInvalidaException;
-import es.um.pds.tarjetas.domain.model.lista.ListaId;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
 //@Entity
 public class Tarjeta {
