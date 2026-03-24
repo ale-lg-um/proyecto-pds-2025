@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.application.usecases.historial;
+package es.um.pds.tarjetas.application.usecases;
 
 import org.springframework.stereotype.Service;
 

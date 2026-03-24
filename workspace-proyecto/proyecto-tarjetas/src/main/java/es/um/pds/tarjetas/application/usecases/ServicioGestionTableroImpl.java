@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.application.usecases.tablero;
+package es.um.pds.tarjetas.application.usecases;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorialId;
-import es.um.pds.tarjetas.application.usecases.historial.ServicioHistorialImpl;
 import es.um.pds.tarjetas.domain.model.entryHistorial.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.lista.Lista;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
