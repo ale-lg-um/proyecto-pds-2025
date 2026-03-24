@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.tarjeta;
 import java.util.Objects;
 import java.util.UUID;
 
-import es.um.pds.tarjetas.domain.exceptions.TarjetaInvalidaException;
+import es.um.pds.tarjetas.application.common.exceptions.TarjetaInvalidaException;
 
 public class TarjetaId {
 	// Atributos

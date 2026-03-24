@@ -3,12 +3,12 @@ package es.um.pds.tarjetas.domain.services;
 import java.util.List;
 import java.util.Set;
 
-import es.um.pds.tarjetas.domain.exceptions.LimiteListaSuperadoException;
-import es.um.pds.tarjetas.domain.exceptions.ListaEspecialInvalidaException;
-import es.um.pds.tarjetas.domain.exceptions.NoExisteListaEspecialException;
-import es.um.pds.tarjetas.domain.exceptions.PrerrequisitosNoCumplidosException;
-import es.um.pds.tarjetas.domain.exceptions.TableroBloqueadoException;
-import es.um.pds.tarjetas.domain.exceptions.TarjetaYaCompletadaException;
+import es.um.pds.tarjetas.application.common.exceptions.LimiteListaSuperadoException;
+import es.um.pds.tarjetas.application.common.exceptions.ListaEspecialInvalidaException;
+import es.um.pds.tarjetas.application.common.exceptions.NoExisteListaEspecialException;
+import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
+import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
+import es.um.pds.tarjetas.application.common.exceptions.TarjetaYaCompletadaException;
 import es.um.pds.tarjetas.domain.model.lista.Lista;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.EstadoBloqueo;

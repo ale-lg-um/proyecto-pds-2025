@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.entryHistorial;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import es.um.pds.tarjetas.domain.exceptions.EntryHistorialInvalidaException;
+import es.um.pds.tarjetas.application.common.exceptions.EntryHistorialInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.Etiqueta;

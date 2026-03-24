@@ -2,7 +2,7 @@ package es.um.pds.tarjetas.domain.model.plantilla;
 
 import java.util.Objects;
 
-import es.um.pds.tarjetas.domain.exceptions.PlantillaInvalidaException;
+import es.um.pds.tarjetas.application.common.exceptions.PlantillaInvalidaException;
 
 //@Entity
 public class Plantilla {

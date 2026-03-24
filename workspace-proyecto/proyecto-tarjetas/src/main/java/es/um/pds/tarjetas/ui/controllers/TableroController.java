@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.exceptions.ListaInvalidaException;
-import es.um.pds.tarjetas.domain.exceptions.TableroBloqueadoException;
+import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
+import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
 import es.um.pds.tarjetas.domain.model.lista.Lista;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 import es.um.pds.tarjetas.domain.ports.input.tablero.ServicioGestionTablero;

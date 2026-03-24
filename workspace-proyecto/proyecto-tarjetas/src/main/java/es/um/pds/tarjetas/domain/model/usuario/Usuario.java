@@ -2,7 +2,7 @@ package es.um.pds.tarjetas.domain.model.usuario;
 
 import java.util.Objects;
 
-import es.um.pds.tarjetas.domain.exceptions.UsuarioInvalidoException;
+import es.um.pds.tarjetas.application.common.exceptions.UsuarioInvalidoException;
 
 //@Entity
 public class Usuario {

@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.domain.exceptions;
+package es.um.pds.tarjetas.application.common.exceptions;
 
 public class TarjetaYaCompletadaException extends Exception {
 	// Identificador de versión para que no salga el warning

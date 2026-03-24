@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import es.um.pds.tarjetas.domain.exceptions.TableroInvalidoException;
+import es.um.pds.tarjetas.application.common.exceptions.TableroInvalidoException;
 import es.um.pds.tarjetas.domain.model.lista.ListaId;
 
 
