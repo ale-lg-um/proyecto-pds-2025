@@ -1,10 +1,7 @@
 package es.um.pds.tarjetas.ui.controllers;
 
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
 
-import ch.qos.logback.core.util.Loader;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import javafx.event.ActionEvent;
@@ -14,8 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
 
-@Controller
-@Scope("prototype")	// Le indica a Spring que se tiene que crear una lista nueva para cada columna del tablero
 public class ListaController {
 	// Atributos
 	private final ServicioGestionTablero servicioTablero;

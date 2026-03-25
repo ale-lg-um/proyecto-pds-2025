@@ -9,6 +9,7 @@ import java.util.Set;
 import es.um.pds.tarjetas.application.common.exceptions.TableroInvalidoException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
+import es.um.pds.tarjetas.domain.model.usuario.models.Usuario;
 
 
 //@Entity
@@ -19,6 +20,7 @@ public class Tablero {
 	private final String tokenUrl;					// Token de la URL que se genera del tablero
 	private final Set<ListaId> listas;				// Aquí se guardan las listas del tablero
 	private EstadoBloqueo estadoBloqueo;			// Desde, Hasta y Descripción
+	private Usuario creador;						// para lo de la lista de ids por usuario en el repositorio
 	
 	// Constructor
 	private Tablero(TableroId identificador, String nombre, String tokenUrl) {
@@ -53,6 +55,10 @@ public class Tablero {
 	
 	public String getNombre() {
 		return this.nombre;
+	}
+	
+	public Usuario getCreador() {
+		return this.creador;
 	}
 	
 	public String getTokenUrl() {

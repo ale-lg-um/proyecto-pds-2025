@@ -9,6 +9,7 @@ import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
 //@Entity
@@ -20,6 +21,7 @@ public class Lista {
 	private boolean especial;
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
+	private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
 	
 	// Constructor
 	private Lista(ListaId identificador, String nombre) {
@@ -45,6 +47,10 @@ public class Lista {
 	// Getters
 	public ListaId getIdentificador() {
 		return this.identificador;
+	}
+	
+	public Tablero getTablero() {
+		return this.tablero;
 	}
 	
 	public String getNombreLista() {

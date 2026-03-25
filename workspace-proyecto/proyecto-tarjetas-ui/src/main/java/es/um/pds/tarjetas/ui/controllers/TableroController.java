@@ -10,6 +10,8 @@ import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoExceptio
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
+import es.um.pds.tarjetas.ui.Configuracion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +24,8 @@ import javafx.scene.layout.VBox;
 @Controller
 public class TableroController {
 	// Atributos
-	private final ServicioGestionTablero servicioTablero;
+	private ServicioGestionTablero servicioTablero;
+	private RepositorioListas repoListas;
 	private final ApplicationContext contextoApp;
 	
 	@FXML private HBox contenedorListas;
@@ -39,13 +42,8 @@ public class TableroController {
 		// Se llama en bucle a instanciarListaVisual()
 		
 		System.out.println("Cargando el tablero principal...");
-		// Prueba
-		try {
-			Lista listaEjemplo = Lista.of(ListaId.of(), "Ejemplo de lista");
-			instanciarListaVisual(listaEjemplo);
-		} catch(Exception e) {
-			System.err.println("Error al cargar el tablero: " + e.getMessage());
-		}
+		this.servicioTablero = Configuracion.getInstancia().getServicioTablero();
+		this.repoListas = Configuracion.getInstancia().getRepoListas();
 	}
 	
 	@FXML
