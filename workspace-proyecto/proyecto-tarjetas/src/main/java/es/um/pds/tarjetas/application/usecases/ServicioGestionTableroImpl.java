@@ -6,10 +6,14 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import es.um.pds.tarjetas.common.events.EventBus;
 import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreado;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreadoDesdePlantilla;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
@@ -20,6 +24,7 @@ import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
 
@@ -31,16 +36,32 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
 	private final RepositorioListas repoListas;
+	private final RepositorioPlantillas repoPlantillas;
+	private final EventBus eventBus;
 	private final PoliticaTarjetas politicaTarjetas;
 	
 	// Constructor
-	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas, PoliticaTarjetas politica) {
+	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas, RepositorioPlantillas repoPlantillas, EventBus eventBus, PoliticaTarjetas politica) {
 		this.repoTableros = repoTableros;
 		this.repoListas = repoListas;
+		this.repoPlantillas = repoPlantillas;
+		this.eventBus = eventBus;
 		this.politicaTarjetas = politica;
 	}
 	
+	/**
+	 * PASOS A SEGUIR:
+	 * 1. Validar comando / argumentos
+	 * 2. Cargar agregados necesarios
+	 * 3. Ejecutar operación de dominio
+	 * 4. Persistir cambios
+	 * 5. Publicar eventos
+	 * 6. Devolver resultado
+	 */
+	
 	// Métodos heredados de la clase padre
+	
+	/*
 	@Override
 	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {	
 		// Generar id del tablero
@@ -56,6 +77,45 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 		this.repoTableros.guardar(nuevo);
 		
 		// Devolver el id del tablero creado
+		return nuevoId;
+	}
+	*/
+	
+	@Override
+	@Transactional
+	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {
+		if (cmd == null) {
+			throw new IllegalArgumentException("El comando CrearTableroCmd no puede ser null");
+		}
+
+		if (cmd.nombreTablero() == null || cmd.nombreTablero().isBlank()) {
+			throw new IllegalArgumentException("El nombre del tablero no puede estar vacío");
+		}
+
+		TableroId nuevoId = TableroId.of();
+		String tokenUrl = UUID.randomUUID().toString();
+
+		Tablero nuevoTablero = Tablero.of(nuevoId, cmd.nombreTablero(), tokenUrl);
+
+		LocalDateTime timestamp = LocalDateTime.now();
+
+		if (cmd.plantillaId() != null) {
+			Plantilla plantilla = repoPlantillas.buscarPorId(cmd.plantillaId())
+					.orElseThrow(() -> new IllegalArgumentException("No existe la plantilla indicada"));
+
+			// TODO método auxiliar o ver cómo lo hacemos
+			aplicarPlantillaAlTablero(nuevoTablero, plantilla);
+		}
+
+		repoTableros.guardar(nuevoTablero);
+
+		if (cmd.plantillaId() != null) {
+			eventBus.publicar(new TableroCreadoDesdePlantilla(nuevoId, cmd.usuarioCreador(), timestamp,
+					cmd.nombreTablero(), cmd.nombrePlantilla()));
+		} else {
+			eventBus.publicar(new TableroCreado(nuevoId, cmd.usuarioCreador(), timestamp, cmd.nombreTablero()));
+		}
+
 		return nuevoId;
 	}
 	
