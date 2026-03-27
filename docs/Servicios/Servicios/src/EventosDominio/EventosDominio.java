@@ -19,6 +19,8 @@ public class EventosDominio {
 	TarjetaCreada(tableroId, tarjetaId, listaId, actorEmail);
 	TarjetaEditada(tableroId, tarjetaId, actorEmail, 
 			contenidoAntiguo, contenidoNuevo);
+	TarjetaRenombrada(tableroId, tarjetaId, actorEmail, nombreAntiguo,
+			nombreNuevo);
 	TarjetaEliminada(tableroId, tarjetaId, listaId, actorEmail);
 	TarjetaMovida(tableroId, tarjetaId, fromListaId, toListaId, actorEmail);
 	// Realmente es mover una tarjeta a la lista especial

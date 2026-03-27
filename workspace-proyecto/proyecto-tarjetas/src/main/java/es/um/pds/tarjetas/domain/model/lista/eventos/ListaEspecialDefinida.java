@@ -12,7 +12,8 @@ public record ListaEspecialDefinida(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	String nombreLista
+	String nombreLista,
+	boolean esEspecial
 ) implements EventoDominio {
 
 }

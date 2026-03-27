@@ -2,8 +2,7 @@ package es.um.pds.tarjetas.domain.model.entryHistorial.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import java.util.List;
+import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.EntryHistorialInvalidaException;
 import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
@@ -11,6 +10,7 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.PrerrequisitoInfo;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
@@ -113,20 +113,22 @@ public class EntryHistorial {
 	// ---------- TABLEROS ----------
 	// TABLERO CREADO
 	public static EntryHistorial tableroCreado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, String nombreTablero) throws EntryHistorialInvalidaException {
 
-		return of(id, tableroId, TipoEntryHistorial.TABLERO_CREADO, usuario, timestamp, "Tablero creado");
+		return of(id, tableroId, TipoEntryHistorial.TABLERO_CREADO, usuario, timestamp,
+				"nombreTablero=" + nombreTablero);
 	}
 
 	// TABLERO CREADO DESDE PLANTILLA
 	public static EntryHistorial tableroCreadoDesdePlantilla(EntryHistorialId id, TableroId tableroId,
-			UsuarioId usuario, LocalDateTime timestamp, String nombrePlantilla) throws EntryHistorialInvalidaException {
+			UsuarioId usuario, LocalDateTime timestamp, String nombreTablero, String nombrePlantilla)
+			throws EntryHistorialInvalidaException {
 
-		String detalles = "modo=plantilla" + ", plantillaNombre=" + nombrePlantilla;
+		String detalles = "nombreTablero=" + nombreTablero + ", modo=plantilla" + ", plantillaNombre="
+				+ nombrePlantilla;
 
 		return of(id, tableroId,
-				// Usa la misma que tablero creado, aunque podría hacerse una concreta para este
-				// caso
+				// Usa la misma que tablero creado, aunque podría hacerse una concreta para este caso
 				TipoEntryHistorial.TABLERO_CREADO, usuario, timestamp, detalles);
 	}
 
@@ -216,7 +218,7 @@ public class EntryHistorial {
 
 	// PRERREQUISITOS LISTA CONFIGURADOS
 	public static EntryHistorial prerrequisitosListaConfigurados(EntryHistorialId id, TableroId tableroId,
-			UsuarioId usuario, LocalDateTime timestamp, ListaId listaId, List<PrerrequisitoInfo> prerrequisitos)
+			UsuarioId usuario, LocalDateTime timestamp, ListaId listaId, Set<PrerrequisitoInfo> prerrequisitos)
 			throws EntryHistorialInvalidaException {
 
 		String prerrequisitosStr = prerrequisitos == null || prerrequisitos.isEmpty() ? "-"
@@ -240,14 +242,24 @@ public class EntryHistorial {
 
 	// TARJETA EDITADA
 	public static EntryHistorial tarjetaEditada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, String tituloAnterior, String tituloNuevo,
-			String descripcionAnterior, String descripcionNueva) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, ContenidoTarjeta contenidoAnterior,
+			ContenidoTarjeta contenidoNuevo) throws EntryHistorialInvalidaException {
 
-		String detalles = "tarjetaId=" + tarjetaId.getId() + ", tituloAnterior=" + tituloAnterior + ", tituloNuevo="
-				+ tituloNuevo + ", descripcionAnterior=" + descripcionAnterior + ", descripcionNueva="
-				+ descripcionNueva;
+		String detalles = "tarjetaId=" + tarjetaId.getId() + ", contenidoAnterior=" + contenidoAnterior.toString()
+				+ ", contenidoNuevo=" + contenidoNuevo.toString();
 
 		return of(id, tableroId, TipoEntryHistorial.TARJETA_EDITADA, usuario, timestamp, detalles);
+	}
+
+	// TARJETA RENOMBRADA
+	public static EntryHistorial tarjetaRenombrada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
+			LocalDateTime timestamp, TarjetaId tarjetaId, String nombreAnterior, String nombreNuevo)
+			throws EntryHistorialInvalidaException {
+
+		String detalles = "tarjetaId=" + tarjetaId.getId() + ", nombreAnterior=" + nombreAnterior + ", nombreNuevo="
+				+ nombreNuevo;
+
+		return of(id, tableroId, TipoEntryHistorial.TARJETA_RENOMBRADA, usuario, timestamp, detalles);
 	}
 
 	// TARJETA ELIMINADA

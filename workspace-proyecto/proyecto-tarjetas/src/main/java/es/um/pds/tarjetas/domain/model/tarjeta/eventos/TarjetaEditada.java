@@ -15,8 +15,6 @@ public record TarjetaEditada(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	String tituloAnterior,
-	String tituloNuevo,
 	ContenidoTarjeta contenidoAnterior,
 	ContenidoTarjeta contenidoNuevo
 ) implements EventoDominio {

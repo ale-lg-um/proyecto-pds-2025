@@ -44,7 +44,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 	@Override
 	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {	
 		// Generar id del tablero
-		TableroId nuevoId = TableroId.of(); // Valor de ejemplo que devuelve un Long, se puede cambiar
+		TableroId nuevoId = TableroId.of();
 		
 		// Generar URL del tablero
 		String tokenUrl = UUID.randomUUID().toString();
