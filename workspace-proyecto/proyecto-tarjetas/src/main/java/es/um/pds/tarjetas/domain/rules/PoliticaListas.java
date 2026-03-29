@@ -2,10 +2,13 @@ package es.um.pds.tarjetas.domain.rules;
 
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 
+@Component
 public class PoliticaListas {
 	// Validar que todas las listas que se quieran configurar como prerrequisitos existan en el tablero (R10)
 	public void validarPrerrequisitosConfigurados(Tablero tablero, Set<ListaId> prerrequisitos)
