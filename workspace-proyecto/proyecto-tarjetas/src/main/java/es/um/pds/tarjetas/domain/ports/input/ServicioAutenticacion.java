@@ -1,11 +1,8 @@
 package es.um.pds.tarjetas.domain.ports.input;
 
-import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-
 public interface ServicioAutenticacion {
-	// Envía el código de login al email del usuario
-	void enviarCodigoLogin(UsuarioId email);
-	
-	// Verifica el código de login con el código enviado al usuario
-	String verificarCodigoLogin(UsuarioId email, String codigo);
+
+    void enviarCodigoLogin(String email);
+
+    String verificarCodigoLogin(String email, String codigo);
 }

@@ -22,26 +22,28 @@ public class Lista {
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
 	private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
+	private int posicionEnTablero;
 	
 	// Constructor
-	private Lista(ListaId identificador, String nombre) {
+	private Lista(ListaId identificador, String nombre, int posicionEnTablero) {
 		this.identificador = identificador;
 		this.nombreLista = nombre;
 		this.listaTarjetas = new ArrayList<>();
 		this.especial = false;	// Cuando se crea una lista aún no es especial
 		this.limite = null; // Al principio, una lista puede ser infinita
 		this.prerrequisitos = new HashSet<>();
+		this.posicionEnTablero = posicionEnTablero;
 	}
 	
 	// Método factoría
-	public static Lista of(ListaId identificador, String nombre) throws ListaInvalidaException {
+	public static Lista of(ListaId identificador, String nombre, int posicionEnTablero) throws ListaInvalidaException {
 		if (identificador == null) {
 			throw new ListaInvalidaException("La lista debe tener un identificador");
 		}
 		
 		// Permitimos que la lista no tenga nombre, no comprobamos si nombre es nulo o blanco
 		
-		return new Lista(identificador, nombre);
+		return new Lista(identificador, nombre, posicionEnTablero);
 	}
 	
 	// Getters
@@ -67,6 +69,10 @@ public class Lista {
 	
 	public Set<ListaId> getPrerrequisitos() {
 		return Collections.unmodifiableSet(prerrequisitos);
+	}
+	
+	public int getPosicionEnTablero() {
+		return this.posicionEnTablero;
 	}
 	
 	public boolean isEspecial() {

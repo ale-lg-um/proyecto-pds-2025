@@ -5,15 +5,20 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.common.events.EventBus;
 import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
+import es.um.pds.tarjetas.domain.model.lista.eventos.ListaCreada;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroBloqueado;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreado;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreadoDesdePlantilla;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroDesbloqueado;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroEditado;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
@@ -23,66 +28,46 @@ import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
+import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
-// TODO Eventos de dominio para las entries del historial
+
 // TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?
 
 @Service
-public class ServicioGestionTableroImpl implements ServicioGestionTablero{
+public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
 	private final RepositorioListas repoListas;
 	private final RepositorioPlantillas repoPlantillas;
 	private final EventBus eventBus;
 	private final PoliticaTarjetas politicaTarjetas;
-	
+
 	// Constructor
-	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas, RepositorioPlantillas repoPlantillas, EventBus eventBus, PoliticaTarjetas politica) {
+	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas,
+			RepositorioPlantillas repoPlantillas, EventBus eventBus, PoliticaTarjetas politica) {
 		this.repoTableros = repoTableros;
 		this.repoListas = repoListas;
 		this.repoPlantillas = repoPlantillas;
 		this.eventBus = eventBus;
 		this.politicaTarjetas = politica;
 	}
-	
+
 	/**
-	 * PASOS A SEGUIR:
-	 * 1. Validar comando / argumentos
-	 * 2. Cargar agregados necesarios
-	 * 3. Ejecutar operación de dominio
-	 * 4. Persistir cambios
-	 * 5. Publicar eventos
-	 * 6. Devolver resultado
+	 * PASOS A SEGUIR: 1. Validar comando / argumentos 2. Cargar agregados
+	 * necesarios 3. Ejecutar operación de dominio 4. Persistir cambios 5. Publicar
+	 * eventos 6. Devolver resultado
 	 */
-	
+
 	// Métodos heredados de la clase padre
-	
-	/*
-	@Override
-	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {	
-		// Generar id del tablero
-		TableroId nuevoId = TableroId.of();
-		
-		// Generar URL del tablero
-		String tokenUrl = UUID.randomUUID().toString();
-		
-		// Crear la entidad a partir del dominio (patrón creador)
-		Tablero nuevo = Tablero.of(nuevoId, cmd.nombreTablero(), tokenUrl);
-		
-		// Guardar el tablero
-		this.repoTableros.guardar(nuevo);
-		
-		// Devolver el id del tablero creado
-		return nuevoId;
-	}
-	*/
-	
+
 	@Override
 	@Transactional
-	public TableroId crearTablero(CrearTableroCmd cmd) throws Exception {
+	public ResultadoCrearTableroDTO crearTablero(CrearTableroCmd cmd) {
 		if (cmd == null) {
 			throw new IllegalArgumentException("El comando CrearTableroCmd no puede ser null");
 		}
@@ -97,9 +82,10 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 		Tablero nuevoTablero = Tablero.of(nuevoId, cmd.nombreTablero(), tokenUrl);
 
 		LocalDateTime timestamp = LocalDateTime.now();
+		Plantilla plantilla = null;
 
 		if (cmd.plantillaId() != null) {
-			Plantilla plantilla = repoPlantillas.buscarPorId(cmd.plantillaId())
+			plantilla = repoPlantillas.buscarPorId(cmd.plantillaId())
 					.orElseThrow(() -> new IllegalArgumentException("No existe la plantilla indicada"));
 
 			// TODO método auxiliar o ver cómo lo hacemos
@@ -108,208 +94,301 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero{
 
 		repoTableros.guardar(nuevoTablero);
 
-		if (cmd.plantillaId() != null) {
+		if (plantilla != null) {
 			eventBus.publicar(new TableroCreadoDesdePlantilla(nuevoId, cmd.usuarioCreador(), timestamp,
-					cmd.nombreTablero(), cmd.nombrePlantilla()));
+					cmd.nombreTablero(), plantilla.getNombre()));
 		} else {
 			eventBus.publicar(new TableroCreado(nuevoId, cmd.usuarioCreador(), timestamp, cmd.nombreTablero()));
 		}
 
-		return nuevoId;
+		return new ResultadoCrearTableroDTO(nuevoTablero.getIdentificador().getId(), nuevoTablero.getNombre(),
+				nuevoTablero.getTokenUrl());
 	}
-	
+
 	@Override
-	public void renombrarTablero(TableroId tablero, String nombreNuevo, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.renombrar(nombreNuevo);
-		this.repoTableros.guardar(tab);
-		
-		// TODO Evento de dominio creación de la entrada del historial
+	@Transactional
+	public void renombrarTablero(String tableroId, String nombreNuevo, String emailUsuario) {
+
+		// 1. Validaciones básicas de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (nombreNuevo == null || nombreNuevo.isBlank()) {
+			throw new IllegalArgumentException("El nuevo nombre del tablero no puede estar vacío");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		UsuarioId idUsuario = UsuarioId.of(emailUsuario);
+
+		// 3. Recuperar el agregado
+		Tablero tablero = repoTableros.buscarPorId(idTablero)
+				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+
+		// 4. Obtener datos necesarios para el evento antes del cambio
+		String nombreAnterior = tablero.getNombre();
+
+		// 5. Ejecutar la operación de lógica de dominio
+		tablero.renombrar(nombreNuevo);
+
+		// 6. Persistir cambios
+		repoTableros.guardar(tablero);
+
+		// 7. Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+
+		eventBus.publicar(new TableroEditado(idTablero, idUsuario, timestamp, nombreAnterior, nombreNuevo));
 	}
-	
+
 	@Override
-	public void eliminarTablero(TableroId tablero, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		this.repoTableros.eliminarPorId(tablero);
-		
-		// TODO Evento de dominio creación de la entrada del historial
+	@Transactional
+	public void eliminarTablero(String tableroId, String emailUsuario) {
+
+		// 1. Validaciones básicas de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		UsuarioId.of(emailUsuario);
+
+		// 3. Recuperar el agregado para comprobar que existe
+		if (repoTableros.buscarPorId(idTablero).isEmpty()) {
+			throw new IllegalArgumentException("No existe el tablero indicado");
+		}
+
+		// 4. Eliminar el tablero
+		repoTableros.eliminarPorId(idTablero);
+
+		// 5. "El historial de tablero desaparece", no se guarda entry del historial al
+		// eliminar
 	}
-	
+
 	@Override
-	public void bloquearTablero(TableroId tablero, EstadoBloqueo espec, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.bloquear(espec);
-		this.repoTableros.guardar(tab);
+	@Transactional
+	public void bloquearTablero(String tableroId, LocalDateTime desde, LocalDateTime hasta, String motivo,
+			String emailUsuario) {
+
+		// 1. Validaciones de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (desde == null) {
+			throw new IllegalArgumentException("La fecha de inicio del bloqueo no puede ser null");
+		}
+
+		if (hasta == null) {
+			throw new IllegalArgumentException("La fecha de fin del bloqueo no puede ser null");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+		}
+
+		if (hasta.isBefore(desde)) {
+			throw new IllegalArgumentException(
+					"La fecha de fin del bloqueo no puede ser anterior a la fecha de inicio");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		UsuarioId usuarioId = UsuarioId.of(emailUsuario);
+		EstadoBloqueo estadoBloqueo = new EstadoBloqueo(desde, hasta, motivo);
+
+		// 3. Recuperar agregado
+		Tablero tablero = repoTableros.buscarPorId(idTablero)
+				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+
+		// 4. Aplicar lógica de dominio
+		tablero.bloquear(estadoBloqueo);
+
+		// 5. Persistir cambios
+		repoTableros.guardar(tablero);
+
+		// 6. Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+
+		eventBus.publicar(new TableroBloqueado(idTablero, usuarioId, timestamp, motivo));
 	}
-	
+
 	@Override
-	public void desbloquearTablero(TableroId tablero, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.desbloquear();
-		this.repoTableros.guardar(tab);
+	@Transactional
+	public void desbloquearTablero(String tableroId, String emailUsuario) {
+
+	    // 1. Validaciones de frontera
+	    if (tableroId == null || tableroId.isBlank()) {
+	        throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+	    }
+
+	    if (emailUsuario == null || emailUsuario.isBlank()) {
+	        throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+	    }
+
+	    // 2. Construcción de objetos del dominio
+	    TableroId idTablero = TableroId.of(tableroId);
+	    UsuarioId usuarioId = UsuarioId.of(emailUsuario);
+
+	    // 3. Recuperar agregado
+	    Tablero tablero = repoTableros.buscarPorId(idTablero)
+	            .orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+
+	    // 4. Aplicar lógica de dominio
+	    tablero.desbloquear();
+
+	    // 5. Persistir cambios
+	    repoTableros.guardar(tablero);
+
+	    // 6. Publicar evento de dominio
+	    LocalDateTime timestamp = LocalDateTime.now();
+
+	    eventBus.publicar(new TableroDesbloqueado(
+	            idTablero,
+	            usuarioId,
+	            timestamp
+	    ));
 	}
+
 	
-	// TODO
+	// TODO Hacer regla en PoliticaListas para que sea lista con nombre único y integrar la regla de negocio en este método
 	@Override
-	public ListaId crearLista(TableroId tablero, String nombre, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		ListaId nuevaLista = ListaId.of();
-		tab.anadirLista(nuevaLista);
-		this.repoListas.guardar();
-		return nuevaLista;
+	@Transactional
+	public ListaDTO crearLista(String tableroId, String nombre, String emailUsuario) {
+
+		// 1. Validaciones de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (nombre == null || nombre.isBlank()) {
+			throw new IllegalArgumentException("El nombre de la lista no puede estar vacío");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		UsuarioId usuarioId = UsuarioId.of(emailUsuario);
+		ListaId nuevaListaId = ListaId.of();
+
+		// 3. Recuperar agregado raíz
+		Tablero tablero = repoTableros.buscarPorId(idTablero)
+				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+
+		// 4. Crear la lista y delegar la lógica al dominio
+
+		int posicion = tablero.getListas().size() + 1;
+
+		Lista nuevaLista = Lista.of(nuevaListaId, nombre, posicion);
+
+		tablero.anadirLista(nuevaListaId);
+
+		// Posición es donde se acaba de meter la lista
+
+		// 5. Persistir cambios
+		repoListas.guardar(nuevaLista);
+		repoTableros.guardar(tablero);
+
+		// 6. Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+
+		eventBus.publicar(new ListaCreada(nuevaListaId, idTablero, usuarioId, timestamp, nombre, posicion));
+
+		// 7. Devolver DTO de salida
+		return new ListaDTO(nuevaLista);
 	}
-	
+
 	@Override
-	public void renombrarLista(TableroId tablero, ListaId lista, String nombreNuevo, String emailUsuario) throws Exception {
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		Lista lis = this.repoListas.buscarPorId(lista)
-				.orElseThrow(() -> new Exception("Lista no encontrada"));
-		
-		lis.renombrar(nombreNuevo); // Lo tengo que hacer llamando a Lista, que es la raíz del agregado
-		this.repoListas.guardar(lis);
+	public void renombrarLista(String tableroId, String listaId, String nuevoNombre, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
-	// TODO
+
 	@Override
-	public void eliminarLista(TableroId tablero, ListaId lista, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.eliminarLista(lista, user);
-		this.repoTableros.guardar(tab);
+	public void eliminarLista(String tableroId, String listaId, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
-	/**
-	 * Marca una lista en el tablero como especial. Solo puede haber una lista especial en el tablero
-	 * La lista que se declare como especial no puede tener límite N configurado. Si lo tenía de antes, el límite
-	 * N se suprimirá. Sí que puede tener prerrequisitos de haber pasado por otras listas
-	 */
+
 	@Override
-	public void definirListaEspecial(TableroId tablero, ListaId lista, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.definirListaEspecial(lista, user);
-		this.repoTableros.guardar(tab);
+	public void definirListaEspecial(String tableroId, String listaId, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void configurarLimiteLista(TableroId tablero, ListaId lista, int limite, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.configurarLimiteLista(lista, limite, user);
-		this.repoTableros.guardar(tab);
+	public void configurarLimiteLista(String tableroId, String listaId, int limite, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void configurarPrerrequisitosLista(TableroId tablero, ListaId lista, List<ListaId> prerrequisitos, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.configurarPrerrequisitosLista(lista, prerrequisitos, user);
-		this.repoTableros.guardar(tab);
+	public void configurarPrerrequisitosLista(String tableroId, String listaId, List<String> prerrequisitoIds,
+			String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public TarjetaId crearTarjeta(TableroId tablero, ListaId lista, ContenidoTarjeta contenido, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		politicaTarjetas.validarCreacion(tab, lista);
-		TarjetaId nueva = TarjetaId.of(System.currentTimeMillis());
-		
-		tab.anadirTarjetaALista(lista, nueva, contenido, user);
-		repoTableros.guardar(tab);
-		return nueva;
+	public TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario) {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
+
 	@Override
-	public void editarTarjeta(TableroId tablero, TarjetaId tarjeta, ContenidoTarjeta nuevoCont, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.editarTarjeta(tarjeta, nuevoCont, user);
-		repoTableros.guardar(tab);
+	public void editarTarjeta(String tableroId, String tarjetaId, TarjetaDTO tarjetaActualizada, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void eliminarTarjeta(TableroId tablero, TarjetaId tarjeta, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.eliminarTarjeta(tarjeta, user);
-		repoTableros.guardar(tab);
+	public void eliminarTarjeta(String tableroId, String tarjetaId, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void moverTarjeta(TableroId tablero, TarjetaId tarjeta, ListaId lista, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		politicaTarjetas.validarMovimiento(tab, tarjeta, lista);
-		tab.moverTarjeta(tarjeta, lista, user);
-		repoTableros.guardar(tab);
+	public void moverTarjeta(String tableroId, String tarjetaId, String listaDestinoId, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void completarTarjeta(TableroId tablero, TarjetaId tarjeta, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		politicaTarjetas.validarCompletar(tab, tarjeta);
-		tab.completarTarjeta(tarjeta, user);
-		repoTableros.guardar(tab);
+	public void completarTarjeta(String tableroId, String tarjetaId, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void addEtiquetaATarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.addEtiqueta(tarjeta, nombre, color, user);
-		repoTableros.guardar(tab);
+	public void addEtiquetaATarjeta(String tableroId, String tarjetaId, String nombre, String color,
+			String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void eliminarEtiquetaDeTarjeta(TableroId tablero, TarjetaId tarjeta, String nombre, String color, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.eliminarEtiqueta(tarjeta, nombre, color, user);
-		repoTableros.guardar(tab);
+	public void eliminarEtiquetaDeTarjeta(String tableroId, String tarjetaId, String nombre, String color,
+			String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
-	
+
 	@Override
-	public void modificarEtiquetaEnTarjeta(TableroId tablero, TarjetaId tarjeta, String nombreOld, String colorOld, String nombreNuevo, String colorNuevo, String emailUsuario) throws Exception {
-		UsuarioId user = UsuarioId.of(emailUsuario);
-		Tablero tab = this.repoTableros.buscarPorId(tablero)
-				.orElseThrow(() -> new Exception("Tablero no encontrado"));
-		
-		tab.modificarEtiqueta(tarjeta, nombreOld, colorOld, nombreNuevo, colorNuevo, user);
-		repoTableros.guardar(tab);
+	public void modificarEtiquetaEnTarjeta(String tableroId, String tarjetaId, String nombreOld, String colorOld,
+			String nombreNuevo, String colorNuevo, String emailUsuario) {
+		// TODO Auto-generated method stub
+
 	}
 }

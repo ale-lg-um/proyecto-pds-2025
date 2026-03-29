@@ -26,16 +26,16 @@ import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaEditada;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaEliminada;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaMovida;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaRenombrada;
-import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
 
 
 @Component
 public class ManejadorEventosHistorial {
 
-	private final ServicioHistorial servicioHistorial;
+	private final RepositorioEntryHistorial repoHistorial;
 
-	public ManejadorEventosHistorial(ServicioHistorial servicioHistorial) {
-		this.servicioHistorial = servicioHistorial;
+	public ManejadorEventosHistorial(RepositorioEntryHistorial repoHistorial) {
+		this.repoHistorial = repoHistorial;
 	}
 
 	// ---------- TABLEROS ----------
@@ -45,7 +45,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroCreado(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.nombreTablero());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroCreado", e);
 		}
@@ -57,7 +57,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroCreadoDesdePlantilla(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.nombreTablero(), evento.nombrePlantilla());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroCreadoDesdePlantilla", e);
 		}
@@ -69,7 +69,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroEditado(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.nombreAnterior(), evento.nombreNuevo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroEditado", e);
 		}
@@ -81,7 +81,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroEliminado(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroEliminado", e);
 		}
@@ -93,7 +93,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroBloqueado(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.motivo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroBloqueado", e);
 		}
@@ -105,7 +105,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tableroDesbloqueado(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TableroDesbloqueado", e);
 		}
@@ -118,7 +118,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.listaCreada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreLista());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para ListaCreada", e);
 		}
@@ -131,7 +131,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreAnterior(),
 					evento.nombreNuevo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para ListaEditada", e);
 		}
@@ -143,7 +143,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.listaEliminada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreLista());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para ListaEliminada", e);
 		}
@@ -156,7 +156,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.limiteAnterior(),
 					evento.limiteNuevo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para LimiteListaConfigurado", e);
 		}
@@ -168,7 +168,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.listaEspecialDefinida(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.esEspecial());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para ListaEspecialDefinida", e);
 		}
@@ -181,7 +181,7 @@ public class ManejadorEventosHistorial {
 					evento.tableroId(), evento.usuarioId(), evento.timestamp(), evento.listaId(),
 					evento.prerrequisitos());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para PrerrequisitosListaConfigurados",
 					e);
@@ -195,7 +195,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tarjetaCreada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaCreada", e);
 		}
@@ -208,7 +208,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.contenidoAnterior(),
 					evento.contenidoNuevo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaEditada", e);
 		}
@@ -221,7 +221,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.nombreAnterior(),
 					evento.nombreNuevo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaRenombrada", e);
 		}
@@ -233,7 +233,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tarjetaEliminada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId(), evento.titulo());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaEliminada", e);
 		}
@@ -245,7 +245,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tarjetaCompletada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId(), evento.completada());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaCompletada", e);
 		}
@@ -258,7 +258,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaOrigenId(),
 					evento.listaDestinoId());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al registrar entrada del historial para TarjetaMovida", e);
 		}
@@ -270,7 +270,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.tarjetaEtiquetada(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiqueta());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al añadir etiqueta a tarjeta", e);
 		}
@@ -282,7 +282,7 @@ public class ManejadorEventosHistorial {
 			EntryHistorial entry = EntryHistorial.etiquetaEliminadaDeTarjeta(EntryHistorialId.of(), evento.tableroId(),
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiqueta());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al eliminar etiqueta de tarjeta", e);
 		}
@@ -295,7 +295,7 @@ public class ManejadorEventosHistorial {
 					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiquetaAnterior(),
 					evento.etiquetaNueva());
 
-			servicioHistorial.append(entry);
+			repoHistorial.guardar(entry);
 		} catch (Exception e) {
 			throw new RuntimeException("Error al eliminar etiqueta de tarjeta", e);
 		}
