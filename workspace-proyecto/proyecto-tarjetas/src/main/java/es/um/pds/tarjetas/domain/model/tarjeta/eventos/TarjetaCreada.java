@@ -14,7 +14,8 @@ public record TarjetaCreada(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	String titulo
+	String titulo,
+	int posicion
 ) implements EventoDominio {
 
 }

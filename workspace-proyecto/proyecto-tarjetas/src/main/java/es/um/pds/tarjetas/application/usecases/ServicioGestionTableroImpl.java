@@ -22,8 +22,10 @@ import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroEditado;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaCreada;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
@@ -34,6 +36,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
 import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
 
 // TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?
@@ -342,9 +345,57 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 	}
 
 	@Override
+	@Transactional
 	public TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO Auto-generated method 
+		// 1. Validaciones de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (listaId == null || listaId.isBlank()) {
+			throw new IllegalArgumentException("El nombre de la lista no puede estar vacío");
+		}
+		
+		if(tarjeta == null) {
+			throw new IllegalArgumentException("La tarjeta no puede ser null");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede estar vacío");
+		}
+		
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		ListaId idLista = ListaId.of(listaId);
+		UsuarioId usuarioId = UsuarioId.of(emailUsuario);
+		TarjetaId nuevaTarjetaId = TarjetaId.of();
+		
+		// 3. Recuperar agregados
+		Tablero tablero = repoTableros.buscarPorId(idTablero)
+				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+		
+		Lista lista = repoListas.buscarPorId(idLista)
+				.orElseThrow(() -> new IllegalArgumentException("No existe la lista indicada"));
+		
+		// 4. Crear la tarjeta y delegar la lógica al dominio
+		int posicion = lista.getListaTarjetas().size() + 1;
+		
+		ContenidoTarjeta contenido = tarjeta.contenido().toDomain();
+		
+		Tarjeta nuevaTarjeta = Tarjeta.of(nuevaTarjetaId, tarjeta.titulo(), idLista, posicion, contenido);
+		
+		lista.anadirTarjeta(nuevaTarjetaId);
+		
+		// 5. Persistir cambios
+		repoListas.guardar(lista);
+		
+		// 6. Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+		eventBus.publicar(new TarjetaCreada(nuevaTarjetaId, idLista, idTablero, usuarioId, timestamp, tarjeta.titulo(), posicion));
+		
+		// 7. devolver DTO de salida
+		return new TarjetaDTO(nuevaTarjeta);
 	}
 
 	@Override

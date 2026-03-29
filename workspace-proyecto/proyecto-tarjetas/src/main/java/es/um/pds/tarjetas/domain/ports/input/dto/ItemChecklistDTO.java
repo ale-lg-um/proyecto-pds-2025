@@ -6,4 +6,8 @@ public record ItemChecklistDTO(String descripcion, boolean completado) {
 	public ItemChecklistDTO(ItemChecklist item) {
 		this(item.getDescripcion(), item.isCompletado());
 	}
+	
+	public ItemChecklist toDomain() {
+		return ItemChecklist.of(this.descripcion);
+	}
 }

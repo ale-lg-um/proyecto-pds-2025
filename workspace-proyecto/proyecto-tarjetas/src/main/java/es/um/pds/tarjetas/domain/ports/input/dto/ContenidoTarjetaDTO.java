@@ -23,4 +23,14 @@ public sealed interface ContenidoTarjetaDTO permits TareaDTO, ChecklistDTO {
 		throw new IllegalArgumentException("Tipo de contenido de tarjeta no soportado: "
 				+ (contenido == null ? "null" : contenido.getClass().getName()));
 	}
+	
+	default ContenidoTarjeta toDomain() throws Exception {
+		if(this instanceof TareaDTO tareaDTO) {
+			return tareaDTO.toDomain();
+		} else if(this instanceof ChecklistDTO checklistDTO) {
+			return checklistDTO.toDomain();
+		} else {
+			throw new IllegalArgumentException("Tipo de contenido DTO no soportado");
+		}
+	}
 }

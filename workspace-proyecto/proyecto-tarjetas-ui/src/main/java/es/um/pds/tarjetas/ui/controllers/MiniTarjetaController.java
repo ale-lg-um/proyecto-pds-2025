@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
+import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,7 +25,7 @@ import javafx.stage.Stage;
 public class MiniTarjetaController {
 	// Atributos
 	private final ApplicationContext contextoApp;
-	private Tarjeta tarjetaDominio;
+	private TarjetaDTO tarjetaDominio;
 	
 	@FXML private Label lblTitulo;
 	@FXML private Label lblIconoTipo;
@@ -33,13 +36,13 @@ public class MiniTarjetaController {
 	}
 	
 	// Inyectar datos reales
-	public void configurarMinitarjeta(Tarjeta tarjeta) {
+	public void configurarMiniTarjeta(TarjetaDTO tarjeta) {
 		this.tarjetaDominio = tarjeta;
-		this.lblTitulo.setText(tarjeta.getTitulo());
+		this.lblTitulo.setText(tarjeta.titulo());
 		
-		if(tarjeta.getContenido() instanceof Tarea) {
+		if(tarjeta.contenido() instanceof TareaDTO) {
 			this.lblIconoTipo.setText("📝: Tarea");
-		} else if(tarjeta.getContenido() instanceof Checklist) {
+		} else if(tarjeta.contenido() instanceof ChecklistDTO) {
 			this.lblIconoTipo.setText("☑: Checklist");
 		}
 		
@@ -49,7 +52,7 @@ public class MiniTarjetaController {
 	// Al hacer clic en la tarjeta
 	@FXML
 	public void accionAbrirDetalle(MouseEvent evento) {
-		System.out.println("Abriendo detalle de la tarjeta: " + tarjetaDominio.getIdentificador());
+		System.out.println("Abriendo detalle de la tarjeta: " + tarjetaDominio.titulo());
 		try {
 			// Cargar vista de Tarjeta
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/TarjetaView.fxml"));
@@ -64,10 +67,12 @@ public class MiniTarjetaController {
 			
 			// Crear ventana
 			Stage ventana = new Stage();
-			ventana.setTitle("Detalle de la tarjeta: " + tarjetaDominio.getTitulo());
+			ventana.setTitle("Detalle de la tarjeta: " + tarjetaDominio.titulo());
 			
 			// Bloquear la ventana del tablero hasta que se cierre la de la tarjeta
 			ventana.initModality(Modality.APPLICATION_MODAL);
+			ventana.setWidth(700);
+			ventana.setHeight(500);
 			
 			// Por si queremos que no se peuda redimensionar la ventana
 			// ventana.setResizeable(false);

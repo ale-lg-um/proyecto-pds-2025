@@ -1,14 +1,21 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.VBox;
@@ -20,6 +27,7 @@ public class ListaController {
 	private final ServicioGestionTablero servicioTablero;
 	private final ApplicationContext contextoApp;
 	private Lista listaDominio;		// Entidad real
+	private String tableroId;
 	
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
@@ -54,9 +62,12 @@ public class ListaController {
 		
 		dialogo.showAndWait().ifPresent(titulo -> {
 			try {
-				// Llamar al dominio... por implementar...
-				
 				System.out.println("Creando tarjeta: " + titulo);
+				
+				TarjetaDTO tarjetaDTO = new TarjetaDTO(null, titulo, null, listaDominio.getIdentificador().getId(), 0, new TareaDTO(""), List.of(), Set.of());
+				
+				// CAMBIAR: tenemos que detectar al usuario que está con la sesión iniciada
+				TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.getIdentificador().getId(), tarjetaDTO, "usuario@ejemplo.com");
 				
 				// cargar el FXML del post-it con Spring
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MiniTarjetaView.fxml"));
@@ -66,13 +77,24 @@ public class ListaController {
 				
 				// pasar datos a post-it
 				MiniTarjetaController controlador = loader.getController();
-				//controlador.configurarMiniTarjeta(nuevaTarjeta);
+				controlador.configurarMiniTarjeta(nuevaTarjeta);
 				
 				// Inyectar en la lista
 				contenedorTarjetas.getChildren().add(nodoTarjeta);
+				
+				System.out.println("TARJETA AÑADIDA");
 			} catch(Exception e) {
 				e.printStackTrace();
+				mostrarError("Error", "No se pudo crear la tarjeta: " +  e.getMessage());
 			}
 		});
+	}
+	
+	private void mostrarError(String titulo, String mensaje) {
+		Alert alerta = new Alert(AlertType.ERROR);
+		alerta.setTitle(titulo);
+		alerta.setHeaderText(null);
+		alerta.setContentText(mensaje);
+		alerta.showAndWait();
 	}
 }
