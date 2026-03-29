@@ -9,6 +9,7 @@ import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 //import es.um.pds.tarjetas.ui.Configuracion;
@@ -27,6 +28,9 @@ public class TableroController {
 	private final ServicioGestionTablero servicioTablero;
 	private final RepositorioListas repoListas;
 	private final ApplicationContext contextoApp;
+	private int nListas = 0;
+	
+	private TableroId actual;
 	
 	@FXML private HBox contenedorListas;
 	
@@ -62,6 +66,12 @@ public class TableroController {
 				// Pintar la lista en panalla
 				System.out.println("Creando la lista: " + nombre);
 				// instanciarListaVisual(nuevaLista)
+				this.nListas = this.nListas + 1;
+				ListaId listaId = ListaId.of();
+				Lista nueva = Lista.of(listaId, nombre, nListas);
+				
+				repoListas.guardar(nueva);
+				instanciarListaVisual(nueva);
 			} catch(Exception e) {
 				if(e instanceof TableroBloqueadoException) {
 					mostrarError("Tablero bloqueado", "El tablero está bloqueado.");
@@ -77,6 +87,7 @@ public class TableroController {
 	// Fusión de JavaFX con Spring
 	private void instanciarListaVisual(Lista lista) {
 		try {
+			System.out.println("Cargando vista de lista: " + lista.getNombreLista());
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ListaView.fxml"));
 			
 			// JavaFX pide a Spring los controladores
