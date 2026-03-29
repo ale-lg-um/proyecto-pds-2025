@@ -27,7 +27,6 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
-
 // TODO Eventos de dominio para las entries del historial
 // TODO ¿Detalles relevantes para la entry del historial extraerlos aquí? ¿Timestamp dónde se genera? ¿Detalles?
 
