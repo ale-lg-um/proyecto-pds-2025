@@ -11,7 +11,7 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
-import es.um.pds.tarjetas.ui.Configuracion;
+//import es.um.pds.tarjetas.ui.Configuracion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,15 +24,16 @@ import javafx.scene.layout.VBox;
 @Controller
 public class TableroController {
 	// Atributos
-	private ServicioGestionTablero servicioTablero;
-	private RepositorioListas repoListas;
+	private final ServicioGestionTablero servicioTablero;
+	private final RepositorioListas repoListas;
 	private final ApplicationContext contextoApp;
 	
 	@FXML private HBox contenedorListas;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioGestionTablero servicioTablero, ApplicationContext contextoApp) {
+	public TableroController(ServicioGestionTablero servicioTablero, RepositorioListas repoListas, ApplicationContext contextoApp) {
 		this.servicioTablero = servicioTablero;
+		this.repoListas = repoListas;
 		this.contextoApp = contextoApp;
 	}
 	
@@ -42,8 +43,8 @@ public class TableroController {
 		// Se llama en bucle a instanciarListaVisual()
 		
 		System.out.println("Cargando el tablero principal...");
-		this.servicioTablero = Configuracion.getInstancia().getServicioTablero();
-		this.repoListas = Configuracion.getInstancia().getRepoListas();
+		//this.servicioTablero = Configuracion.getInstancia().getServicioTablero();
+		//this.repoListas = Configuracion.getInstancia().getRepoListas();
 	}
 	
 	@FXML

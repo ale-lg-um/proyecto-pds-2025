@@ -2,6 +2,8 @@ package es.um.pds.tarjetas.ui.controllers;
 
 import java.io.IOException;
 
+import org.springframework.context.ApplicationContext;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,6 +13,11 @@ public class SceneManager {
 	// Atributos
 	private Stage stage;
 	private Scene actual;
+	private final ApplicationContext contextoSpring;
+	
+	public SceneManager(ApplicationContext contexto) {
+		this.contextoSpring = contexto;
+	}
 	
 	public void inicializar(Stage stage) {
 		this.stage = stage;
@@ -21,23 +28,40 @@ public class SceneManager {
 	}
 	
 	private void cargarYMostrar(String vista) {
-		try {
-			Parent root = loadFXML(vista);
-			if(actual == null) {
-				actual = new Scene(root, 1200, 1700);
-				stage.setScene(actual);
-				stage.setTitle("Tablero");
-				stage.show();
-			} else {
-				actual.setRoot(root);
-			}
-		} catch(IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	private Parent loadFXML(String vista)throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/" + vista + ".fxml"));
-		return loader.load();
+	    try {
+	        String rutaCompleta = "/views/" + vista + ".fxml";
+	        System.out.println("Intentando cargar: " + rutaCompleta);
+	        
+	        // Verificar que el recurso existe
+	        var recurso = getClass().getResource(rutaCompleta);
+	        if (recurso == null) {
+	            System.err.println("❌ ARCHIVO NO ENCONTRADO: " + rutaCompleta);
+	            System.err.println("Ruta absoluta esperada: " + getClass().getResource("/views/").getPath());
+	            throw new RuntimeException("El archivo FXML no existe: " + rutaCompleta);
+	        }
+	        
+	        System.out.println("✅ Archivo encontrado: " + recurso);
+	        
+	        FXMLLoader loader = new FXMLLoader(recurso);
+	        loader.setControllerFactory(contextoSpring::getBean);
+	        
+	        System.out.println("Cargando controlador...");
+	        Parent root = loader.load();
+	        System.out.println("✅ FXML cargado correctamente");
+	        
+	        if(actual == null) {
+	            actual = new Scene(root, 1200, 700);
+	            stage.setScene(actual);
+	            stage.setTitle("Gestor de Tableros");
+	            stage.show();
+	        } else {
+	            actual.setRoot(root);
+	        }
+	        
+	    } catch(Exception e) {
+	        System.err.println("❌ Error al cargar la vista: " + vista);
+	        e.printStackTrace();
+	        throw new RuntimeException(e);
+	    }
 	}
 }

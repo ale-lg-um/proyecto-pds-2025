@@ -3,6 +3,8 @@ package es.um.pds.tarjetas.domain.rules;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import es.um.pds.tarjetas.application.common.exceptions.LimiteListaSuperadoException;
 import es.um.pds.tarjetas.application.common.exceptions.ListaEspecialInvalidaException;
 import es.um.pds.tarjetas.application.common.exceptions.NoExisteListaEspecialException;
@@ -15,6 +17,7 @@ import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 
+@Component
 public class PoliticaTarjetas {
 	
 	// Para acceder a los tableros, listas y tarjetas llamaremos en la implementación de los servicios de aplicación

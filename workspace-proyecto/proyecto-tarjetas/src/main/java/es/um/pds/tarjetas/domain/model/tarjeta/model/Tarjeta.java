@@ -10,6 +10,7 @@ import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.TarjetaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
 //@Entity
@@ -19,6 +20,7 @@ public class Tarjeta {
 	private String titulo;					
 	private final LocalDate fechaCreacion;
 	private ListaId listaActual;
+	private TableroId tablero;
 	private int posicionEnLista;
 	private final ContenidoTarjeta contenido;	// Puede ser una Tarea o un Checklist
 	private final List<Etiqueta> etiquetas;		// Lista de etiquetas de la tarjeta (puede haber repetidas)
@@ -80,6 +82,10 @@ public class Tarjeta {
 	
 	public ListaId getListaActual() {
 		return this.listaActual;
+	}
+	
+	public TableroId getTablero() {
+		return this.tablero;
 	}
 	
 	public int getPosicionEnLista() {
