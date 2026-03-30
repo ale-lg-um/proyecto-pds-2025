@@ -13,7 +13,8 @@ public record LimiteListaConfigurado(
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
 	Integer limiteAnterior,
-	Integer limiteNuevo
+	Integer limiteNuevo,
+	String nombreLista
 ) implements EventoDominio {
 
 }

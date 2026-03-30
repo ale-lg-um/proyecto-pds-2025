@@ -15,7 +15,8 @@ public record EtiquetaAnadidaATarjeta(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	Etiqueta etiqueta
+	Etiqueta etiqueta,
+	String nombreTarjeta
 ) implements EventoDominio {
 
 }

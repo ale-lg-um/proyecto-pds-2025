@@ -14,7 +14,8 @@ public record PrerrequisitosListaConfigurados(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	Set<PrerrequisitoInfo> prerrequisitos
+	Set<PrerrequisitoInfo> prerrequisitos,
+	String nombreLista
 ) implements EventoDominio {
 
 }

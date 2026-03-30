@@ -14,7 +14,8 @@ public record TarjetaMovida(
 	ListaId listaDestinoId,
 	TableroId tableroId,
 	UsuarioId usuarioId,
-	LocalDateTime timestamp
+	LocalDateTime timestamp,
+	String nombreTarjeta
 ) implements EventoDominio {
 
 }

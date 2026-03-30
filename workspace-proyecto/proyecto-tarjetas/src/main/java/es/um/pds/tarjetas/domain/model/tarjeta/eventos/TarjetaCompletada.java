@@ -14,7 +14,7 @@ public record TarjetaCompletada(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	boolean completada
+	String nombreTarjeta
 ) implements EventoDominio {
 
 }

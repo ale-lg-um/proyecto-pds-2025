@@ -21,27 +21,26 @@ public class Tarjeta {
 	private final LocalDate fechaCreacion;
 	private ListaId listaActual;
 	private TableroId tablero;
-	private int posicionEnLista;
-	private final ContenidoTarjeta contenido;	// Puede ser una Tarea o un Checklist
+	//private int posicionEnLista;				Se puede obtener viendo List<TarjetaId> en Lista
+	private ContenidoTarjeta contenido;			// Puede ser una Tarea o un Checklist
 	private final List<Etiqueta> etiquetas;		// Lista de etiquetas de la tarjeta (puede haber repetidas)
 	private final Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta
 	
 	// Constructor
-	private Tarjeta(TarjetaId identificador, String titulo, ListaId listaActual, int posicionEnLista, ContenidoTarjeta contenido) {
+	private Tarjeta(TarjetaId identificador, String titulo, ListaId listaActual, ContenidoTarjeta contenido) {
 		this.identificador = identificador;
 		this.titulo = titulo;
 		this.fechaCreacion = LocalDate.now();
 		this.listaActual = listaActual;
-		this.posicionEnLista = posicionEnLista;
 		this.contenido = contenido;
-		this.etiquetas = new ArrayList<Etiqueta>();
-		this.listasVisitadas = new HashSet<ListaId>();
+		this.etiquetas = new ArrayList<>();
+		this.listasVisitadas = new HashSet<>();
 		
 		this.listasVisitadas.add(listaActual);
 	}
 	
 	// Método 'of' aplicando patrón creador y método factoría
-	public static Tarjeta of(TarjetaId identificador, String titulo, ListaId listaActual, int posicionEnLista, ContenidoTarjeta contenido) throws TarjetaInvalidaException {
+	public static Tarjeta of(TarjetaId identificador, String titulo, ListaId listaActual, ContenidoTarjeta contenido) throws TarjetaInvalidaException {
         if (identificador == null) {
             throw new TarjetaInvalidaException("La tarjeta debe tener un identificador");
         }
@@ -56,15 +55,11 @@ public class Tarjeta {
         	throw new TarjetaInvalidaException("La tarjeta tiene que ser creada dentro de una lista");
         }
         
-        if (posicionEnLista < 0) {
-        	throw new TarjetaInvalidaException("La posición de la tarjeta no puede ser negativa");
-        }
-        
         if (!(contenido instanceof Tarea) && !(contenido instanceof Checklist)) {
             throw new TarjetaInvalidaException("El contenido de la tarjeta debe ser una TAREA o una CHECKLIST.");
         }
          
-        return new Tarjeta(identificador, titulo, listaActual, posicionEnLista, contenido);
+        return new Tarjeta(identificador, titulo, listaActual, contenido);
     }
 	
 	// Getters
@@ -86,10 +81,6 @@ public class Tarjeta {
 	
 	public TableroId getTablero() {
 		return this.tablero;
-	}
-	
-	public int getPosicionEnLista() {
-		return this.posicionEnLista;
 	}
 	
 	public ContenidoTarjeta getContenido() {
@@ -127,11 +118,13 @@ public class Tarjeta {
 		this.listasVisitadas.add(nuevaLista);
 	}
 	
+	/*
 	// El servicio de aplicación debe llamar a este método después de haber reorganizado el resto de tarjetas dentro de la lista
     public void cambiarPosicionEnLista(int nuevaPosicion) {
         if (nuevaPosicion < 0) throw new IllegalArgumentException("La posición no puede ser negativa");
         this.posicionEnLista = nuevaPosicion;
     }
+    */
 	
 	public void anadirEtiqueta(Etiqueta nueva) {
 		if (nueva == null) {
@@ -154,6 +147,14 @@ public class Tarjeta {
 	
 	public void cambiarTitulo(String nuevoTitulo) {
 		titulo = nuevoTitulo;
+	}
+	
+	public void editarContenido(ContenidoTarjeta nuevoContenido) {
+		if (nuevoContenido == null) {
+			throw new IllegalArgumentException("El nuevo contenido no puede ser nulo");
+		}
+		
+		this.contenido = nuevoContenido;
 	}
     
     /** Operaciones como servicios de aplicación orquestadores:

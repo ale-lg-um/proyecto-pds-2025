@@ -12,8 +12,7 @@ public record ListaCreada(
 	TableroId tableroId,
 	UsuarioId usuarioId,
 	LocalDateTime timestamp,
-	String nombreLista,
-	int posicion
+	String nombreLista
 ) implements EventoDominio {
 
 }

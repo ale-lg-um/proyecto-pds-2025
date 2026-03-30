@@ -29,7 +29,7 @@ public class Tarea extends ContenidoTarjeta{
 	
 
 	@Override
-	public TipoContenido getTipo() {
-		return ContenidoTarjeta.TipoContenido.TAREA;
+	public TipoContenidoTarjeta getTipo() {
+		return TipoContenidoTarjeta.TAREA;
 	}
 }

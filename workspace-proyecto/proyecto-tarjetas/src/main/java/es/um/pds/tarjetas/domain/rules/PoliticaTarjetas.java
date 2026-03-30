@@ -132,7 +132,10 @@ public class PoliticaTarjetas {
 		validarPrerrequisitos(tarjeta, listaDestino);	
 	}
 	
-	// Comprobar que la tarjeta no esté ya en la lista especial
+	// Este método comprueba:
+	// - que exista una única lista especial
+	// - que la tarjeta no esté ya completada
+	// - que se cumplan los prerrequisitos para entrar en la lista especial
 	public void validarCompletar(Set<Lista> listasTablero, Tarjeta tarjeta) {
 		
 		if (listasTablero == null) {

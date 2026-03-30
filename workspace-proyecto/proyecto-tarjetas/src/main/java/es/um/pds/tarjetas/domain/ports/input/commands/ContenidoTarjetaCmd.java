@@ -4,7 +4,7 @@ import java.util.List;
 
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 
-public record CrearTarjetaCmd(String titulo, TipoContenidoTarjeta tipoContenido, String descripcionTarea,
+public record ContenidoTarjetaCmd(TipoContenidoTarjeta tipoContenido, String descripcionTarea,
 		List<String> itemsChecklist, String emailUsuario) {
 	
 }

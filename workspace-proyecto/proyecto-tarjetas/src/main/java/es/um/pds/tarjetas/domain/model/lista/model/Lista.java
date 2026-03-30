@@ -23,28 +23,26 @@ public class Lista {
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
 	private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
-	private int posicionEnTablero;
 	
 	// Constructor
-	private Lista(ListaId identificador, String nombre, int posicionEnTablero) {
+	private Lista(ListaId identificador, String nombre) {
 		this.identificador = identificador;
 		this.nombreLista = nombre;
 		this.listaTarjetas = new ArrayList<>();
 		this.especial = false;	// Cuando se crea una lista aún no es especial
 		this.limite = null; // Al principio, una lista puede ser infinita
 		this.prerrequisitos = new HashSet<>();
-		this.posicionEnTablero = posicionEnTablero;
 	}
 	
 	// Método factoría
-	public static Lista of(ListaId identificador, String nombre, int posicionEnTablero) throws ListaInvalidaException {
+	public static Lista of(ListaId identificador, String nombre) throws ListaInvalidaException {
 		if (identificador == null) {
 			throw new ListaInvalidaException("La lista debe tener un identificador");
 		}
 		
 		// Permitimos que la lista no tenga nombre, no comprobamos si nombre es nulo o blanco
 		
-		return new Lista(identificador, nombre, posicionEnTablero);
+		return new Lista(identificador, nombre);
 	}
 	
 	// Getters
@@ -70,10 +68,6 @@ public class Lista {
 	
 	public Set<ListaId> getPrerrequisitos() {
 		return Collections.unmodifiableSet(prerrequisitos);
-	}
-	
-	public int getPosicionEnTablero() {
-		return this.posicionEnTablero;
 	}
 	
 	public boolean isEspecial() {
@@ -108,10 +102,11 @@ public class Lista {
 			throw new IllegalArgumentException("Se ha superado el límite de tarjetas de la lista");
 		}
 		
+		// Se añade al final
 		this.listaTarjetas.add(nueva);
 	}
 	
-	public void quitarTarjeta(TarjetaId tarjeta) {
+	public void eliminarTarjeta(TarjetaId tarjeta) {
 		if (tarjeta == null) {
 			throw new IllegalArgumentException("La tarjeta que se desea eliminar no puede ser nula");
 		}

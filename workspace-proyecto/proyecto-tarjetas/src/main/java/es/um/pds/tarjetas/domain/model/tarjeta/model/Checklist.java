@@ -52,7 +52,7 @@ public class Checklist extends ContenidoTarjeta {
     }
 
 	@Override
-	public TipoContenido getTipo() {
-		return ContenidoTarjeta.TipoContenido.CHECKLIST;
+	public TipoContenidoTarjeta getTipo() {
+		return TipoContenidoTarjeta.CHECKLIST;
 	}
 }
