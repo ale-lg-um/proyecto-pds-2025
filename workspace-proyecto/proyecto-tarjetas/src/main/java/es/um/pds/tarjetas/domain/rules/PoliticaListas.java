@@ -2,12 +2,15 @@ package es.um.pds.tarjetas.domain.rules;
 
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 
+@Component
 public class PoliticaListas {
 
 	// Inyección de dependecias necesarias

@@ -165,6 +165,11 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		return new ResultadoCrearTableroDTO(nuevoTablero.getIdentificador().getId(), nuevoTablero.getNombre(),
 				nuevoTablero.getTokenUrl());
 	}
+	
+	public void aplicarPlantillaAlTablero(Tablero nuevoTablero, Plantilla plantinlla) {
+		// TODO
+		// Creado para evitar error, pero hay que implementar
+	}
 
 	@Override
 	@Transactional

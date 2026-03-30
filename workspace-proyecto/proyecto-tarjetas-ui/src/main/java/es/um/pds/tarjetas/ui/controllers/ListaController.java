@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
+import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.event.ActionEvent;
@@ -26,7 +29,7 @@ public class ListaController {
 	// Atributos
 	private final ServicioGestionTablero servicioTablero;
 	private final ApplicationContext contextoApp;
-	private Lista listaDominio;		// Entidad real
+	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
 	
 	@FXML private Label lblNombreLista;
@@ -40,13 +43,14 @@ public class ListaController {
 	}
 	
 	// El tablero llama a este método depsués de crear la lista
-	public void configurarLista(Lista lista) {
+	public void configurarLista(ListaDTO lista, String tableroId) {
 		this.listaDominio = lista;
-		this.lblNombreLista.setText(lista.getNombreLista());
+		this.lblNombreLista.setText(lista.nombre());
+		this.tableroId = tableroId;
 		
 		// Revisar si la lista tiene límite
-		if(lista.getLimite() != null) {
-			this.lblLimite.setText("(0/" + lista.getLimite() + ")");
+		if(lista.limite() != null) {
+			this.lblLimite.setText("(0/" + lista.limite() + ")");
 		} else {
 			this.lblLimite.setText("(\u221E)");
 		}
@@ -54,20 +58,23 @@ public class ListaController {
 	
 	@FXML
 	public void accionAnadirTarjeta(ActionEvent evento) {
-		System.out.println("Botón 'Añadir Tarjeta' pulsado en la lista: " + listaDominio.getNombreLista());
+		System.out.println("Botón 'Añadir Tarjeta' pulsado en la lista: " + listaDominio.nombre());
 		TextInputDialog dialogo = new TextInputDialog();
 		dialogo.setTitle("Nueva tarea");
-		dialogo.setHeaderText("Añadir tarjeta a: " + listaDominio.getNombreLista());
+		dialogo.setHeaderText("Añadir tarjeta a: " + listaDominio.nombre());
 		dialogo.setContentText("Título:");
 		
 		dialogo.showAndWait().ifPresent(titulo -> {
 			try {
 				System.out.println("Creando tarjeta: " + titulo);
 				
-				TarjetaDTO tarjetaDTO = new TarjetaDTO(null, titulo, null, listaDominio.getIdentificador().getId(), 0, new TareaDTO(""), List.of(), Set.of());
+				//TarjetaDTO tarjetaDTO = new TarjetaDTO(null, titulo, null, listaDominio.getIdentificador().getId(), 0, new TareaDTO(""), List.of(), Set.of());
 				
 				// CAMBIAR: tenemos que detectar al usuario que está con la sesión iniciada
-				TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.getIdentificador().getId(), tarjetaDTO, "usuario@ejemplo.com");
+				ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, titulo, List.of(), "usuario@ejemplo.com");
+				
+				//TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.getIdentificador().getId(), tarjetaDTO, "usuario@ejemplo.com");
+				TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.id(), titulo, contenido);
 				
 				// cargar el FXML del post-it con Spring
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MiniTarjetaView.fxml"));

@@ -12,6 +12,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -84,5 +85,17 @@ public class MiniTarjetaController {
 		} catch(Exception e) {
 			System.err.println("Error al abrir la vista de tarjeta: " + e.getMessage());
 		}
+	}
+	
+	@FXML
+	public void accionHoverEntrar(MouseEvent evento) {
+		Node nodoTarjeta = (Node) evento.getSource();
+		nodoTarjeta.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 5; -fx-border-color: #b0b0b0; -fx-border-radius: 5; -fx-cursor: hand;");
+	}
+	
+	@FXML
+	public void accionHoverSalir(MouseEvent evento) {
+		Node nodoTarjeta = (Node) evento.getSource();
+		nodoTarjeta.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 5; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-cursor: hand;");
 	}
 }
