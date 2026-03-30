@@ -1,7 +1,6 @@
 package es.um.pds.tarjetas.domain.ports.input.dto;
 
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea.TareaInvalidaException;
 
 public record TareaDTO(String descripcion) implements ContenidoTarjetaDTO {
 
@@ -9,7 +8,8 @@ public record TareaDTO(String descripcion) implements ContenidoTarjetaDTO {
 		this(tarea.getDescripcion());
 	}
 	
-	public Tarea toDomain() throws TareaInvalidaException {
+	@Override
+	public Tarea toDomain() {
 		return Tarea.of(this.descripcion);
 	}
 }

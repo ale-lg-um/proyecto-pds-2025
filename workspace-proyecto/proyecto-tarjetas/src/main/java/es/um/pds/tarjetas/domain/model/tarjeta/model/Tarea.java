@@ -1,26 +1,18 @@
 package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
+import es.um.pds.tarjetas.application.common.exceptions.TareaInvalidaException;
+
 public class Tarea extends ContenidoTarjeta{
 	// Atributos
 	private String descripcion;
-	
-	// Excepción
-	public static class TareaInvalidaException extends Exception {
-		// Identificador de versión para que no salga el warning
-		private static final long serialVersionUID = 1L;
 
-		public TareaInvalidaException(String mensaje) {
-			super(mensaje);
-		}
-	}
-	
 	// Constructor
 	private Tarea(String descripcion) {
 		this.descripcion = descripcion;
 	}
 	
 	// Método 'of'
-	public static Tarea of(String descripcion) throws TareaInvalidaException {
+	public static Tarea of(String descripcion) {
 		if(descripcion == null || descripcion.isBlank()) {
 			throw new TareaInvalidaException("El texto de la tarea no puede estar vacío");
 		}

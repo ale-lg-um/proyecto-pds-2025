@@ -35,12 +35,16 @@ import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaCreada;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
+import es.um.pds.tarjetas.domain.ports.input.commands.CrearTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
@@ -81,6 +85,34 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 	 * eventos 6. Devolver resultado
 	 */
 
+	// Métodos auxiliares
+	private ContenidoTarjeta construirContenido(CrearTarjetaCmd cmd) {
+		return switch (cmd.tipoContenido()) {
+
+		case TAREA -> {
+			if (cmd.descripcionTarea() == null || cmd.descripcionTarea().isBlank()) {
+				throw new IllegalArgumentException("La descripción de la tarea no puede estar vacía");
+			}
+			yield Tarea.of(cmd.descripcionTarea());
+		}
+
+		case CHECKLIST -> {
+			if (cmd.itemsChecklist() == null || cmd.itemsChecklist().isEmpty()) {
+				throw new IllegalArgumentException("La checklist debe contener al menos un ítem");
+			}
+
+			List<ItemChecklist> items = cmd.itemsChecklist().stream().map(texto -> {
+				if (texto == null || texto.isBlank()) {
+					throw new IllegalArgumentException("Los ítems del checklist no pueden ser vacíos");
+				}
+				return ItemChecklist.of(texto); // o new ItemChecklist(...)
+			}).toList();
+
+			yield Checklist.of(items);
+		}
+		};
+	}
+	
 	// Métodos heredados de la clase padre
 
 	// TODO Revisar todo este método
@@ -671,7 +703,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 
 	@Override
 	@Transactional
-	public void editarTarjeta(String tableroId, String tarjetaId, TarjetaDTO tarjetaActualizada, String emailUsuario) {
+	public void editarTarjeta(String tableroId, String tarjetaId, ContenidoTarjeta nuevoContenido, String emailUsuario) {
 		// TODO Auto-generated method stub
 
 	}

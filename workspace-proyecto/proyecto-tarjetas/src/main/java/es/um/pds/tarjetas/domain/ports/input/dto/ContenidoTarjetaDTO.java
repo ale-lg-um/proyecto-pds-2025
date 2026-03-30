@@ -3,7 +3,6 @@ package es.um.pds.tarjetas.domain.ports.input.dto;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea.TareaInvalidaException;
 
 public sealed interface ContenidoTarjetaDTO permits TareaDTO, ChecklistDTO {
 
@@ -19,7 +18,7 @@ public sealed interface ContenidoTarjetaDTO permits TareaDTO, ChecklistDTO {
 				+ (contenido == null ? "null" : contenido.getClass().getName()));
 	}
 
-	default ContenidoTarjeta toDomain() throws TareaInvalidaException {
+	default ContenidoTarjeta toDomain() {
 		return switch (this) {
 		case TareaDTO tareaDTO -> tareaDTO.toDomain();
 		case ChecklistDTO checklistDTO -> checklistDTO.toDomain();
