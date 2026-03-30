@@ -17,6 +17,7 @@ public class Lista {
 	// Atributos
 	private final ListaId identificador;
 	private String nombreLista;
+	// Lo modelo como lista porque consideramos la posición de la tarjeta. NO consideramos añadir dos tarjetas con el mismo ID en el servicio de aplicación
 	private final List<TarjetaId> listaTarjetas;
 	private boolean especial;
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
@@ -152,13 +153,22 @@ public class Lista {
     }
 	
 	public void configurarLimite(Integer limite) {
-		if(limite != null && limite <= 0) {
+		if (this.especial) {
+			throw new IllegalStateException("No se puede establecer límite para una lista especial");
+		}
+		
+		if (limite != null && limite <= 0) {
 			throw new IllegalArgumentException("El límite debe ser un entero positivo");
 		}
+		
+		if (limite!= null && listaTarjetas.size() > limite) {
+			throw new IllegalStateException("No se puede configurar el límite en esta lista porque ya contiene más tarjetas que el límite");
+		}
+		
 		this.limite = limite;
 	}
 	
-	public void configurarPrerrequisitos(List<ListaId> prerrequisitos) {
+	public void configurarPrerrequisitos(Set<ListaId> prerrequisitos) {
 		this.prerrequisitos.clear();
 		if (prerrequisitos != null) {
 			this.prerrequisitos.addAll(prerrequisitos);

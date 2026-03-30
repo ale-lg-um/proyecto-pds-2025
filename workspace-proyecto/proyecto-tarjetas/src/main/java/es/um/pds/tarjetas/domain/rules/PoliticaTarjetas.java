@@ -73,7 +73,7 @@ public class PoliticaTarjetas {
 	}
 	
 	// Valida que exista lista especial de completadas
-	private Lista validarListaEspecial(Set<Lista> listasTablero) throws NoExisteListaEspecialException, ListaEspecialInvalidaException {
+	private Lista validarListaEspecial(Set<Lista> listasTablero) {
 
 	    List<Lista> listasEspeciales = listasTablero.stream()
 	            .filter(Lista::isEspecial)
@@ -133,8 +133,7 @@ public class PoliticaTarjetas {
 	}
 	
 	// Comprobar que la tarjeta no esté ya en la lista especial
-	public void validarCompletar(Set<Lista> listasTablero, Tarjeta tarjeta) 
-			throws NoExisteListaEspecialException, ListaEspecialInvalidaException, TarjetaYaCompletadaException, PrerrequisitosNoCumplidosException {
+	public void validarCompletar(Set<Lista> listasTablero, Tarjeta tarjeta) {
 		
 		if (listasTablero == null) {
 			throw new IllegalArgumentException("El tablero no puede estar vacío");
@@ -152,5 +151,35 @@ public class PoliticaTarjetas {
 		
 		// Se podría hacer también con validarMovimientoEntreListas porque completar una tarjeta es moverla a la lista de especiales
 		validarPrerrequisitos(tarjeta, listaEspecial);
+	}
+	
+	public void validarConfiguracionPrerrequisitos(List<Tarjeta> tarjetasLista, Set<ListaId> prerrequisitos)
+			throws PrerrequisitosNoCumplidosException {
+
+		if (tarjetasLista == null) {
+			throw new IllegalArgumentException("La lista de tarjetas no puede ser nula");
+		}
+
+		if (prerrequisitos == null) {
+			throw new IllegalArgumentException("Los prerrequisitos no pueden ser nulos");
+		}
+
+		for (Tarjeta tarjeta : tarjetasLista) {
+			if (tarjeta == null) {
+				throw new IllegalArgumentException("No puede haber tarjetas nulas en la lista");
+			}
+
+			for (ListaId prerrequisito : prerrequisitos) {
+				if (prerrequisito == null) {
+					throw new IllegalArgumentException("No puede haber prerrequisitos nulos");
+				}
+
+				if (!tarjeta.getListasVisitadas().contains(prerrequisito)) {
+					throw new PrerrequisitosNoCumplidosException(
+							"No se pueden configurar los prerrequisitos porque la tarjeta " + tarjeta.getIdentificador()
+									+ " no ha pasado por la lista prerrequisito " + prerrequisito);
+				}
+			}
+		}
 	}
 }

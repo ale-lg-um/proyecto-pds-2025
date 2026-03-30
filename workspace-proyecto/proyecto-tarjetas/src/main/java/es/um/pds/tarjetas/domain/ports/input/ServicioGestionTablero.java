@@ -1,8 +1,7 @@
 package es.um.pds.tarjetas.domain.ports.input;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
+import java.util.Set;
 
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
@@ -25,8 +24,8 @@ public interface ServicioGestionTablero {
 	void renombrarLista(String tableroId, String listaId, String nuevoNombre, String emailUsuario);								// Cambiar el nombre de una lista dentro de un tablero
 	void eliminarLista(String tableroId, String listaId, String emailUsuario);													// Eliminar una lista de un tablero
 	void definirListaEspecial(String tableroId, String listaId, String emailUsuario);											// Marcamos una lista de un tablero como especial
-	void configurarLimiteLista(String tableroId, String listaId, int limite, String emailUsuario);								// Configuramos el número de elementos que puede tener una determinada lista
-	void configurarPrerrequisitosLista(String tableroId, String listaId, List<String> prerrequisitoIds, String emailUsuario);	// Configuramos los prerrequisitos de una lista
+	void configurarLimiteLista(String tableroId, String listaId, Integer limite, String emailUsuario);							// Configuramos el número de elementos que puede tener una determinada lista
+	void configurarPrerrequisitosLista(String tableroId, String listaId, Set<String> prerrequisitos, String emailUsuario);		// Configuramos los prerrequisitos de una lista
 	
 	// Tarjetas
 	TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario);				// Crear una tarjeta dentro de una lista

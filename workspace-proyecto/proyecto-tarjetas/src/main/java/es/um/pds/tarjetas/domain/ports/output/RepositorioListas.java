@@ -1,7 +1,7 @@
 package es.um.pds.tarjetas.domain.ports.output;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
@@ -13,7 +13,9 @@ public interface RepositorioListas {
 
 	Optional<Lista> buscarPorId(ListaId listaId);
 
-	List<Lista> buscarPorTableroId(TableroId tableroId);
+	Set<Lista> buscarPorIds(Set<ListaId> ids);
+	
+	Set<Lista> buscarPorTableroId(TableroId tableroId);
 
 	void eliminarPorId(ListaId listaId);
 
