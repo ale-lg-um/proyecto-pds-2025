@@ -609,6 +609,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 	 * Por tanto, no habrá problema con usar List<TarjetaId> en Lista, porque nos aseguramos de que no haya repetidos. Recomprobarlo igualmente
 	 */
 	
+	// TODO Método incompleto e incorrecto provisional
 	@Override
 	@Transactional
 	public TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario) {
@@ -644,25 +645,28 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 
 		try {
 			ContenidoTarjeta contenido = tarjeta.contenido().toDomain();
+			
+			Tarjeta nuevaTarjeta = Tarjeta.of(nuevaTarjetaId, tarjeta.titulo(), idLista, posicion, contenido);
+
+			lista.anadirTarjeta(nuevaTarjetaId);
+
+			// 5. Persistir cambios
+			repoListas.guardar(lista);
+
+			// 6. Publicar evento de dominio
+			LocalDateTime timestamp = LocalDateTime.now();
+			eventBus.publicar(new TarjetaCreada(nuevaTarjetaId, idLista, idTablero, usuarioId, timestamp, tarjeta.titulo(),
+					posicion));
+
+			// 7. devolver DTO de salida
+			return new TarjetaDTO(nuevaTarjeta);
+			
+			
+			
 		} catch (Exception e) {
 			throw new RuntimeException(e.getMessage());
 		}
 		
-
-		Tarjeta nuevaTarjeta = Tarjeta.of(nuevaTarjetaId, tarjeta.titulo(), idLista, posicion, contenido);
-
-		lista.anadirTarjeta(nuevaTarjetaId);
-
-		// 5. Persistir cambios
-		repoListas.guardar(lista);
-
-		// 6. Publicar evento de dominio
-		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaCreada(nuevaTarjetaId, idLista, idTablero, usuarioId, timestamp, tarjeta.titulo(),
-				posicion));
-
-		// 7. devolver DTO de salida
-		return new TarjetaDTO(nuevaTarjeta);
 	}
 
 	@Override

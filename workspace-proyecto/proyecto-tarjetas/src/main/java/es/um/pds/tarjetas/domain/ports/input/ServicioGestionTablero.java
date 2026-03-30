@@ -3,6 +3,7 @@ package es.um.pds.tarjetas.domain.ports.input;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
@@ -29,7 +30,7 @@ public interface ServicioGestionTablero {
 	
 	// Tarjetas
 	TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario);				// Crear una tarjeta dentro de una lista
-	void editarTarjeta(String tableroId, String tarjetaId, TarjetaDTO tarjetaActualizada, String emailUsuario);		// Modificar el contenido de la tarjeta. No se puede cambiar de Tarea a Checklist o viceversa
+	void editarTarjeta(String tableroId, String tarjetaId, ContenidoTarjeta nuevoContenido, String emailUsuario);	// Modificar el contenido de la tarjeta. No se puede cambiar de Tarea a Checklist o viceversa
 	void eliminarTarjeta(String tableroId, String tarjetaId, String emailUsuario);									// Eliminar una tarjeta de una lista
 	void moverTarjeta(String tableroId, String tarjetaId, String listaDestinoId, String emailUsuario);				// Mover la tarjeta a una lista especial
 	void completarTarjeta(String tableroId, String tarjetaId, String emailUsuario);									// Marcar una tarjeta como completada (en realidad es moverla a la lista especial)
