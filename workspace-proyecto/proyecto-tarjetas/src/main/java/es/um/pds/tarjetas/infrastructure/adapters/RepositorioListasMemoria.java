@@ -32,7 +32,7 @@ public class RepositorioListasMemoria implements RepositorioListas{
 	public Set<Lista> buscarPorTableroId(TableroId id) {
 		Set<Lista> listas = new HashSet<>();
 		for(Lista lista : baseDatos.values()) {
-			if(lista.getTablero().getIdentificador().equals(id)) {
+			if(lista.getTablero().equals(id)) {
 				listas.add(lista);
 			}
 		}
@@ -48,7 +48,7 @@ public class RepositorioListasMemoria implements RepositorioListas{
 	public void eliminarPorTableroId(TableroId id) {
 		for(Lista lista : baseDatos.values()) {
 			ListaId listaid = lista.getIdentificador();
-			if(lista.getTablero().getIdentificador().equals(id)) {
+			if(lista.getTablero().equals(id)) {
 				baseDatos.remove(listaid);
 			}
 		}

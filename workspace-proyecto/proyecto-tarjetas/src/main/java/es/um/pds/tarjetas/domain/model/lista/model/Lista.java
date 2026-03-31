@@ -9,7 +9,7 @@ import java.util.Set;
 
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
-import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
 //@Entity
@@ -22,7 +22,9 @@ public class Lista {
 	private boolean especial;
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
-	private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
+	// No puede cargar otros agregados, no se puede poner
+	//private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
+	private TableroId tablero;
 	
 	// Constructor
 	private Lista(ListaId identificador, String nombre) {
@@ -35,7 +37,7 @@ public class Lista {
 	}
 	
 	// Método factoría
-	public static Lista of(ListaId identificador, String nombre) throws ListaInvalidaException {
+	public static Lista of(ListaId identificador, String nombre) {
 		if (identificador == null) {
 			throw new ListaInvalidaException("La lista debe tener un identificador");
 		}
@@ -50,7 +52,7 @@ public class Lista {
 		return this.identificador;
 	}
 	
-	public Tablero getTablero() {
+	public TableroId getTablero() {
 		return this.tablero;
 	}
 	
@@ -168,5 +170,12 @@ public class Lista {
 		if (prerrequisitos != null) {
 			this.prerrequisitos.addAll(prerrequisitos);
 		}
+	}
+	
+	public void asignarATablero(TableroId tablero) {
+		if (tablero == null) {
+			throw new IllegalArgumentException("El tablero no puede ser nulo");
+		}
+		this.tablero = tablero;
 	}
 }

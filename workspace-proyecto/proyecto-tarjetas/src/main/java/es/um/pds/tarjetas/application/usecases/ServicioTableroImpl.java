@@ -1,13 +1,21 @@
 package es.um.pds.tarjetas.application.usecases;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla;
+import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionListaPlantilla;
+import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionTarjetaPlantilla;
 import es.um.pds.tarjetas.common.events.EventBus;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
 import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
@@ -20,10 +28,17 @@ import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroEditado;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ContenidoTarjeta;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
+import es.um.pds.tarjetas.domain.ports.output.PuertoParserYAML;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
@@ -36,15 +51,18 @@ public class ServicioTableroImpl implements ServicioTablero {
 	private final RepositorioListas repoListas;
 	private final RepositorioTarjetas repoTarjetas;
 	private final RepositorioPlantillas repoPlantillas;
+	private final PuertoParserYAML parserYAML;
 	private final EventBus eventBus;
 
 	// Constructor
 	public ServicioTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas,
-			RepositorioTarjetas repoTarjetas, RepositorioPlantillas repoPlantillas, EventBus eventBus) {
+			RepositorioTarjetas repoTarjetas, RepositorioPlantillas repoPlantillas, PuertoParserYAML parserYAML,
+			EventBus eventBus) {
 		this.repoTableros = repoTableros;
 		this.repoListas = repoListas;
 		this.repoTarjetas = repoTarjetas;
 		this.repoPlantillas = repoPlantillas;
+		this.parserYAML = parserYAML;
 		this.eventBus = eventBus;
 	}
 
@@ -56,9 +74,106 @@ public class ServicioTableroImpl implements ServicioTablero {
 
 	// Métodos auxiliares
 
+	private ContenidoTarjeta construirContenidoTarjetaPlantilla(EspecificacionTarjetaPlantilla tarjetaSpec) {
+		return switch (tarjetaSpec.getTipoContenido()) {
+		case TAREA -> Tarea.of(tarjetaSpec.getDescripcionTarea());
+
+		case CHECKLIST -> {
+			List<ItemChecklist> items = tarjetaSpec.getItemsChecklist().stream().map(ItemChecklist::of).toList();
+			yield Checklist.of(items);
+		}
+		};
+	}
+	
 	private void aplicarPlantillaAlTablero(Tablero nuevoTablero, Plantilla plantilla) {
-		// TODO
-		// Creado para evitar error, pero hay que implementar
+
+		// 1. Parsear el YAML almacenado en la plantilla a una especificación Java
+		EspecificacionTableroPlantilla especificacion = parserYAML.parse(plantilla.getContenidoYaml());
+
+		if (especificacion == null) {
+			throw new IllegalArgumentException("La plantilla no se ha podido interpretar correctamente");
+		}
+
+		// 2. Estructuras auxiliares para relacionar nombres de listas de la plantilla
+		// con las listas reales que se van creando en el tablero
+		Map<String, Lista> listasPorNombre = new LinkedHashMap<>();
+		Map<String, ListaId> idsPorNombre = new LinkedHashMap<>();
+
+		// 3. Crear primero todas las listas del tablero
+		// Esto se hace en una primera pasada para poder resolver después los prerrequisitos
+		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+			ListaId listaId = ListaId.of();
+			Lista lista = Lista.of(listaId, listaSpec.getNombre());
+			lista.asignarATablero(nuevoTablero);
+
+			// Asociar la lista al tablero
+			nuevoTablero.anadirLista(listaId);
+
+			listasPorNombre.put(listaSpec.getNombre(), lista);
+			idsPorNombre.put(listaSpec.getNombre(), listaId);
+		}
+
+		// 4. Configurar propiedades de cada lista: especial, límite y prerrequisitos
+		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+			Lista lista = listasPorNombre.get(listaSpec.getNombre());
+
+			// Si la lista es especial, se marca como tal
+			if (listaSpec.isEspecial()) {
+				lista.hacerEspecial();
+				nuevoTablero.definirListaEspecial(lista.getIdentificador());
+			}
+
+			// Si tiene límite, se configura
+			if (listaSpec.getLimite() != null) {
+				lista.configurarLimite(listaSpec.getLimite());
+			}
+
+			// Si tiene prerrequisitos, hay que traducir los nombres del YAML
+			// a los ListaId reales del tablero que acabamos de crear
+			if (listaSpec.getPrerrequisitos() != null && !listaSpec.getPrerrequisitos().isEmpty()) {
+				Set<ListaId> idsPrerrequisitos = new LinkedHashSet<>();
+
+				for (String nombrePrerrequisito : listaSpec.getPrerrequisitos()) {
+					ListaId idPrerequisito = idsPorNombre.get(nombrePrerrequisito);
+
+					if (idPrerequisito == null) {
+						throw new IllegalArgumentException(
+								"No existe la lista prerrequisito '" + nombrePrerrequisito + "' en la plantilla");
+					}
+
+					idsPrerrequisitos.add(idPrerequisito);
+				}
+
+				lista.configurarPrerrequisitos(idsPrerrequisitos);
+			}
+		}
+
+		// 5. Crear tarjetas predeterminadas en cada lista
+		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+			Lista lista = listasPorNombre.get(listaSpec.getNombre());
+
+			for (EspecificacionTarjetaPlantilla tarjetaSpec : listaSpec.getTarjetas()) {
+				TarjetaId tarjetaId = TarjetaId.of();
+				ContenidoTarjeta contenido = construirContenidoTarjetaPlantilla(tarjetaSpec);
+
+				Tarjeta tarjeta = Tarjeta.of(
+						tarjetaId,
+						tarjetaSpec.getTitulo(),
+						lista.getIdentificador(),
+						contenido);
+
+				// Asociar la tarjeta a la lista
+				lista.anadirTarjeta(tarjetaId);
+
+				// Persistir la tarjeta
+				repoTarjetas.guardar(tarjeta);
+			}
+		}
+
+		// 6. Persistir todas las listas una vez ya configuradas
+		for (Lista lista : listasPorNombre.values()) {
+			repoListas.guardar(lista);
+		}
 	}
 	
 	private TableroId construirTableroId(String tableroId) {

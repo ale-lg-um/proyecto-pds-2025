@@ -6,5 +6,5 @@ public interface ServicioPlantilla {
 
     PlantillaDTO crearPlantilla(String yaml, String emailUsuario);
 
-    PlantillaDTO obtenerYamlPlantilla(String plantillaId);
+    PlantillaDTO obtenerPlantilla(String plantillaId);
 }
