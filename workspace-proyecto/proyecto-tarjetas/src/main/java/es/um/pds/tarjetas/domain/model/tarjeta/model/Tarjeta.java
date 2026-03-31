@@ -156,6 +156,14 @@ public class Tarjeta {
 		
 		this.contenido = nuevoContenido;
 	}
+	
+	public void asignarATablero(TableroId tablero) {
+		if (tablero == null) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
+		}
+		
+		this.tablero = tablero;
+	}
     
     /** Operaciones como servicios de aplicación orquestadores:
      * TarjetaId crearTarjeta(TableroId id, ListaId listaId, ContenidoTarjeta contenido, Actor actor);

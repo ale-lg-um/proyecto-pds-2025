@@ -85,7 +85,7 @@ public class ServicioTableroImpl implements ServicioTablero {
 		};
 	}
 	
-	private void aplicarPlantillaAlTablero(Tablero nuevoTablero, Plantilla plantilla) {
+	private void aplicarPlantillaAlTablero(TableroId tableroId, Tablero nuevoTablero, Plantilla plantilla) {
 
 		// 1. Parsear el YAML almacenado en la plantilla a una especificación Java
 		EspecificacionTableroPlantilla especificacion = parserYAML.parse(plantilla.getContenidoYaml());
@@ -102,11 +102,11 @@ public class ServicioTableroImpl implements ServicioTablero {
 		// 3. Crear primero todas las listas del tablero
 		// Esto se hace en una primera pasada para poder resolver después los prerrequisitos
 		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+
 			ListaId listaId = ListaId.of();
 			Lista lista = Lista.of(listaId, listaSpec.getNombre());
-			lista.asignarATablero(nuevoTablero);
+			lista.asignarATablero(tableroId);
 
-			// Asociar la lista al tablero
 			nuevoTablero.anadirLista(listaId);
 
 			listasPorNombre.put(listaSpec.getNombre(), lista);
@@ -115,6 +115,7 @@ public class ServicioTableroImpl implements ServicioTablero {
 
 		// 4. Configurar propiedades de cada lista: especial, límite y prerrequisitos
 		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+
 			Lista lista = listasPorNombre.get(listaSpec.getNombre());
 
 			// Si la lista es especial, se marca como tal
@@ -130,37 +131,36 @@ public class ServicioTableroImpl implements ServicioTablero {
 
 			// Si tiene prerrequisitos, hay que traducir los nombres del YAML
 			// a los ListaId reales del tablero que acabamos de crear
-			if (listaSpec.getPrerrequisitos() != null && !listaSpec.getPrerrequisitos().isEmpty()) {
-				Set<ListaId> idsPrerrequisitos = new LinkedHashSet<>();
+			if (!listaSpec.getPrerrequisitos().isEmpty()) {
+				Set<ListaId> idsPrereq = new LinkedHashSet<>();
 
-				for (String nombrePrerrequisito : listaSpec.getPrerrequisitos()) {
-					ListaId idPrerequisito = idsPorNombre.get(nombrePrerrequisito);
-
-					if (idPrerequisito == null) {
-						throw new IllegalArgumentException(
-								"No existe la lista prerrequisito '" + nombrePrerrequisito + "' en la plantilla");
+				for (String nombre : listaSpec.getPrerrequisitos()) {
+					ListaId id = idsPorNombre.get(nombre);
+					if (id == null) {
+						throw new IllegalArgumentException("Prerrequisito inválido: " + nombre);
 					}
-
-					idsPrerrequisitos.add(idPrerequisito);
+					idsPrereq.add(id);
 				}
 
-				lista.configurarPrerrequisitos(idsPrerrequisitos);
+				lista.configurarPrerrequisitos(idsPrereq);
 			}
 		}
 
 		// 5. Crear tarjetas predeterminadas en cada lista
 		for (EspecificacionListaPlantilla listaSpec : especificacion.getListas()) {
+
 			Lista lista = listasPorNombre.get(listaSpec.getNombre());
 
 			for (EspecificacionTarjetaPlantilla tarjetaSpec : listaSpec.getTarjetas()) {
+
 				TarjetaId tarjetaId = TarjetaId.of();
+
 				ContenidoTarjeta contenido = construirContenidoTarjetaPlantilla(tarjetaSpec);
 
-				Tarjeta tarjeta = Tarjeta.of(
-						tarjetaId,
-						tarjetaSpec.getTitulo(),
-						lista.getIdentificador(),
-						contenido);
+				Tarjeta tarjeta = Tarjeta.of(tarjetaId, tarjetaSpec.getTitulo(), lista.getIdentificador(), contenido);
+
+				// Asociar el tablero a la tarjeta
+				tarjeta.asignarATablero(tableroId);
 
 				// Asociar la tarjeta a la lista
 				lista.anadirTarjeta(tarjetaId);
@@ -230,7 +230,7 @@ public class ServicioTableroImpl implements ServicioTablero {
 			plantilla = repoPlantillas.buscarPorId(idPlantilla)
 					.orElseThrow(() -> new IllegalArgumentException("No existe la plantilla indicada"));
 
-			aplicarPlantillaAlTablero(nuevoTablero, plantilla);
+			aplicarPlantillaAlTablero(idTablero, nuevoTablero, plantilla);
 		}
 
 		// 5. Persistir cambios

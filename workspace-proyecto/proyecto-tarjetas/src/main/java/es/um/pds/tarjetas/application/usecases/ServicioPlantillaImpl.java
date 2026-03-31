@@ -142,6 +142,11 @@ public class ServicioPlantillaImpl implements ServicioPlantilla {
 					throw new PlantillaInvalidaException(
 							"La tarjeta '" + tarjeta.getTitulo() + "' debe tener descripción de tarea");
 				}
+
+				if (tarjeta.getItemsChecklist() != null && !tarjeta.getItemsChecklist().isEmpty()) {
+					throw new PlantillaInvalidaException("La tarjeta '" + tarjeta.getTitulo()
+							+ "' es de tipo TAREA y no puede tener itemsChecklist");
+				}
 			}
 
 			if (tarjeta.getTipoContenido() == TipoContenidoTarjeta.CHECKLIST) {
@@ -156,6 +161,11 @@ public class ServicioPlantillaImpl implements ServicioPlantilla {
 				if (itemVacio) {
 					throw new PlantillaInvalidaException(
 							"La tarjeta '" + tarjeta.getTitulo() + "' tiene ítems de checklist vacíos");
+				}
+
+				if (tarjeta.getDescripcionTarea() != null && !tarjeta.getDescripcionTarea().isBlank()) {
+					throw new PlantillaInvalidaException("La tarjeta '" + tarjeta.getTitulo()
+							+ "' es de tipo CHECKLIST y no puede tener descripcionTarea");
 				}
 			}
 		}
