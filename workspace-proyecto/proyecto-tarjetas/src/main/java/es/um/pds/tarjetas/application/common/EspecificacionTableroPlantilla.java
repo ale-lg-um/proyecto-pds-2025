@@ -2,12 +2,13 @@ package es.um.pds.tarjetas.application.common;
 
 import java.util.List;
 
-import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
-
-//TODO Revisar
 public class EspecificacionTableroPlantilla {
 
+	// EspecificacionTableroPlantilla traduce el YAML a un modelo comprensible
+	// Buscamos trabajar con objetos, no con texto. Evitamos que el dominio entienda YAML
+	
 	private final String nombrePlantilla;
+	// Clase estática que creamos que contiene los detalles de la lista
 	private final List<EspecificacionListaPlantilla> listas;
 	
 	public EspecificacionTableroPlantilla(String nombrePlantilla, List<EspecificacionListaPlantilla> listas) {
@@ -26,10 +27,10 @@ public class EspecificacionTableroPlantilla {
 	public static class EspecificacionListaPlantilla {
 		private final String nombre;
 		private final Integer limite;
-		private final List<ListaId> prerrequisitos;
+		private final List<String> prerrequisitos;
 		private final boolean especial;
 	
-		public EspecificacionListaPlantilla(String nombre, Integer limite, List<ListaId> prerrequisitos, boolean especial) {
+		public EspecificacionListaPlantilla(String nombre, Integer limite, List<String> prerrequisitos, boolean especial) {
 			this.nombre = nombre;
 	    	this.limite = limite;
 	    	this.prerrequisitos = prerrequisitos;
@@ -44,7 +45,7 @@ public class EspecificacionTableroPlantilla {
 	    	return limite;
 	    }
 	
-	    public List<ListaId> getPrerrequisitos() {
+	    public List<String> getPrerrequisitos() {
 	    	return prerrequisitos;
 	    }
 	

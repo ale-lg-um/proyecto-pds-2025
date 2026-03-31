@@ -1,8 +1,10 @@
 package es.um.pds.tarjetas.domain.ports.input;
 
+import es.um.pds.tarjetas.domain.ports.input.dto.PlantillaDTO;
+
 public interface ServicioPlantilla {
 
-    String crearPlantilla(String yaml, String emailUsuario);
+    PlantillaDTO crearPlantilla(String yaml, String emailUsuario);
 
-    String obtenerYamlPlantilla(String plantillaId);
+    PlantillaDTO obtenerYamlPlantilla(String plantillaId);
 }
