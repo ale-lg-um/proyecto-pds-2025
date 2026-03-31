@@ -13,7 +13,9 @@ import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+//import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
@@ -30,7 +32,8 @@ import javafx.scene.layout.VBox;
 @Controller
 public class TableroController {
 	// Atributos
-	private final ServicioGestionTablero servicioTablero;
+	private final ServicioTablero servicioTablero;
+	private final ServicioLista servicioLista;
 	private final RepositorioListas repoListas;
 	private final RepositorioTableros repoTableros;
 	private final ApplicationContext contextoApp;
@@ -41,8 +44,9 @@ public class TableroController {
 	@FXML private HBox contenedorListas;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioGestionTablero servicioTablero, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp) {
+	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp) {
 		this.servicioTablero = servicioTablero;
+		this.servicioLista = servicioLista;
 		this.repoListas = repoListas;
 		this.repoTableros = repoTableros;
 		this.contextoApp = contextoApp;
@@ -87,7 +91,7 @@ public class TableroController {
 				// instanciarListaVisual(nuevaLista)
 				//this.nListas = this.nListas + 1;
 				//ListaId listaId = ListaId.of();
-				ListaDTO nueva = servicioTablero.crearLista(actual, nombre, "usuario@ejemplo.com");
+				ListaDTO nueva = servicioLista.crearLista(actual, nombre, "usuario@ejemplo.com");
 				
 				//repoListas.guardar(nueva);
 				instanciarListaVisual(nueva);

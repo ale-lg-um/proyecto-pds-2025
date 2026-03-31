@@ -8,8 +8,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+//import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
@@ -17,17 +20,26 @@ import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 
 @Controller
 @Scope("prototype")
 public class ListaController {
 	// Atributos
-	private final ServicioGestionTablero servicioTablero;
+	private final ServicioTablero servicioTablero;
+	private final ServicioTarjeta servicioTarjeta;
 	private final ApplicationContext contextoApp;
 	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
@@ -37,8 +49,9 @@ public class ListaController {
 	@FXML private VBox contenedorTarjetas;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioGestionTablero servicioTablero, ApplicationContext contextoApp) {
+	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ApplicationContext contextoApp) {
 		this.servicioTablero = servicioTablero;
+		this.servicioTarjeta = servicioTarjeta;
 		this.contextoApp = contextoApp;
 	}
 	
@@ -59,22 +72,71 @@ public class ListaController {
 	@FXML
 	public void accionAnadirTarjeta(ActionEvent evento) {
 		System.out.println("Botón 'Añadir Tarjeta' pulsado en la lista: " + listaDominio.nombre());
-		TextInputDialog dialogo = new TextInputDialog();
+		
+		// Diálogo genérico
+		Dialog<Pair<String, String>> dialogo = new Dialog<>();
+		dialogo.setTitle("Nueva Tarjeta");
+		dialogo.setHeaderText("Añadir nueva tarjeta a: " + listaDominio.nombre());
+		
+		// Botones de aceptar y cancelar
+		ButtonType btnAceptar = new ButtonType("Aceptar", ButtonData.OK_DONE);
+		ButtonType btnCancelar = new ButtonType("Cancelar", ButtonData.CANCEL_CLOSE);
+		dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, btnCancelar);
+		
+		// Alinear textos e inputs
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 150, 10, 10));
+		
+		// Crear campo de texto y desplegable
+		TextField nombre = new TextField();
+		nombre.setPromptText("Titulo:");
+		
+		ComboBox<String> opciones = new ComboBox<>();
+		opciones.getItems().addAll(TipoContenidoTarjeta.TAREA.toString(), TipoContenidoTarjeta.CHECKLIST.toString());
+		opciones.getSelectionModel().selectFirst();
+		
+		// Añadir todo a la vista
+		grid.add(new Label("Título:"), 0, 0);
+		grid.add(nombre, 1, 0);
+		grid.add(new Label("Tipo:"), 0, 0);
+		grid.add(opciones, 1, 1);
+		
+		dialogo.getDialogPane().setContent(grid);
+		
+		dialogo.setResultConverter(dialogButton -> {
+			if(dialogButton == btnAceptar) {
+				return new Pair<>(nombre.getText(), opciones.getValue());
+			}
+			return null;
+		});
+		
+		/*TextInputDialog dialogo = new TextInputDialog();
 		dialogo.setTitle("Nueva tarea");
 		dialogo.setHeaderText("Añadir tarjeta a: " + listaDominio.nombre());
-		dialogo.setContentText("Título:");
+		dialogo.setContentText("Título:");*/
 		
-		dialogo.showAndWait().ifPresent(titulo -> {
+		dialogo.showAndWait().ifPresent(resultado -> {
+			String titulo = resultado.getKey();
+			String opcion = resultado.getValue();
+			
 			try {
 				System.out.println("Creando tarjeta: " + titulo);
 				
 				//TarjetaDTO tarjetaDTO = new TarjetaDTO(null, titulo, null, listaDominio.getIdentificador().getId(), 0, new TareaDTO(""), List.of(), Set.of());
 				
 				// CAMBIAR: tenemos que detectar al usuario que está con la sesión iniciada
-				ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, titulo, List.of(), "usuario@ejemplo.com");
+				String usuario = "usuario@ejemplo.com";
+				ContenidoTarjetaCmd contenido;
+				if(TipoContenidoTarjeta.valueOf(opcion).equals(TipoContenidoTarjeta.TAREA)) {
+					contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.valueOf(opcion), titulo, List.of(), usuario);
+				} else {
+					contenido = inicializarChecklist(titulo, usuario);
+				}
 				
 				//TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.getIdentificador().getId(), tarjetaDTO, "usuario@ejemplo.com");
-				TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.id(), titulo, contenido);
+				TarjetaDTO nuevaTarjeta = servicioTarjeta.crearTarjeta(tableroId, listaDominio.id(), titulo, contenido);
 				
 				// cargar el FXML del post-it con Spring
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MiniTarjetaView.fxml"));
@@ -95,6 +157,24 @@ public class ListaController {
 				mostrarError("Error", "No se pudo crear la tarjeta: " +  e.getMessage());
 			}
 		});
+	}
+	
+	private ContenidoTarjetaCmd inicializarChecklist(String titulo, String usuario) throws Exception{
+		ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, titulo, List.of(), usuario);
+		TextInputDialog dialogo = new TextInputDialog();
+		dialogo.setTitle("Nuevo ítem");
+		dialogo.setHeaderText("Añadir primer ítem a la tarjeta");
+		dialogo.setContentText("Ítem:");
+		
+		dialogo.showAndWait().ifPresent(item -> {
+			try {
+				ItemChecklist i = ItemChecklist.of(item);
+				contenido.itemsChecklist().add(item);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		});
+		return contenido;
 	}
 	
 	private void mostrarError(String titulo, String mensaje) {

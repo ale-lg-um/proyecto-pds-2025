@@ -5,7 +5,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseEntered="#accionHoverEntrar" onMouseExited="#accionHoverSalir" prefWidth="250.0" style="-fx-background-radius: 5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.MiniTarjetaController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#accionAbrirDetalle" onMouseEntered="#accionHoverEntrar" onMouseExited="#accionHoverSalir" prefWidth="250.0" style="-fx-background-radius: 5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.MiniTarjetaController">
    <children>
       <FlowPane fx:id="contenedorEtiquetas" prefWidth="200.0" VBox.vgrow="NEVER" />
       <Label fx:id="lblTitulo" text="Titulo" wrapText="true" />
