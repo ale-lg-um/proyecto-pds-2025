@@ -243,7 +243,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(TarjetaCompletada evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaCompletada(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId(), evento.completada());
+					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {

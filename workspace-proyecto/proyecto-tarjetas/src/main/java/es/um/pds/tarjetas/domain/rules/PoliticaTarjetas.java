@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import es.um.pds.tarjetas.application.common.exceptions.LimiteListaSuperadoException;
 import es.um.pds.tarjetas.application.common.exceptions.ListaEspecialInvalidaException;
-import es.um.pds.tarjetas.application.common.exceptions.NoExisteListaEspecialException;
 import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
 import es.um.pds.tarjetas.application.common.exceptions.TarjetaYaCompletadaException;
@@ -22,19 +21,6 @@ public class PoliticaTarjetas {
 	
 	// Para acceder a los tableros, listas y tarjetas llamaremos en la implementación de los servicios de aplicación
 	// a los métodos buscar de los repositorios. Por eso aquí trabajamos con las entidades y no con los IDs.
-	
-	// Método auxiliar (no se utiliza)
-	
-	/*
-	private Lista buscarLista(Set<Lista> listas, ListaId id) throws ListaInvalidaException {
-	    return listas.stream()
-	            .filter(l -> l.getIdentificador().equals(id))
-	            .findFirst()
-	            .orElseThrow(() -> new ListaInvalidaException(
-	                    "La lista especificada no se encuentra en este tablero"
-	            ));
-	}
-	*/
 	
 	// Comprueba si un tablero está bloqueado
 	private void validarBloqueo(Tablero tablero) throws TableroBloqueadoException {
@@ -72,31 +58,6 @@ public class PoliticaTarjetas {
 		}
 	}
 	
-	// Valida que exista lista especial de completadas
-	private Lista validarListaEspecial(Set<Lista> listasTablero) {
-
-	    List<Lista> listasEspeciales = listasTablero.stream()
-	            .filter(Lista::isEspecial)
-	            .toList();
-
-	    if (listasEspeciales.isEmpty()) {
-	        throw new NoExisteListaEspecialException("El tablero no contiene ninguna lista especial");
-	    }
-
-	    if (listasEspeciales.size() > 1) {
-	        throw new ListaEspecialInvalidaException("El tablero contiene más de una lista especial");
-	    }
-
-	    Lista listaEspecial = listasEspeciales.get(0);
-
-	    if (listaEspecial.getLimite() != null) {
-	        throw new ListaEspecialInvalidaException("La lista especial no puede tener límite de tarjetas");
-	    }
-	    
-	    // Devuelve el ID de la única lista especial que hay
-	    return listasEspeciales.get(0);
-	}
-	
 	// Hace uso de los métodos validarBloqueo, validarLimite y validarCrearEnListaConPrerrequisitos para validar todas las reglas
 	// de negocio a la hora de crear la tarjeta (R1, R2, HH1)
 	public void validarCreacion(Tablero tablero, Lista listaDestino)
@@ -132,27 +93,29 @@ public class PoliticaTarjetas {
 		validarPrerrequisitos(tarjeta, listaDestino);	
 	}
 	
-	// Este método comprueba:
-	// - que exista una única lista especial
-	// - que la tarjeta no esté ya completada
-	// - que se cumplan los prerrequisitos para entrar en la lista especial
-	public void validarCompletar(Set<Lista> listasTablero, Tarjeta tarjeta) {
-		
-		if (listasTablero == null) {
-			throw new IllegalArgumentException("El tablero no puede estar vacío");
+	public void validarCompletar(Lista listaEspecial, Tarjeta tarjeta) {
+
+		if (listaEspecial == null) {
+			throw new IllegalArgumentException("La lista especial no puede ser nula");
 		}
-		
+
 		if (tarjeta == null) {
 			throw new IllegalArgumentException("La tarjeta no puede ser nula");
 		}
-		
-		Lista listaEspecial = validarListaEspecial(listasTablero);
-		
+
+		if (!listaEspecial.isEspecial()) {
+			throw new ListaEspecialInvalidaException("La lista indicada no es una lista especial");
+		}
+
+		if (listaEspecial.getLimite() != null) {
+			throw new ListaEspecialInvalidaException("La lista especial no puede tener límite de tarjetas");
+		}
+
 		if (tarjeta.getListaActual().equals(listaEspecial.getIdentificador())) {
 			throw new TarjetaYaCompletadaException("La tarjeta ya está en la lista especial de completadas");
 		}
-		
-		// Se podría hacer también con validarMovimientoEntreListas porque completar una tarjeta es moverla a la lista de especiales
+
+		// Completar una tarjeta es, en esencia, moverla a la lista especial
 		validarPrerrequisitos(tarjeta, listaEspecial);
 	}
 	

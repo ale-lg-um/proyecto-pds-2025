@@ -125,6 +125,10 @@ public class Tablero {
 			throw new IllegalArgumentException("La lista que se desea eliminar no existe");
 		}
 		
+		if (lista.equals(listaEspecial)) {
+			this.listaEspecial = null;
+		}
+		
 		this.listas.remove(lista);
 	}
 	

@@ -285,11 +285,10 @@ public class EntryHistorial {
 
 	// TARJETA COMPLETADA
 	public static EntryHistorial tarjetaCompletada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId, boolean completada)
+			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId)
 			throws EntryHistorialInvalidaException {
 
-		String detalles = "tarjetaId=" + tarjetaId.getId() + ", listaId=" + listaId.getId() + ", completada="
-				+ completada;
+		String detalles = "tarjetaId=" + tarjetaId.getId() + ", listaId=" + listaId.getId();
 
 		return of(id, tableroId, TipoEntryHistorial.TARJETA_COMPLETADA, usuario, timestamp, detalles);
 	}
