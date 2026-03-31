@@ -446,23 +446,20 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	public void addEtiquetaATarjeta(String tableroId, String listaId, String tarjetaId, String nombre, String color,
 			String emailUsuario) {
 
-		// 1. Validaciones de frontera
-		// Nombre y color de la etiqueta puede ser nulo. Sería etiqueta blanca por defecto sin nombre
-
-		// 2. Validación y construcción de objetos del dominio
+		// 1. Validación y construcción de objetos del dominio
 		TableroId idTablero = construirTableroId(tableroId);
 		ListaId idLista = construirListaId(listaId);
 		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
 		UsuarioId idUsuario = construirUsuarioId(emailUsuario);
-
+		
 		Etiqueta nuevaEtiqueta = new Etiqueta(nombre, color);
 
-		// 3. Recuperar raíces de agregados
+		// 2. Recuperar raíces de agregados
 		Tablero tablero = cargarTablero(idTablero);
 		Lista lista = cargarLista(idLista);
 		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
 
-		// 4. Comprobar consistencia entre agregados
+		// 3. Comprobar consistencia entre agregados
 		if (!tablero.getListas().contains(idLista)) {
 			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
 		}
@@ -475,16 +472,16 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista");
 		}
 
-		// 5. Obtener datos necesarios para el evento
+		// 4. Obtener datos necesarios para el evento
 		String nombreTarjeta = tarjeta.getTitulo();
 
-		// 6. Aplicar la operación delegando la lógica al dominio
+		// 5. Aplicar la operación delegando la lógica al dominio
 		tarjeta.anadirEtiqueta(nuevaEtiqueta);
 
-		// 7. Persistir cambios
+		// 6. Persistir cambios
 		repoTarjetas.guardar(tarjeta);
 
-		// 8. Publicar evento de dominio
+		// 7. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
 		eventBus.publicar(
 				new EtiquetaAnadidaATarjeta(idTarjeta, idLista, idTablero, idUsuario, timestamp, nuevaEtiqueta, nombreTarjeta));
@@ -495,23 +492,20 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	public void eliminarEtiquetaDeTarjeta(String tableroId, String listaId, String tarjetaId, String nombre,
 			String color, String emailUsuario) {
 
-		// 1. Validaciones de frontera
-		// Nombre y color de la etiqueta puede ser nulo. Sería etiqueta blanca por defecto sin nombre
-
-		// 2. Validación y construcción de objetos del dominio
+		// 1. Validación y construcción de objetos del dominio	
 		TableroId idTablero = construirTableroId(tableroId);
 		ListaId idLista = construirListaId(listaId);
 		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
 		UsuarioId idUsuario = construirUsuarioId(emailUsuario);
-
+		
 		Etiqueta etiquetaAEliminar = new Etiqueta(nombre, color);
 
-		// 3. Recuperar raíces de agregados
+		// 2. Recuperar raíces de agregados
 		Tablero tablero = cargarTablero(idTablero);
 		Lista lista = cargarLista(idLista);
 		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
 
-		// 4. Comprobar consistencia entre agregados
+		// 3. Comprobar consistencia entre agregados
 		if (!tablero.getListas().contains(idLista)) {
 			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
 		}
@@ -524,16 +518,16 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista");
 		}
 
-		// 5. Obtener datos necesarios para el evento
+		// 4. Obtener datos necesarios para el evento
 		String nombreTarjeta = tarjeta.getTitulo();
 
-		// 6. Aplicar la operación delegando la lógica al dominio
+		// 5. Aplicar la operación delegando la lógica al dominio
 		tarjeta.eliminarEtiqueta(etiquetaAEliminar);
 
-		// 7. Persistir cambios
+		// 6. Persistir cambios
 		repoTarjetas.guardar(tarjeta);
 
-		// 8. Publicar evento de dominio
+		// 7. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
 		eventBus.publicar(new EtiquetaEliminadaDeTarjeta(idTarjeta, idLista, idTablero, idUsuario, timestamp,
 				etiquetaAEliminar, nombreTarjeta));
@@ -543,24 +537,22 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	@Transactional
 	public void modificarEtiquetaEnTarjeta(String tableroId, String listaId, String tarjetaId, String nombreOld,
 			String colorOld, String nombreNuevo, String colorNuevo, String emailUsuario) {
-		// 1. Validaciones de frontera
-		// Nombre y color de la etiqueta puede ser nulo. Sería etiqueta blanca por defecto sin nombre
-
-		// 2. Validación y construcción de objetos del dominio
+		
+		// 1. Validación y construcción de objetos del dominio	
 		TableroId idTablero = construirTableroId(tableroId);
 		ListaId idLista = construirListaId(listaId);
 		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
 		UsuarioId idUsuario = construirUsuarioId(emailUsuario);
-
+		
 		Etiqueta etiquetaEliminada = new Etiqueta(nombreOld, colorOld);
 		Etiqueta etiquetaNueva = new Etiqueta(nombreNuevo, colorNuevo);
 
-		// 3. Recuperar raíces de agregados
+		// 2. Recuperar raíces de agregados
 		Tablero tablero = cargarTablero(idTablero);
 		Lista lista = cargarLista(idLista);
 		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
 
-		// 4. Comprobar consistencia entre agregados
+		// 3. Comprobar consistencia entre agregados
 		if (!tablero.getListas().contains(idLista)) {
 			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
 		}
@@ -573,17 +565,17 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista");
 		}
 
-		// 5. Obtener datos necesarios para el evento
+		// 4. Obtener datos necesarios para el evento
 		String nombreTarjeta = tarjeta.getTitulo();
 
-		// 6. Aplicar la operación delegando la lógica al dominio
+		// 5. Aplicar la operación delegando la lógica al dominio
 		tarjeta.eliminarEtiqueta(etiquetaEliminada);
 		tarjeta.anadirEtiqueta(etiquetaNueva);
 
-		// 7. Persistir cambios
+		// 6. Persistir cambios
 		repoTarjetas.guardar(tarjeta);
 
-		// 8. Publicar evento de dominio
+		// 7. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
 		eventBus.publicar(new EtiquetaModificadaEnTarjeta(idTarjeta, idLista, idTablero, idUsuario, timestamp,
 				etiquetaEliminada, etiquetaNueva, nombreTarjeta));
