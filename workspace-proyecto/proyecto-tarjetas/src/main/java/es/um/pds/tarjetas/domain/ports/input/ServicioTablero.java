@@ -9,7 +9,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 
-public interface ServicioGestionTablero {
+public interface ServicioTablero {
 	// TODO Actualizar DDD si es necesario en este servicio y todos
 	// Métodos
 	
@@ -19,6 +19,7 @@ public interface ServicioGestionTablero {
 	void eliminarTablero(String tableroId, String emailUsuario);															// Eliminar el tablero
 	void bloquearTablero(String tableroId, LocalDateTime desde, LocalDateTime hasta, String motivo, String emailUsuario);	// Bloquear el tablero
 	void desbloquearTablero(String tableroId, String emailUsuario);															// Desbloquear un tablero bloqueado
+	void configurarLimiteTablero(String tableroId, Integer limite, String emailUsuario);									// Configurar límite N a nivel de tablero
 	
 	// Listas
 	ListaDTO crearLista(String tableroId, String nombre, String emailUsuario);													// Crear una lista dentro de un tablero

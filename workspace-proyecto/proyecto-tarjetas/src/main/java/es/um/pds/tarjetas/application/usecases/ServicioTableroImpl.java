@@ -1,9 +1,7 @@
 package es.um.pds.tarjetas.application.usecases;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.common.events.EventBus;
-import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
-import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.lista.eventos.LimiteListaConfigurado;
 import es.um.pds.tarjetas.domain.model.lista.eventos.ListaCreada;
 import es.um.pds.tarjetas.domain.model.lista.eventos.ListaEditada;
@@ -24,7 +20,9 @@ import es.um.pds.tarjetas.domain.model.lista.eventos.PrerrequisitosListaConfigur
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.lista.model.PrerrequisitoInfo;
+import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
 import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
+import es.um.pds.tarjetas.domain.model.tablero.eventos.LimiteTableroConfigurado;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroBloqueado;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreado;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.TableroCreadoDesdePlantilla;
@@ -50,8 +48,7 @@ import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
-import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
@@ -66,7 +63,7 @@ import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
 
 // TODO Clase muy larga, separarla en gestión según tablero, listas y tarjetas
 @Service
-public class ServicioGestionTableroImpl implements ServicioGestionTablero {
+public class ServicioTableroImpl implements ServicioTablero {
 	// Inyectamos dependencias estrictas (patrón fachada)
 	private final RepositorioTableros repoTableros;
 	private final RepositorioListas repoListas;
@@ -77,7 +74,7 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 	private final PoliticaTarjetas politicaTarjetas;
 
 	// Constructor
-	public ServicioGestionTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas,
+	public ServicioTableroImpl(RepositorioTableros repoTableros, RepositorioListas repoListas,
 			RepositorioTarjetas repoTarjetas, RepositorioPlantillas repoPlantillas, EventBus eventBus,
 			PoliticaListas politicaListas, PoliticaTarjetas politicaTarjetas) {
 		this.repoTableros = repoTableros;
@@ -123,53 +120,68 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		};
 	}
 	
+	private void aplicarPlantillaAlTablero(Tablero nuevoTablero, Plantilla plantilla) {
+		// TODO
+		// Creado para evitar error, pero hay que implementar
+	}
+	
 	// Métodos heredados de la clase padre
 
-	// TODO Revisar todo este método
 	@Override
 	@Transactional
 	public ResultadoCrearTableroDTO crearTablero(CrearTableroCmd cmd) {
+
+		// 1. Validaciones de frontera
 		if (cmd == null) {
-			throw new IllegalArgumentException("El comando CrearTableroCmd no puede ser null");
+			throw new IllegalArgumentException("El comando CrearTableroCmd no puede ser nulo");
 		}
 
 		if (cmd.nombreTablero() == null || cmd.nombreTablero().isBlank()) {
 			throw new IllegalArgumentException("El nombre del tablero no puede estar vacío");
 		}
 
-		TableroId nuevoId = TableroId.of();
+		if (cmd.usuarioCreador() == null || cmd.usuarioCreador().isBlank()) {
+			throw new IllegalArgumentException("El usuario creador no puede ser nulo o vacío");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of();
+		UsuarioId idUsuario = UsuarioId.of(cmd.usuarioCreador());
 		String tokenUrl = UUID.randomUUID().toString();
 
-		Tablero nuevoTablero = Tablero.of(nuevoId, cmd.nombreTablero(), tokenUrl, cmd.usuarioCreador());
+		// 3. Crear agregado raíz
+		Tablero nuevoTablero = Tablero.of(idTablero, cmd.nombreTablero(), tokenUrl, idUsuario);
 
-		LocalDateTime timestamp = LocalDateTime.now();
 		Plantilla plantilla = null;
 
-		if (cmd.plantillaId() != null) {
-			plantilla = repoPlantillas.buscarPorId(cmd.plantillaId())
+		// 4. Cargar plantilla si procede y aplicarla
+		if (cmd.plantillaId() != null && !cmd.plantillaId().isBlank()) {
+			PlantillaId idPlantilla = PlantillaId.of(cmd.plantillaId());
+			plantilla = repoPlantillas.buscarPorId(idPlantilla)
 					.orElseThrow(() -> new IllegalArgumentException("No existe la plantilla indicada"));
 
-			// TODO método auxiliar o ver cómo lo hacemos
 			aplicarPlantillaAlTablero(nuevoTablero, plantilla);
 		}
 
+		// 5. Persistir cambios
 		repoTableros.guardar(nuevoTablero);
 
+		// 6. Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+
 		if (plantilla != null) {
-			eventBus.publicar(new TableroCreadoDesdePlantilla(nuevoId, cmd.usuarioCreador(), timestamp,
-					cmd.nombreTablero(), plantilla.getNombre()));
+			eventBus.publicar(new TableroCreadoDesdePlantilla(idTablero, idUsuario, timestamp, nuevoTablero.getNombre(),
+					plantilla.getNombre()));
 		} else {
-			eventBus.publicar(new TableroCreado(nuevoId, cmd.usuarioCreador(), timestamp, cmd.nombreTablero()));
+			eventBus.publicar(new TableroCreado(idTablero, idUsuario, timestamp, nuevoTablero.getNombre()));
 		}
 
+		// 7. Devolver DTO de salida
 		return new ResultadoCrearTableroDTO(nuevoTablero.getIdentificador().getId(), nuevoTablero.getNombre(),
 				nuevoTablero.getTokenUrl());
 	}
 	
-	public void aplicarPlantillaAlTablero(Tablero nuevoTablero, Plantilla plantinlla) {
-		// TODO
-		// Creado para evitar error, pero hay que implementar
-	}
+
 
 	@Override
 	@Transactional
@@ -319,6 +331,58 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		LocalDateTime timestamp = LocalDateTime.now();
 
 		eventBus.publicar(new TableroDesbloqueado(idTablero, idUsuario, timestamp));
+	}
+	
+	@Override
+	@Transactional
+	public void configurarLimiteTablero(String tableroId, Integer limite, String emailUsuario) {
+
+		// 1. Validaciones de frontera
+		if (tableroId == null || tableroId.isBlank()) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
+		}
+
+		if (emailUsuario == null || emailUsuario.isBlank()) {
+			throw new IllegalArgumentException("El email del usuario no puede ser null o vacío");
+		}
+
+		// null significa quitar el límite global
+		if (limite != null && limite <= 0) {
+			throw new IllegalArgumentException("El límite debe ser un entero positivo");
+		}
+
+		// 2. Construcción de objetos del dominio
+		TableroId idTablero = TableroId.of(tableroId);
+		UsuarioId idUsuario = UsuarioId.of(emailUsuario);
+
+		// 3. Recuperar agregado raíz
+		Tablero tablero = repoTableros.buscarPorId(idTablero)
+				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
+
+		// 4. Recuperar todas las listas del tablero
+		Set<Lista> listasTablero = repoListas.buscarPorIds(tablero.getListas());
+
+		// 5. Validar que ninguna lista no especial supere el límite
+		if (limite != null) {
+			for (Lista lista : listasTablero) {
+				if (!lista.isEspecial() && lista.getListaTarjetas().size() > limite) {
+					throw new IllegalStateException("No se puede establecer el límite global porque la lista "
+							+ lista.getNombreLista() + " ya contiene más tarjetas que el límite indicado");
+				}
+			}
+		}
+
+		// 6. Aplicar el límite a todas las listas menos a la especial
+		for (Lista lista : listasTablero) {
+			if (!lista.isEspecial()) {
+				lista.configurarLimite(limite);
+				repoListas.guardar(lista);
+			}
+		}
+
+		// 7. Publicar un único evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+		eventBus.publicar(new LimiteTableroConfigurado(idTablero, idUsuario, timestamp, limite));
 	}
 
 	@Override
@@ -513,8 +577,6 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		eventBus.publicar(new ListaEspecialDefinida(idLista, idTablero, idUsuario, timestamp, nombreLista, esEspecial));
 	}
 
-	// TODO Debería haber un método para configurar límites de todas las listas desde el tablero, no solamente un método individual
-	// TODO ¿Hay método para eliminar el límite? También no solo individual, sino a nivel de tablero
 	// Si la lista es especial no se puede configurar un límite
 	@Override
 	@Transactional
@@ -652,67 +714,6 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		eventBus.publicar(new PrerrequisitosListaConfigurados(idLista, idTablero, idUsuario, timestamp,
 				prerrequisitosSimplificados, nombreLista));
 	}
-	
-	/*
-	Método incompleto e incorrecto provisional
-	@Override
-	@Transactional
-	public TarjetaDTO crearTarjeta(String tableroId, String listaId, TarjetaDTO tarjeta, String emailUsuario) {
-		// 1. Validaciones de frontera
-		if (tableroId == null || tableroId.isBlank()) {
-			throw new IllegalArgumentException("El identificador del tablero no puede ser null o vacío");
-		}
-
-		if (listaId == null || listaId.isBlank()) {
-			throw new IllegalArgumentException("El nombre de la lista no puede estar vacío");
-		}
-		
-		if (tarjeta == null) {
-			throw new IllegalArgumentException("La tarjeta no puede ser null");
-		}
-
-		if (emailUsuario == null || emailUsuario.isBlank()) {
-			throw new IllegalArgumentException("El email del usuario no puede ser null o vacío");
-		}
-
-		// 2. Construcción de objetos del dominio
-		TableroId idTablero = TableroId.of(tableroId);
-		ListaId idLista = ListaId.of(listaId);
-		UsuarioId usuarioId = UsuarioId.of(emailUsuario);
-		TarjetaId nuevaTarjetaId = TarjetaId.of();
-
-		// 3. Recuperar raíz del agregado
-		Lista lista = repoListas.buscarPorId(idLista)
-				.orElseThrow(() -> new IllegalArgumentException("No existe la lista indicada"));
-
-		// 4. Crear la tarjeta y delegar la lógica al dominio
-		int posicion = lista.getListaTarjetas().size() + 1;
-
-		try {
-			ContenidoTarjeta contenido = tarjeta.contenido().toDomain();
-			
-			Tarjeta nuevaTarjeta = Tarjeta.of(nuevaTarjetaId, tarjeta.titulo(), idLista, posicion, contenido);
-
-			lista.anadirTarjeta(nuevaTarjetaId);
-
-			// 5. Persistir cambios
-			repoListas.guardar(lista);
-
-			// 6. Publicar evento de dominio
-			LocalDateTime timestamp = LocalDateTime.now();
-			eventBus.publicar(new TarjetaCreada(nuevaTarjetaId, idLista, idTablero, usuarioId, timestamp, tarjeta.titulo(),
-					posicion));
-
-			// 7. devolver DTO de salida
-			return new TarjetaDTO(nuevaTarjeta);
-			
-			
-			
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage());
-		}
-	}
-	*/
 
 	/*
 	 * NO SE PUEDEN CLONAR TARJETAS, no se puede añadir una tarjeta a una lista que ya tenga esa tarjeta. Tarjetas únicas
@@ -738,8 +739,8 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		if (cmd.emailUsuario() == null || cmd.emailUsuario().isBlank()) {
 			throw new IllegalArgumentException("El email del usuario no puede ser null o vacío");
 		}
-
-		// El nombre no puede ser nulo, sobre todo pensando de cara al historial. Podría ser nulo si se decidiera
+		
+		// El nombre no puede ser nulo, especialmente pensando de cara al historial. Podría ser nulo si se decidiera
 		if (nombre == null || nombre.isBlank()) {
 			throw new IllegalArgumentException("El nombre de la tarjeta no puede ser null o vacío");
 		}
@@ -1131,9 +1132,6 @@ public class ServicioGestionTableroImpl implements ServicioGestionTablero {
 		listaOrigen.eliminarTarjeta(idTarjeta);
 		listaEspecial.anadirTarjeta(idTarjeta);
 		tarjeta.cambiarListaActual(idListaEspecial);
-
-		// Si tu dominio distingue explícitamente entre mover y completar, añade aquí:
-		// tarjeta.marcarComoCompletada();
 
 		// 9. Persistir cambios
 		repoListas.guardar(listaOrigen);

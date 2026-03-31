@@ -37,7 +37,7 @@ public class RepositorioTablerosMemoria implements RepositorioTableros {
 	public List<TableroId> listarIdsPorUsuario(UsuarioId usuarioId) {
 		List<TableroId> idList = new ArrayList<>();
 		for(Tablero tab : baseDatos.values()) {
-			if(tab.getCreador().getIdentificador().equals(usuarioId)) {
+			if(tab.getCreador().equals(usuarioId)) {
 				idList.add(tab.getIdentificador());
 			}
 		}
