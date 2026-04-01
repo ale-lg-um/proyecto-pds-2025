@@ -114,3 +114,15 @@ interface RepositorioCodigosLogin {
 
 	void invalidarCodigo(UsuarioId usuarioId);
 }
+
+/* ------------------------- SESIONES DE APLICACIÓN ------------------------- */
+public interface RepositorioSesiones {
+
+	void guardarToken(String token, UsuarioId usuarioId, Instant expiraEn);
+
+	Optional<UsuarioId> buscarUsuarioPorTokenVigente(String token);
+
+	void extenderExpiracion(String token, Instant nuevaExpiracion);
+
+	void invalidarToken(String token);
+}

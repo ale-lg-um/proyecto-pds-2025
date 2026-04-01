@@ -133,6 +133,8 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 		};
 	}
 		
+	// Métodos heredados
+	
 	/*
 	 * NO SE PUEDEN CLONAR TARJETAS, no se puede añadir una tarjeta a una lista que ya tenga esa tarjeta. Tarjetas únicas
 	 * Por tanto, no habrá problema con usar List<TarjetaId> en Lista, porque nos aseguramos de que no haya repetidos. Recomprobarlo igualmente

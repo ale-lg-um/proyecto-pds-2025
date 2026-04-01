@@ -175,6 +175,8 @@ public class ServicioPlantillaImpl implements ServicioPlantilla {
 		return new PlantillaDTO(plantilla);
 	}
 
+	// Métodos heredados
+	
 	@Override
 	@Transactional
 	public PlantillaDTO crearPlantilla(String yaml, String emailUsuario) {

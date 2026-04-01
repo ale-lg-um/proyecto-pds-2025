@@ -195,7 +195,7 @@ public class ServicioTableroImpl implements ServicioTablero {
 				.orElseThrow(() -> new IllegalArgumentException("No existe el tablero indicado"));
 	}
 	
-	// Métodos heredados de la clase padre
+	// Métodos heredados
 
 	@Override
 	@Transactional
