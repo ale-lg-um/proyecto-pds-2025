@@ -119,6 +119,7 @@ public class PoliticaTarjetas {
 		validarPrerrequisitos(tarjeta, listaEspecial);
 	}
 	
+	// Comprobar que las tarjetas de una lista cumplen con los prerrequisitos antes de ser configurados
 	public void validarConfiguracionPrerrequisitos(List<Tarjeta> tarjetasLista, Set<ListaId> prerrequisitos)
 			throws PrerrequisitosNoCumplidosException {
 

@@ -27,7 +27,6 @@ public interface RepositorioTarjetas {
 
 	void eliminarPorTableroId(TableroId tableroId);
 
-	// TODO Modelar clases Page y PageRequest
 	Page<Tarjeta> filtrarPorEtiquetas(
 			TableroId tableroId,
 			List<Etiqueta> etiquetas,

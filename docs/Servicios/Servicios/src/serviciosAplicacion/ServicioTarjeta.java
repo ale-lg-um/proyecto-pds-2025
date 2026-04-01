@@ -1,7 +1,4 @@
-package es.um.pds.tarjetas.domain.ports.input;
-
-import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
-import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+package serviciosAplicacion;
 
 public interface ServicioTarjeta {
 	// La tarjeta se crea dentro de una lista

@@ -9,7 +9,6 @@ public interface RepositorioEntryHistorial {
 
 	void guardar(EntryHistorial entry);
 
-	// TODO
 	Page<EntryHistorial> consultarPorTablero(TableroId tableroId, PageRequest pageRequest);
 
 	void eliminarPorTableroId(TableroId tableroId);

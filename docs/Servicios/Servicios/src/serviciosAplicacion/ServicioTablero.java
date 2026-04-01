@@ -1,9 +1,4 @@
-package es.um.pds.tarjetas.domain.ports.input;
-
-import java.time.LocalDateTime;
-
-import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
-import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
+package serviciosAplicacion;
 
 public interface ServicioTablero {
 	// Se trata de una operación compleja, por lo que se usa un Command

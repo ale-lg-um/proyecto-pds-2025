@@ -1,7 +1,10 @@
 package serviciosDominio;
 
-public class PoliticaTarjetas {
+public class PoliticaListas {
 	
-	// Valida que todas las listas que se quieran configurar como prerrequisitos existan en el tablero
-	validarPrerrequisitosConfigurados(tablero, prerrequisitos);
+	// Validar que todas las listas que se quieran configurar como prerrequisito existan en el tablero (R10)
+	public void validarPrerrequisitosConfigurados(Set<ListaId> listasTablero, Set<ListaId> prerrequisitos);
+	
+	// Validar que todas las listas de un tablero tienen nombre único (R11)
+	public void validarNombreUnicoEnTablero(TableroId tablero, String nombreLista);
 }

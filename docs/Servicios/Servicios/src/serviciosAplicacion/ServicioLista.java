@@ -1,8 +1,4 @@
-package es.um.pds.tarjetas.domain.ports.input;
-
-import java.util.Set;
-
-import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
+package serviciosAplicacion;
 
 public interface ServicioLista {
 	ListaDTO crearLista(String tableroId, String nombre, String emailUsuario);

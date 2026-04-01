@@ -4,30 +4,36 @@ package InterfacesSalida;
 
 interface RepositorioTableros {
     void guardar(Tablero tablero);
+    
     Optional<Tablero> buscarPorId(TableroId tableroId);
 
     // Necesario para HA6 (hard delete)
     void eliminarPorId(TableroId tableroId);
 
-    // Útil para "tableros disponibles" (HA6). Si no lo quieres, puedes quitarlo.
-    List<TableroId> listarIdsPorUsuario(Email email);
+    // Útil para tableros disponibles (HA6)
+    List<TableroId> listarIdsPorUsuario(UsuarioId usuarioId);
 }
 
 /* ------------------------- PLANTILLAS ------------------------- */
 
 interface RepositorioPlantilla {
     void guardar(Plantilla plantilla);
+    
     Optional<Plantilla> buscarPorId(PlantillaId plantillaId);
 }
 
 /* ------------------------- LISTAS ------------------------- */
 
 interface RepositorioListas {
-    void guardar(ListaDeTareas lista);
-    Optional<ListaDeTareas> buscarPorId(ListaId listaId);
+    void guardar(Lista lista);
+    
+    Optional<Lista> buscarPorId(ListaId listaId);
+    
+    // Útil para configurar límite a nivel de tablero, configurar prerrequisitos y eliminar tablero
+    Set<Lista> buscarPorIds(Set<ListaId> ids);
 
     // Necesario para HA6 (hard delete cascada) y para operaciones por tablero
-    List<ListaDeTareas> buscarPorTableroId(TableroId tableroId);
+    Set<Lista> buscarPorTableroId(TableroId tableroId);
 
     // Necesario para borrar lista (HB1) y cascada al borrar tablero
     void eliminarPorId(ListaId listaId);
@@ -42,6 +48,7 @@ enum ModoFiltradoEtiquetas { AND, OR }
 
 interface RepositorioTarjetas {
     void guardar(Tarjeta tarjeta);
+    
     Optional<Tarjeta> buscarPorId(TarjetaId tarjetaId);
 
     // Necesario para eliminar todas las tarjetas dentro de una lista (HB1)
@@ -53,8 +60,9 @@ interface RepositorioTarjetas {
     // Borrado directo
     void eliminarPorId(TarjetaId tarjetaId);
 
-    // Borrados masivos (eficientes)
+    // Borrados masivos
     void eliminarPorListaId(ListaId listaId);
+    
     void eliminarPorTableroId(TableroId tableroId);
 
     // HG1 – Filtrado por etiquetas (consulta)
@@ -70,56 +78,39 @@ interface RepositorioTarjetas {
 
 interface RepositorioUsuarios {
     void guardar(Usuario usuario);
-    Optional<Usuario> buscarPorEmail(Email email);
+    
+    Optional<Usuario> buscarPorEmail(UsuarioId usuarioId);
 }
 
 /* ------------------------- HISTORIAL (EntryHistorial) ------------------------- */
 
 interface RepositorioEntryHistorial {
-    void append(EntryHistorial entry);
+    void guardar(EntryHistorial entry);
 
     Page<EntryHistorial> consultarPorTablero(TableroId tableroId, PageRequest pageRequest);
 
     // Necesario para HA6 (hard delete) -> "El historial del tablero desaparece"
     void eliminarPorTableroId(TableroId tableroId);
-
-    // Posibles mejoras:
-    /*
-    // Opcional: filtros si los expones en REST
-    Page<EntryHistorial> consultarPorTableroYTipo(
-            TableroId tableroId,
-            TipoEntry tipo,
-            PageRequest pageRequest
-    );
-
-    // Opcional: si quieres rango de fechas
-    Page<EntryHistorial> consultarPorTableroYRango(
-            TableroId tableroId,
-            Instant from,
-            Instant to,
-            PageRequest pageRequest
-    );
-    */
 }
 
 /* ------------------------- EMAIL (autenticación) ------------------------- */
 
 interface PuertoEnvioEmail {
-    void enviarEmail(MensajeEmail m);
+	void enviarEmail(UsuarioId destinatario, String asunto, String cuerpo);
 }
 
 /* ------------------------- YAML (plantillas) ------------------------- */
 
 interface PuertoParserYAML {
-    YamlCorrecto parse(String yaml) throws PlantillaInvalida;
+    EspecificacionTableroPlantilla parse(String yaml);
 }
 
 /* ------------------------- CÓDIGOS DE LOGIN ------------------------- */
 
 interface RepositorioCodigosLogin {
-    void guardarCodigo(Email email, CodigoLogin codigo, Instant expiraEn);
+	void guardarCodigo(UsuarioId usuarioId, String codigo, Instant expiraEn);
 
-    Optional<CodigoLogin> buscarCodigoVigente(Email email);
+	Optional<String> buscarCodigoVigente(UsuarioId usuarioId);
 
-    void invalidarCodigo(Email email);
+	void invalidarCodigo(UsuarioId usuarioId);
 }
