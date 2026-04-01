@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
@@ -27,9 +26,10 @@ public interface RepositorioTarjetas {
 
 	void eliminarPorTableroId(TableroId tableroId);
 
+	// El filtrado se hace solamente por nombre, no por (nombre, color)
 	Page<Tarjeta> filtrarPorEtiquetas(
 			TableroId tableroId,
-			List<Etiqueta> etiquetas,
+			List<String> nombresEtiquetas,
 			ModoFiltradoEtiquetas modo,
 			PageRequest pageRequest
     );
