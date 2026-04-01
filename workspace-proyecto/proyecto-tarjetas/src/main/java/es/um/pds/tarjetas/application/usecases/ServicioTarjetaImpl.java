@@ -132,7 +132,49 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 		}
 		};
 	}
+	
+	// Se podría modificar mover tarjeta, pero separamos por semántica de dominio
+	private void moverTarjetaAListaEspecial(Tablero tablero, Lista listaOrigen, Tarjeta tarjeta, UsuarioId idUsuario) {
+
+		ListaId idListaEspecial = tablero.getListaEspecial();
+		if (idListaEspecial == null) {
+			throw new IllegalStateException("El tablero no tiene una lista especial configurada");
+		}
+
+		if (!tablero.getListas().contains(idListaEspecial)) {
+			throw new IllegalStateException("La lista especial configurada no pertenece al tablero");
+		}
+
+		Lista listaEspecial = repoListas.buscarPorId(idListaEspecial)
+				.orElseThrow(() -> new IllegalArgumentException("No existe la lista especial indicada en el tablero"));
+
+		// Validar reglas de negocio de completar tarjeta
+		politicaTarjetas.validarCompletar(listaEspecial, tarjeta);
+
+		// Obtener datos necesarios para el evento
+		TarjetaId idTarjeta = tarjeta.getIdentificador();
+		TableroId idTablero = tablero.getIdentificador();
+		String nombreTarjeta = tarjeta.getTitulo();
+
+		// Ejecutar las operaciones delegando lógica al dominio
+		listaOrigen.eliminarTarjeta(idTarjeta);
+		listaEspecial.anadirTarjeta(idTarjeta);
+		tarjeta.cambiarListaActual(idListaEspecial);
+		tarjeta.marcarComoCompletada();
+
+		// Persistir cambios
+		repoListas.guardar(listaOrigen);
+		repoListas.guardar(listaEspecial);
+		repoTarjetas.guardar(tarjeta);
+
+		// Publicar evento de dominio
+		LocalDateTime timestamp = LocalDateTime.now();
+		eventBus.publicar(
+				new TarjetaCompletada(idTarjeta, idListaEspecial, idTablero, idUsuario, timestamp, nombreTarjeta));
+	}
 		
+	
+	
 	// Métodos heredados
 	
 	/*
@@ -377,6 +419,103 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 		LocalDateTime timestamp = LocalDateTime.now();
 		eventBus.publicar(new TarjetaMovida(idTarjeta, idListaOrigen, idListaDestino, idTablero, idUsuario, timestamp, nombreTarjeta));
 	}
+	
+	@Override
+	@Transactional
+	public void completarItemChecklist(String tableroId, String listaId, String tarjetaId, int indiceItem, String emailUsuario) {
+
+		// 1. Validaciones de frontera
+		if (indiceItem < 0) {
+			throw new IllegalArgumentException("El índice del ítem no puede ser negativo");
+		}
+
+		// 2. Validación y construcción de objetos del dominio
+		TableroId idTablero = construirTableroId(tableroId);
+		ListaId idLista = construirListaId(listaId);
+		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
+		UsuarioId idUsuario = construirUsuarioId(emailUsuario);
+
+		// 3. Recuperar raíces de agregados
+		Tablero tablero = cargarTablero(idTablero);
+		Lista lista = cargarLista(idLista);
+		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
+
+		// 4. Comprobar consistencia entre agregados
+		if (!tablero.getListas().contains(idLista)) {
+			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
+		}
+
+		if (!tarjeta.getListaActual().equals(idLista)) {
+			throw new IllegalArgumentException("La tarjeta indicada no pertenece a la lista");
+		}
+
+		if (!lista.getListaTarjetas().contains(idTarjeta)) {
+			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista");
+		}
+
+		if (!(tarjeta.getContenido() instanceof Checklist)) {
+			throw new IllegalStateException("La tarjeta indicada no contiene una checklist");
+		}
+
+		// 5. Ejecutar la operación delegando la lógica al dominio
+		boolean estabaCompletada = tarjeta.isCompletada();
+		tarjeta.marcarItemChecklistComoCompletado(indiceItem);
+
+		// 6. Completar si procede y persistir cambios
+		if (!estabaCompletada && tarjeta.isCompletada()) {
+			moverTarjetaAListaEspecial(tablero, lista, tarjeta, idUsuario);
+		} else {
+			repoTarjetas.guardar(tarjeta);
+		}
+	}
+	
+	/* La versión opuesta del método anterior, para desmarcar el ítem. Este método no intenta "descompletar"
+	 * una tarjeta ya movida a la lista especial, solo cambia el estado del checklist mientras la tarjeta
+	 * siga en su lista actual
+	 */
+	@Override
+	@Transactional
+	public void marcarItemChecklistComoPendiente(String tableroId, String listaId, String tarjetaId, int indiceItem,
+			String emailUsuario) {
+
+		// 1. Validaciones de frontera
+		if (indiceItem < 0) {
+			throw new IllegalArgumentException("El índice del ítem no puede ser negativo");
+		}
+
+		// 2. Validación y construcción de objetos del dominio
+		TableroId idTablero = construirTableroId(tableroId);
+		ListaId idLista = construirListaId(listaId);
+		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
+
+		// 3. Recuperar raíces de agregados
+		Tablero tablero = cargarTablero(idTablero);
+		Lista lista = cargarLista(idLista);
+		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
+
+		// 4. Comprobar consistencia entre agregados
+		if (!tablero.getListas().contains(idLista)) {
+			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
+		}
+
+		if (!tarjeta.getListaActual().equals(idLista)) {
+			throw new IllegalArgumentException("La tarjeta indicada no pertenece a la lista");
+		}
+
+		if (!lista.getListaTarjetas().contains(idTarjeta)) {
+			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista");
+		}
+
+		if (!(tarjeta.getContenido() instanceof Checklist)) {
+			throw new IllegalStateException("La tarjeta indicada no contiene una checklist");
+		}
+
+		// 5. Ejecutar la operación delegando la lógica al dominio
+		tarjeta.marcarItemChecklistComoPendiente(indiceItem);
+		
+		// 6. Persistir cambios
+		repoTarjetas.guardar(tarjeta);
+	}
 
 	// Realmente es mover una tarjeta a la lista especial de completadas y se podría prescindir,
 	// pero lo separamos como acciones distintas por tener más coherencia con el dominio
@@ -407,40 +546,9 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 		if (!listaOrigen.getListaTarjetas().contains(idTarjeta)) {
 			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista indicada");
 		}
-
-		// 4. Obtener la lista especial desde el tablero
-		ListaId idListaEspecial = tablero.getListaEspecial();
-		if (idListaEspecial == null) {
-			throw new IllegalStateException("El tablero no tiene una lista especial configurada");
-		}
-
-		if (!tablero.getListas().contains(idListaEspecial)) {
-			throw new IllegalStateException("La lista especial configurada no pertenece al tablero");
-		}
-
-		Lista listaEspecial = repoListas.buscarPorId(idListaEspecial)
-				.orElseThrow(() -> new IllegalArgumentException("No existe la lista especial indicada en el tablero"));
-
-		// 5. Validar reglas de negocio de completar tarjeta
-		politicaTarjetas.validarCompletar(listaEspecial, tarjeta);
-
-		// 6. Obtener datos necesarios para el evento
-		String nombreTarjeta = tarjeta.getTitulo();
-
-		// 7. Ejecutar la operación delegando la lógica al dominio
-		listaOrigen.eliminarTarjeta(idTarjeta);
-		listaEspecial.anadirTarjeta(idTarjeta);
-		tarjeta.cambiarListaActual(idListaEspecial);
-
-		// 8. Persistir cambios
-		repoListas.guardar(listaOrigen);
-		repoListas.guardar(listaEspecial);
-		repoTarjetas.guardar(tarjeta);
-
-		// 9. Publicar evento de dominio
-		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(
-				new TarjetaCompletada(idTarjeta, idListaEspecial, idTablero, idUsuario, timestamp, nombreTarjeta));
+		
+		// Llamar al método auxiliar
+		moverTarjetaAListaEspecial(tablero, listaOrigen, tarjeta, idUsuario);
 	}
 
 	@Override

@@ -34,6 +34,14 @@ public class ServicioHistorialImpl implements ServicioHistorial {
 		if (tamano > MAX_TAMANO_PAGINA) {
 			throw new IllegalArgumentException("El tamaño máximo de página es " + MAX_TAMANO_PAGINA);
 		}
+		
+		if (pagina < 0) {
+			throw new IllegalArgumentException("El número de página no puede ser negativo");
+		}
+		
+		if (tamano <= 0) {
+			throw new IllegalArgumentException("El tamaño de página debe ser positivo");
+		}
 
 		// 2. Validación y construcción de objetos del dominio
 		TableroId idTablero = TableroId.of(tableroId);

@@ -42,7 +42,10 @@ public class Lista {
 			throw new ListaInvalidaException("La lista debe tener un identificador");
 		}
 		
-		// Permitimos que la lista no tenga nombre, no comprobamos si nombre es nulo o blanco
+		// Se podría permitir que la lista no tuviera nombre
+		if (nombre == null || nombre.isBlank()) {
+			throw new ListaInvalidaException("La lista debe tener un nombre no vacío");
+		}
 		
 		return new Lista(identificador, nombre);
 	}
@@ -121,6 +124,9 @@ public class Lista {
 	}
 	
 	public void renombrar(String nuevoNombre) {
+		if (nuevoNombre == null || nuevoNombre.isBlank()) {
+			throw new IllegalArgumentException("El nombre de la lista no puede estar vacío");
+		}
 		this.nombreLista = nuevoNombre;
 	}
 	

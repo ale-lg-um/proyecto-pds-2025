@@ -1,4 +1,7 @@
-package serviciosAplicacion;
+package es.um.pds.tarjetas.domain.ports.input;
+
+import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
+import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 
 public interface ServicioTarjeta {
 	// La tarjeta se crea dentro de una lista
@@ -11,6 +14,10 @@ public interface ServicioTarjeta {
 	void moverTarjeta(String tableroId, String tarjetaId, String listaOrigenId, String listaDestinoId, String emailUsuario);
 	// Marcar una tarjeta como completada (en realidad es como moverla a la lista especial)
 	void completarTarjeta(String tableroId, String listaId, String tarjetaId, String emailUsuario);
+	// Marcar como completado item de la checklist y completar la tarjeta si procede
+	void completarItemChecklist(String tableroId, String listaId, String tarjetaId, int indiceItem, String emailUsuario);
+	// Desmarcar item de checklist
+	void marcarItemChecklistComoPendiente(String tableroId, String listaId, String tarjetaId, int indiceItem, String emailUsuario);
 	
 	// ETIQUETAS
 	// Añadir una etiqueta (nombre y color) a una tarjeta de un tablero

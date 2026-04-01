@@ -46,12 +46,11 @@ public class RepositorioListasMemoria implements RepositorioListas{
 	
 	@Override
 	public void eliminarPorTableroId(TableroId id) {
-		for(Lista lista : baseDatos.values()) {
-			ListaId listaid = lista.getIdentificador();
-			if(lista.getTablero().equals(id)) {
-				baseDatos.remove(listaid);
-			}
+		if (id == null) {
+			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
+
+		baseDatos.values().removeIf(lista -> id.equals(lista.getTablero()));
 	}
 
 	@Override

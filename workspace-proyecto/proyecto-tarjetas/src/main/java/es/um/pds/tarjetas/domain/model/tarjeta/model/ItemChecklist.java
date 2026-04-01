@@ -19,6 +19,14 @@ public class ItemChecklist {
 		}
 		return new ItemChecklist(descripcion, false);
 	}
+	
+	// Método factoría que permita reconstruir el estado
+	public static ItemChecklist of(String descripcion, boolean completado) {
+		if (descripcion == null || descripcion.isBlank()) {
+			throw new IllegalArgumentException("La descripción del ítem no puede estar vacía");
+		}
+		return new ItemChecklist(descripcion, completado);
+	}
 
 	// Getters
 	public String getDescripcion() {
