@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-import es.um.pds.tarjetas.domain.model.usuario.models.Usuario;
+import es.um.pds.tarjetas.domain.model.usuario.model.Usuario;
 import es.um.pds.tarjetas.domain.ports.input.ServicioAutenticacion;
 import es.um.pds.tarjetas.domain.ports.output.PuertoEnvioEmail;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioCodigosLogin;

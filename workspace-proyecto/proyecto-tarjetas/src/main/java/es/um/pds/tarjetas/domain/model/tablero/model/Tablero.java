@@ -12,8 +12,6 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
-
-//@Entity
 public class Tablero {
 	// Atributos
 	private final TableroId identificador;			// Identificador del tablero

@@ -12,7 +12,6 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 
-//@Entity
 public class Lista {
 	// Atributos
 	private final ListaId identificador;

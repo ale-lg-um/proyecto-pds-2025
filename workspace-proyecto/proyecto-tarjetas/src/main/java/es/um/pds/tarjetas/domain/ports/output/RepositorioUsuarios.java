@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.ports.output;
 import java.util.Optional;
 
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-import es.um.pds.tarjetas.domain.model.usuario.models.Usuario;
+import es.um.pds.tarjetas.domain.model.usuario.model.Usuario;
 
 public interface RepositorioUsuarios {
 

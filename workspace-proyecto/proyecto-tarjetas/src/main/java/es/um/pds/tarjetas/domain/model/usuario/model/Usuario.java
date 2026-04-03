@@ -1,11 +1,10 @@
-package es.um.pds.tarjetas.domain.model.usuario.models;
+package es.um.pds.tarjetas.domain.model.usuario.model;
 
 import java.util.Objects;
 
 import es.um.pds.tarjetas.application.common.exceptions.UsuarioInvalidoException;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
-//@Entity
 public class Usuario {
 	// Atributos
 	private final UsuarioId identificador;
