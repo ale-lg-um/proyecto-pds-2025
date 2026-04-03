@@ -21,11 +21,9 @@ public class Lista {
 	private boolean especial;
 	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
 	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
-	// No puede cargar otros agregados, no se puede poner
-	//private Tablero tablero; // necesario para el eliminarPorTableroId de repoListas
 	private TableroId tablero;
 	
-	// Constructor
+	// Constructor para creación nueva
 	private Lista(ListaId identificador, String nombre) {
 		this.identificador = identificador;
 		this.nombreLista = nombre;
@@ -35,18 +33,70 @@ public class Lista {
 		this.prerrequisitos = new HashSet<>();
 	}
 	
-	// Método factoría
+	// Constructor para reconstrucción
+	private Lista(ListaId identificador, String nombre, List<TarjetaId> listaTarjetas, boolean especial, Integer limite,
+			Set<ListaId> prerrequisitos, TableroId tablero) {
+		this.identificador = identificador;
+		this.nombreLista = nombre;
+		this.listaTarjetas = new ArrayList<>(listaTarjetas);
+		this.especial = especial;
+		this.limite = limite;
+		this.prerrequisitos = new HashSet<>(prerrequisitos);
+		this.tablero = tablero;
+	}
+	
+	// Método factoría de nueva creación
 	public static Lista of(ListaId identificador, String nombre) {
+		validarDatosBasicos(identificador, nombre);
+		
+		return new Lista(identificador, nombre);
+	}
+	
+	// Método factoría de reconstrucción
+	public static Lista reconstruir(ListaId identificador, String nombre, List<TarjetaId> listaTarjetas,
+			boolean especial, Integer limite, Set<ListaId> prerrequisitos, TableroId tablero) {
+		validarDatosBasicos(identificador, nombre);
+
+		if (listaTarjetas == null) {
+			throw new ListaInvalidaException("La lista de tarjetas no puede ser nula");
+		}
+
+		if (listaTarjetas.contains(null)) {
+			throw new ListaInvalidaException("La lista no puede contener identificadores de tarjeta nulos");
+		}
+
+		if (prerrequisitos == null) {
+			throw new ListaInvalidaException("Los prerrequisitos no pueden ser nulos");
+		}
+
+		if (prerrequisitos.contains(null)) {
+			throw new ListaInvalidaException("La lista no puede contener prerrequisitos nulos");
+		}
+
+		if (especial && limite != null) {
+			throw new ListaInvalidaException("Una lista especial no puede tener límite");
+		}
+
+		if (limite != null && limite <= 0) {
+			throw new ListaInvalidaException("El límite debe ser un entero positivo");
+		}
+
+		if (limite != null && listaTarjetas.size() > limite) {
+			throw new ListaInvalidaException("La lista contiene más tarjetas que el límite configurado");
+		}
+
+		return new Lista(identificador, nombre, listaTarjetas, especial, limite, prerrequisitos, tablero);
+	}
+	
+	// Métodos auxiliares
+	private static void validarDatosBasicos(ListaId identificador, String nombre) {
 		if (identificador == null) {
 			throw new ListaInvalidaException("La lista debe tener un identificador");
 		}
-		
-		// Se podría permitir que la lista no tuviera nombre
+
 		if (nombre == null || nombre.isBlank()) {
 			throw new ListaInvalidaException("La lista debe tener un nombre no vacío");
 		}
-		
-		return new Lista(identificador, nombre);
 	}
 	
 	// Getters

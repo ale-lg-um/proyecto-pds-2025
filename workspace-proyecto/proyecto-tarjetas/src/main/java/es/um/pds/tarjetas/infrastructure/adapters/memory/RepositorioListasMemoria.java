@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.infrastructure.adapters;
+package es.um.pds.tarjetas.infrastructure.adapters.memory;
 
 import java.util.HashMap;
 import java.util.HashSet;

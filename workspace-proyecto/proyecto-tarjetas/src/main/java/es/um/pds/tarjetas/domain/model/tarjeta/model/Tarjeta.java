@@ -27,7 +27,7 @@ public class Tarjeta {
 	private final Set<ListaId> listasVisitadas;	// Conjunto de listas por las que ha pasado la tarjeta
 	private boolean completada;					// Podría prescindirse pero es más cómodo trabajar con el atributo
 	
-	// Constructor
+	// Constructor para creación nueva
 	private Tarjeta(TarjetaId identificador, String titulo, ListaId listaActual, ContenidoTarjeta contenido) {
 		this.identificador = identificador;
 		this.titulo = titulo;
@@ -42,31 +42,97 @@ public class Tarjeta {
 		actualizarEstadoCompletitudSegunContenido();
 	}
 	
+	// Constructor para reconstrucción
+	private Tarjeta(TarjetaId identificador, String titulo, LocalDate fechaCreacion, ListaId listaActual,
+			TableroId tablero, ContenidoTarjeta contenido, List<Etiqueta> etiquetas, Set<ListaId> listasVisitadas,
+			boolean completada) {
+		this.identificador = identificador;
+		this.titulo = titulo;
+		this.fechaCreacion = fechaCreacion;
+		this.listaActual = listaActual;
+		this.tablero = tablero;
+		this.contenido = contenido;
+		this.etiquetas = new ArrayList<>(etiquetas);
+		this.listasVisitadas = new HashSet<>(listasVisitadas);
+		this.completada = completada;
+	}
+	
 	// Método 'of' aplicando patrón creador y método factoría
 	public static Tarjeta of(TarjetaId identificador, String titulo, ListaId listaActual, ContenidoTarjeta contenido) {
-        if (identificador == null) {
-            throw new TarjetaInvalidaException("La tarjeta debe tener un identificador");
-        }
-        
-        // Se podrían permitir nombres vacíos
-        if (titulo == null || titulo.isBlank()) {
-        	throw new TarjetaInvalidaException("El nombre de la tarjeta no puede estar vacío");
-        }
-        
-        if (contenido == null) {
-            throw new TarjetaInvalidaException("La tarjeta no puede estar vacía, debe contener una tarea o una checklist");
-        }
-        
-        if (listaActual == null) {
-        	throw new TarjetaInvalidaException("La tarjeta tiene que ser creada dentro de una lista");
-        }
-        
-        if (!(contenido instanceof Tarea) && !(contenido instanceof Checklist)) {
-            throw new TarjetaInvalidaException("El contenido de la tarjeta debe ser una TAREA o una CHECKLIST.");
-        }
+        validarDatosBasicos(identificador, titulo, listaActual, contenido);
          
         return new Tarjeta(identificador, titulo, listaActual, contenido);
     }
+	
+	// Método factoría de reconstrucción
+	public static Tarjeta reconstruir(TarjetaId identificador, String titulo, LocalDate fechaCreacion,
+			ListaId listaActual, TableroId tablero, ContenidoTarjeta contenido, List<Etiqueta> etiquetas,
+			Set<ListaId> listasVisitadas, boolean completada) {
+
+		validarDatosBasicos(identificador, titulo, listaActual, contenido);
+
+		if (fechaCreacion == null) {
+			throw new TarjetaInvalidaException("La tarjeta debe tener fecha de creación");
+		}
+
+		if (etiquetas == null) {
+			throw new TarjetaInvalidaException("La lista de etiquetas no puede ser nula");
+		}
+
+		if (etiquetas.contains(null)) {
+			throw new TarjetaInvalidaException("La tarjeta no puede contener etiquetas nulas");
+		}
+
+		if (listasVisitadas == null) {
+			throw new TarjetaInvalidaException("Las listas visitadas no pueden ser nulas");
+		}
+
+		if (listasVisitadas.contains(null)) {
+			throw new TarjetaInvalidaException("La tarjeta no puede contener listas visitadas nulas");
+		}
+
+		if (!listasVisitadas.contains(listaActual)) {
+			throw new TarjetaInvalidaException("La lista actual debe formar parte de las listas visitadas");
+		}
+
+		Tarjeta tarjeta = new Tarjeta(identificador, titulo, fechaCreacion, listaActual, tablero, contenido, etiquetas,
+				listasVisitadas, completada);
+
+		if (contenido instanceof Checklist checklist) {
+			boolean completadaSegunChecklist = checklist.todosCompletados();
+			if (completada != completadaSegunChecklist) {
+				throw new TarjetaInvalidaException(
+						"El estado de completitud no es consistente con los ítems de la checklist");
+			}
+		}
+
+		return tarjeta;
+	}
+	
+	// Métodos auxiliares
+	private static void validarDatosBasicos(TarjetaId identificador, String titulo, ListaId listaActual,
+			ContenidoTarjeta contenido) {
+		if (identificador == null) {
+			throw new TarjetaInvalidaException("La tarjeta debe tener un identificador");
+		}
+
+		if (titulo == null || titulo.isBlank()) {
+			throw new TarjetaInvalidaException("El nombre de la tarjeta no puede estar vacío");
+		}
+
+		if (contenido == null) {
+			throw new TarjetaInvalidaException(
+					"La tarjeta no puede estar vacía, debe contener una tarea o una checklist");
+		}
+
+		if (listaActual == null) {
+			throw new TarjetaInvalidaException("La tarjeta tiene que ser creada dentro de una lista");
+		}
+
+		if (!(contenido instanceof Tarea) && !(contenido instanceof Checklist)) {
+			throw new TarjetaInvalidaException("El contenido de la tarjeta debe ser una TAREA o una CHECKLIST");
+		}
+	}
 	
 	// Getters
 	public TarjetaId getIdentificador() {

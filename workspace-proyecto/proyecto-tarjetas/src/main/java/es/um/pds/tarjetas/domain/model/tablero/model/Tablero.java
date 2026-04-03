@@ -22,7 +22,7 @@ public class Tablero {
 	private EstadoBloqueo estadoBloqueo;			// Desde, Hasta y Descripción
 	private UsuarioId creador;						// para lo de la lista de ids por usuario en el repositorio
 	
-	// Constructor
+	// Constructor para creación de un tablero nuevo
 	private Tablero(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador) {
 		this.identificador = identificador;
 		this.nombre = nombre;
@@ -33,25 +33,63 @@ public class Tablero {
 		this.creador = creador;
 	}
 	
-	// Método factoría
-	public static Tablero of(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador) throws TableroInvalidoException {
+	// Constructor para reconstrucción desde persistencia
+	private Tablero(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador, Set<ListaId> listas,
+			ListaId listaEspecial, EstadoBloqueo estadoBloqueo) {
+		this.identificador = identificador;
+		this.nombre = nombre;
+		this.tokenUrl = tokenUrl;
+		this.creador = creador;
+		this.listas = new HashSet<>(listas);
+		this.listaEspecial = listaEspecial;
+		this.estadoBloqueo = estadoBloqueo;
+	}
+	
+	// Método factoría de nueva creación
+	public static Tablero of(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador) {
+		validarDatosBasicos(identificador, nombre, tokenUrl, creador);
+		
+		return new Tablero(identificador, nombre, tokenUrl, creador);
+	}
+	
+	// Método factoría de reconstrucción
+	public static Tablero reconstruir(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador,
+			Set<ListaId> listas, ListaId listaEspecial, EstadoBloqueo estadoBloqueo) {
+		validarDatosBasicos(identificador, nombre, tokenUrl, creador);
+
+		if (listas == null) {
+			throw new TableroInvalidoException("Las listas del tablero no pueden ser nulas");
+		}
+
+		if (listas.contains(null)) {
+			throw new TableroInvalidoException("El tablero no puede contener identificadores de lista nulos");
+		}
+
+		if (listaEspecial != null && !listas.contains(listaEspecial)) {
+			throw new TableroInvalidoException("La lista especial debe pertenecer al conjunto de listas del tablero");
+		}
+
+		return new Tablero(identificador, nombre, tokenUrl, creador, listas, listaEspecial, estadoBloqueo);
+	}
+	
+	// Métodos auxiliares
+	private static void validarDatosBasicos(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador)
+			throws TableroInvalidoException {
 		if (identificador == null) {
 			throw new TableroInvalidoException("El tablero debe tener un identificador");
 		}
-		
+
 		if (nombre == null || nombre.isBlank()) {
 			throw new TableroInvalidoException("El tablero debe tener un nombre");
 		}
-		
+
 		if (tokenUrl == null || tokenUrl.isBlank()) {
 			throw new TableroInvalidoException("El tablero debe tener un token para su URL");
 		}
-		
+
 		if (creador == null) {
 			throw new TableroInvalidoException("El tablero debe tener un usuario creador");
 		}
-		
-		return new Tablero(identificador, nombre, tokenUrl, creador);
 	}
 	
 	// Getters
@@ -67,7 +105,7 @@ public class Tablero {
 		return this.creador;
 	}
 	
-	public String getTokenUrl() {
+	public String getTokenURL() {
 		return this.tokenUrl;
 	}
 	

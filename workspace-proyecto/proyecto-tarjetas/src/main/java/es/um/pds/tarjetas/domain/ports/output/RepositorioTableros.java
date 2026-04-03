@@ -12,6 +12,8 @@ public interface RepositorioTableros {
 	void guardar(Tablero tablero);
 
     Optional<Tablero> buscarPorId(TableroId tableroId);
+    
+    Optional<Tablero> buscarPorURL(String tokenURL);
 
     void eliminarPorId(TableroId tableroId);
 

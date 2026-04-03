@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.infrastructure.adapters;
+package es.um.pds.tarjetas.infrastructure.adapters.memory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,17 @@ public class RepositorioTablerosMemoria implements RepositorioTableros {
 	@Override
 	public Optional<Tablero> buscarPorId(TableroId id) {
 		return Optional.ofNullable(baseDatos.get(id));
+	}
+	
+	@Override
+	public Optional<Tablero> buscarPorURL(String tokenURL) {
+		if (tokenURL == null || tokenURL.isBlank()) {
+			throw new IllegalArgumentException("El token de URL no puede ser nulo o vacío");
+		}
+
+		return baseDatos.values().stream()
+				.filter(tab -> tokenURL.equals(tab.getTokenURL()))
+				.findFirst();
 	}
 	
 	@Override
