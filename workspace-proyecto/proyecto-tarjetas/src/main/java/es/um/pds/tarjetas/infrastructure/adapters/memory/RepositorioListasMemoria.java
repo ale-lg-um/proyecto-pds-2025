@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
@@ -14,6 +15,7 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 
 @Repository
+@Primary
 public class RepositorioListasMemoria implements RepositorioListas{
 	// Atributos
 	private final Map<ListaId, Lista> baseDatos = new HashMap<>();

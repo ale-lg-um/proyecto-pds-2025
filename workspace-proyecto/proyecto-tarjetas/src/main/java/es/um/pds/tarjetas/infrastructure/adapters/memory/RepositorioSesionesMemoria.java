@@ -5,12 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioSesiones;
 
 @Repository
+@Primary
 public class RepositorioSesionesMemoria implements RepositorioSesiones {
 
 	// Clase estática para modelar sesión guardada

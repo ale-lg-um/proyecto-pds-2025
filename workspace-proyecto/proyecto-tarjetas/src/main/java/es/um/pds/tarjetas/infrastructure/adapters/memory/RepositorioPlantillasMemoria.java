@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
@@ -11,6 +12,7 @@ import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 
 @Repository
+@Primary
 public class RepositorioPlantillasMemoria implements RepositorioPlantillas {
 	// Atribuos
 	private final Map<PlantillaId, Plantilla> plantillas = new HashMap<>();

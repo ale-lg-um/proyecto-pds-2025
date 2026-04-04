@@ -1,5 +1,6 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -100,7 +101,7 @@ public class ListaController {
 		// Añadir todo a la vista
 		grid.add(new Label("Título:"), 0, 0);
 		grid.add(nombre, 1, 0);
-		grid.add(new Label("Tipo:"), 0, 0);
+		grid.add(new Label("Tipo:"), 0, 1);
 		grid.add(opciones, 1, 1);
 		
 		dialogo.getDialogPane().setContent(grid);
@@ -159,8 +160,10 @@ public class ListaController {
 		});
 	}
 	
+	// Añadir el primer elemento a una checklist (no pueden estar vacías)
 	private ContenidoTarjetaCmd inicializarChecklist(String titulo, String usuario) throws Exception{
-		ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, titulo, List.of(), usuario);
+		// new ArrayList<>() en lugar de List.of() porque el of devuelve lista inmutable, por lo que no se puede añadir el primer item a la checklist
+		ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, titulo, new ArrayList<>(), usuario);
 		TextInputDialog dialogo = new TextInputDialog();
 		dialogo.setTitle("Nuevo ítem");
 		dialogo.setHeaderText("Añadir primer ítem a la tarjeta");
