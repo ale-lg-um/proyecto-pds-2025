@@ -10,7 +10,9 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 /**
- * Entidad JPA para persistir entradas del historial
+ * Entidad JPA para persistir entradas del historial. Usamos tipos primitivos
+ * como String y LocalDate para aislarse completamente del dominio y así
+ * no depender de la infraestructura. Podrían usarse los VO
  */
 @Entity
 @Table(name = "entries_historial")

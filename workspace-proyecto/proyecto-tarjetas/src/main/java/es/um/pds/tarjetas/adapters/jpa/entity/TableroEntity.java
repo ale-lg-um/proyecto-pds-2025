@@ -17,7 +17,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 /**
- * Entidad JPA para persistir el agregado Tablero
+ * Entidad JPA para persistir el agregado Tablero. Usamos tipos primitivos
+ * como String y LocalDate para aislarse completamente del dominio y así
+ * no depender de la infraestructura. En este caso utilizamos solo el VO
+ * del estado de bloqueo por simplicidad
  */
 @Entity
 @Table(name = "tableros")

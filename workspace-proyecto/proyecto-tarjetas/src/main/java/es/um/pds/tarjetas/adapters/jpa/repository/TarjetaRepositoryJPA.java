@@ -11,34 +11,39 @@ import org.springframework.stereotype.Repository;
 import es.um.pds.tarjetas.adapters.jpa.entity.TarjetaEntity;
 
 /**
- * Repositorio JPA de bajo nivel para tarjetas.
+ * Repositorio JPA de bajo nivel para tarjetas
  */
 @Repository
 public interface TarjetaRepositoryJPA extends JpaRepository<TarjetaEntity, String> {
 
 	/**
-	 * Recupera todas las tarjetas de una lista.
+	 * Recupera todas las tarjetas de una lista
+	 * Implementación generada automáticamente por JPA
 	 */
 	List<TarjetaEntity> findByListaActualId(String listaActualId);
 
 	/**
-	 * Recupera todas las tarjetas de un tablero.
+	 * Recupera todas las tarjetas de un tablero
+	 * Implementación generada automáticamente por JPA
 	 */
 	List<TarjetaEntity> findByTableroId(String tableroId);
 
 	/**
-	 * Elimina todas las tarjetas de una lista.
+	 * Elimina todas las tarjetas de una lista
+	 * Implementación generada automáticamente por JPA
 	 */
 	void deleteByListaActualId(String listaActualId);
 
 	/**
-	 * Elimina todas las tarjetas de un tablero.
+	 * Elimina todas las tarjetas de un tablero
+	 * Implementación generada automáticamente por JPA
 	 */
 	void deleteByTableroId(String tableroId);
 
 	/**
 	 * Filtrado OR por nombre de etiqueta dentro de un tablero. Devuelve tarjetas
-	 * que tengan al menos una de las etiquetas indicadas.
+	 * que tengan al menos una de las etiquetas indicadas. Implementación con
+	 * una nueva Query. Pageable interfaz de Spring para paginación
 	 */
 	@Query("""
 				SELECT DISTINCT t
@@ -51,7 +56,8 @@ public interface TarjetaRepositoryJPA extends JpaRepository<TarjetaEntity, Strin
 
 	/**
 	 * Filtrado AND por nombre de etiqueta dentro de un tablero. Devuelve tarjetas
-	 * que contengan todas las etiquetas indicadas.
+	 * que contengan todas las etiquetas indicadas. Implementación con una
+	 * nueva Query. Pageable interfaz de Spring para paginación
 	 */
 	@Query("""
 				SELECT t

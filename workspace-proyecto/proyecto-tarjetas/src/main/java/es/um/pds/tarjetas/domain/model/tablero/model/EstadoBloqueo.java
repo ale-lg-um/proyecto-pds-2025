@@ -24,6 +24,19 @@ public record EstadoBloqueo(LocalDateTime desde, LocalDateTime hasta, String des
 		}
 	}
 	
+	// Getters
+	public LocalDateTime getDesde() {
+		return this.desde;
+	}
+	
+	public LocalDateTime getHasta() {
+		return this.hasta;
+	}
+	
+	public String getDescripcion() {
+		return this.descripcion;
+	}
+	
 	// Funcionalidades
 	public boolean estaActivoEn(LocalDateTime fecha) {
 		if (fecha == null) {

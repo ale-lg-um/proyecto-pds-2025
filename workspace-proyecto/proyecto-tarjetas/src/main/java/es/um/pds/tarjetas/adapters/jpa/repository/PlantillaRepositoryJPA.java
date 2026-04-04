@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import es.um.pds.tarjetas.adapters.jpa.entity.PlantillaEntity;
 
 /**
- * Repositorio JPA de bajo nivel para plantillas.
+ * Repositorio JPA de bajo nivel para plantillas
  */
 @Repository
 public interface PlantillaRepositoryJPA extends JpaRepository<PlantillaEntity, String> {

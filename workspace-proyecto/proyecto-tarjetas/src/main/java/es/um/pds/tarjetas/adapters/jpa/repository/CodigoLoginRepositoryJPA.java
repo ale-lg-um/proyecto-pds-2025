@@ -9,23 +9,26 @@ import org.springframework.stereotype.Repository;
 import es.um.pds.tarjetas.adapters.jpa.entity.CodigoLoginEntity;
 
 /**
- * Repositorio JPA de bajo nivel para códigos de login.
+ * Repositorio JPA de bajo nivel para códigos de login
  */
 @Repository
 public interface CodigoLoginRepositoryJPA extends JpaRepository<CodigoLoginEntity, String> {
 
 	/**
-	 * Busca el código de login asociado a un usuario.
+	 * Busca el código de login asociado a un usuario
+	 * Implementación generada automáticamente por JPA
 	 */
 	Optional<CodigoLoginEntity> findByUsuarioId(String usuarioId);
 
 	/**
-	 * Busca el código de login de un usuario solo si sigue vigente.
+	 * Busca el código de login de un usuario solo si sigue vigente
+	 * Implementación generada automáticamente por JPA
 	 */
 	Optional<CodigoLoginEntity> findByUsuarioIdAndExpiraEnAfter(String usuarioId, Instant instante);
 
 	/**
-	 * Elimina el código de login asociado a un usuario.
+	 * Elimina el código de login asociado a un usuario
+	 * Implementación generada automáticamente por JPA
 	 */
 	void deleteByUsuarioId(String usuarioId);
 }

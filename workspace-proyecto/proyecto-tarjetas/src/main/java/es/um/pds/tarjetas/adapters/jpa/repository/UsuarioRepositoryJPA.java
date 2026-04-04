@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import es.um.pds.tarjetas.adapters.jpa.entity.UsuarioEntity;
 
 /**
- * Repositorio JPA de bajo nivel para usuarios.
+ * Repositorio JPA de bajo nivel para usuarios
  */
 @Repository
 public interface UsuarioRepositoryJPA extends JpaRepository<UsuarioEntity, String> {

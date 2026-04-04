@@ -19,9 +19,13 @@ import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
 /**
- * Entidad JPA para persistir el agregado Tarjeta. Se usa esta estrategia para
- * el contenido: tipoContenido = TAREA o CHECKLIST tareaDescripcion para
- * tarjetas de tipo tarea itemsChecklist para tarjetas de tipo checklist
+ * Entidad JPA para persistir el agregado Tarjeta. Usamos tipos primitivos
+ * como String y LocalDate para aislarse completamente del dominio y así
+ * no depender de la infraestructura. Podrían usarse los VO
+ * Se usa esta estrategia para el contenido:
+ * tipoContenido = TAREA o CHECKLIST
+ * tareaDescripcion para tarjetas de tipo tarea
+ * itemsChecklist para tarjetas de tipo checklist
  */
 @Entity
 @Table(name = "tarjetas")

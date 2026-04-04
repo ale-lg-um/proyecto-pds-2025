@@ -1,6 +1,6 @@
 package es.um.pds.tarjetas.adapters.jpa.embeddable;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -13,36 +13,40 @@ import jakarta.persistence.Embeddable;
 public class EstadoBloqueoEmbeddable {
 
 	@Column(name = "desde")
-	private LocalDate desde;
+	private LocalDateTime desde;
 
 	@Column(name = "hasta")
-	private LocalDate hasta;
+	private LocalDateTime hasta;
 
 	@Column(name = "descripcion")
 	private String descripcion;
 
+	// Constructor vacío
 	public EstadoBloqueoEmbeddable() {
 	}
 
-	public EstadoBloqueoEmbeddable(LocalDate desde, LocalDate hasta, String descripcion) {
+	// Constructor con argumentos
+	public EstadoBloqueoEmbeddable(LocalDateTime desde, LocalDateTime hasta, String descripcion) {
 		this.desde = desde;
 		this.hasta = hasta;
 		this.descripcion = descripcion;
 	}
 
-	public LocalDate getDesde() {
+	// Getters y setters
+	
+	public LocalDateTime getDesde() {
 		return desde;
 	}
 
-	public void setDesde(LocalDate desde) {
+	public void setDesde(LocalDateTime desde) {
 		this.desde = desde;
 	}
 
-	public LocalDate getHasta() {
+	public LocalDateTime getHasta() {
 		return hasta;
 	}
 
-	public void setHasta(LocalDate hasta) {
+	public void setHasta(LocalDateTime hasta) {
 		this.hasta = hasta;
 	}
 

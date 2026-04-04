@@ -9,7 +9,9 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 /**
- * Entidad JPA para persistir plantillas
+ * Entidad JPA para persistir plantillas. Usamos tipos primitivos
+ * como String para aislarse completamente del dominio y así
+ * no depender de la infraestructura. Podrían usarse los VO
  */
 @Entity
 @Table(name = "plantillas")

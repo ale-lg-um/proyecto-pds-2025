@@ -248,7 +248,7 @@ public class ServicioTableroImpl implements ServicioTablero {
 
 		// 7. Devolver DTO de salida
 		return new ResultadoCrearTableroDTO(nuevoTablero.getIdentificador().getId(), nuevoTablero.getNombre(),
-				nuevoTablero.getTokenUrl());
+				nuevoTablero.getTokenURL());
 	}
 
 	@Override

@@ -7,7 +7,7 @@ public class Tarea extends ContenidoTarjeta{
 	private String descripcion;
 
 	// Constructor
-	private Tarea(String descripcion) {
+	public Tarea(String descripcion) {
 		this.descripcion = descripcion;
 	}
 	
