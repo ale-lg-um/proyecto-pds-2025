@@ -37,6 +37,7 @@ public class TableroController {
 	private final RepositorioListas repoListas;
 	private final RepositorioTableros repoTableros;
 	private final ApplicationContext contextoApp;
+	private final ContextoUsuario contextoUsuario;
 	private int nListas = 0;
 	
 	private String actual;
@@ -44,12 +45,13 @@ public class TableroController {
 	@FXML private HBox contenedorListas;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp) {
+	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario) {
 		this.servicioTablero = servicioTablero;
 		this.servicioLista = servicioLista;
 		this.repoListas = repoListas;
 		this.repoTableros = repoTableros;
 		this.contextoApp = contextoApp;
+		this.contextoUsuario = contextoUsuario;
 	}
 	
 	@FXML
@@ -60,7 +62,7 @@ public class TableroController {
 		System.out.println("Cargando el tablero principal...");
 		try {
 			TableroId id = TableroId.of();
-			UsuarioId creador = UsuarioId.of("usuario@ejemplo.com"); // CAMBIAR, tiene que haber una pantalla antes en la que se introduzca el email
+			UsuarioId creador = UsuarioId.of(contextoUsuario.getEmail());
 			
 			Tablero inicial = Tablero.of(id, "Tblero prueba", "token-prueba", creador);
 			repoTableros.guardar(inicial);
@@ -91,7 +93,9 @@ public class TableroController {
 				// instanciarListaVisual(nuevaLista)
 				//this.nListas = this.nListas + 1;
 				//ListaId listaId = ListaId.of();
-				ListaDTO nueva = servicioLista.crearLista(actual, nombre, "usuario@ejemplo.com");
+				System.out.println("▶ DEBUG - Nombre de la lista: " + nombre);
+				System.out.println("▶ DEBUG - Email en contexto: " + contextoUsuario.getEmail());
+				ListaDTO nueva = servicioLista.crearLista(actual, nombre, contextoUsuario.getEmail());
 				
 				//repoListas.guardar(nueva);
 				instanciarListaVisual(nueva);

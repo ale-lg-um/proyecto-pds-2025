@@ -3,12 +3,14 @@ package es.um.pds.tarjetas.ui.controllers;
 import java.io.IOException;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+@Component
 public class SceneManager {
 	// Atributos
 	private Stage stage;
@@ -24,6 +26,10 @@ public class SceneManager {
 	}
 	
 	public void showVentanaPrincipal() {
+		cargarYMostrar("LoginView");
+	}
+	
+	public void showTablero() {
 		cargarYMostrar("TableroView");
 	}
 	

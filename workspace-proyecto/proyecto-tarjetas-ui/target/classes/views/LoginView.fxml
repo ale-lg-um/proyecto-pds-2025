@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="500.0" spacing="20.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.LoginController">
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+   </padding>
+   <children>
+      <Label text="Nombre de la app">
+         <font>
+            <Font name="System Bold" size="28.0" />
+         </font>
+      </Label>
+      <VBox fx:id="panelEmail" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0">
+         <children>
+            <Label text="Introduce tu email para acceder:" />
+            <TextField fx:id="txtEmail" promptText="usuario@ejemplo.com" />
+            <Button fx:id="btnEnviar" mnemonicParsing="false" onAction="#accionEnviarCorreo" text="Enviar código de acceso" />
+         </children>
+      </VBox>
+      <VBox fx:id="panelCodigo" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0" visible="false">
+         <children>
+            <Label text="Inroduce el código de 6 dígitos que te hemos enviado:" />
+            <TextField fx:id="txtCodigo" promptText="123456" />
+            <Button fx:id="btnVerificar" mnemonicParsing="false" onAction="#accionVerificarCodigo" text="Verificar y entrar" />
+         </children>
+      </VBox>
+   </children>
+</VBox>

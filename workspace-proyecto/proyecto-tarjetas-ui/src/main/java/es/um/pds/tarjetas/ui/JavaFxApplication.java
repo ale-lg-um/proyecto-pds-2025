@@ -21,7 +21,7 @@ public class JavaFxApplication extends Application {
 	public void start(Stage stage) throws IOException {
 		try {
 			contexto = SpringApplication.run(AppConfig.class, new String[]{});
-			SceneManager manager = new SceneManager(contexto);
+			SceneManager manager = contexto.getBean(SceneManager.class);
 			manager.inicializar(stage);
 			manager.showVentanaPrincipal();
 		} catch(Exception e) {
