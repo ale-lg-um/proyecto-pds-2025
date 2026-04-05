@@ -16,11 +16,17 @@ public class Lista {
 	// Atributos
 	private final ListaId identificador;
 	private String nombreLista;
-	// Lo modelo como lista porque consideramos la posición de la tarjeta. NO consideramos añadir dos tarjetas con el mismo ID en el servicio de aplicación
+	
+	// Lo modelamos como lista porque consideramos la posición de la tarjeta
+	// NO consideramos añadir dos tarjetas con el mismo ID en el servicio de aplicación
 	private final List<TarjetaId> listaTarjetas;
 	private boolean especial;
-	private Integer limite;	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
-	private final Set<ListaId> prerrequisitos;	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
+	
+	// Integer para poder tener listas infinitas en caso de que no se configure límite (int no permite nulo, Integer sí)
+	private Integer limite;
+	
+	// Listas por las que ha tenido que pasar antes la tarjeta para estar ahí
+	private final Set<ListaId> prerrequisitos;
 	private TableroId tablero;
 	
 	// Constructor para creación nueva
@@ -28,8 +34,8 @@ public class Lista {
 		this.identificador = identificador;
 		this.nombreLista = nombre;
 		this.listaTarjetas = new ArrayList<>();
-		this.especial = false;	// Cuando se crea una lista aún no es especial
-		this.limite = null; // Al principio, una lista puede ser infinita
+		this.especial = false;					// Cuando se crea una lista aún no es especial
+		this.limite = null; 					// Al principio, una lista puede ser infinita
 		this.prerrequisitos = new HashSet<>();
 	}
 	

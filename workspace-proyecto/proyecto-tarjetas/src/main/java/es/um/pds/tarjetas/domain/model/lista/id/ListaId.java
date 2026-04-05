@@ -15,7 +15,7 @@ public class ListaId {
 	}
 	
 	// Método 'of' aplicando patrón creador y método factoría con identificador
-	public static ListaId of(String id) throws ListaInvalidaException {
+	public static ListaId of(String id) {
 		if(id == null) {
 			throw new ListaInvalidaException("El identificador de la lista no puede ser nulo");
 		}
@@ -23,7 +23,7 @@ public class ListaId {
 	}
 	
 	// Método 'of' aplicando patrón creador y método factoría sin identificador
-	public static ListaId of() throws ListaInvalidaException {
+	public static ListaId of() {
 		String id = UUID.randomUUID().toString();
 		return new ListaId(id);
 	}

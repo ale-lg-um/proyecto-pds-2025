@@ -1,6 +1,9 @@
 package es.um.pds.tarjetas.application.common;
 
-//TODO Revisar
+/*
+ * Clase que utilizamos para modelar la petición que se hace
+ * por páginas en una consulta paginada
+ */
 public class PageRequest {
 
 	private final int page;

@@ -15,7 +15,7 @@ public class TableroId {
 	}
 	
 	// Método factoría con identificador
-	public static TableroId of(String id) throws TableroInvalidoException {
+	public static TableroId of(String id) {
 		if(id == null) {
 			throw new TableroInvalidoException("El código del tablero no puede ser nulo");
 		}
@@ -23,7 +23,7 @@ public class TableroId {
 	}
 	
 	// Método factoría sin identificador
-	public static TableroId of() throws TableroInvalidoException {
+	public static TableroId of() {
 		String id = UUID.randomUUID().toString();
 		return new TableroId(id);
 	}

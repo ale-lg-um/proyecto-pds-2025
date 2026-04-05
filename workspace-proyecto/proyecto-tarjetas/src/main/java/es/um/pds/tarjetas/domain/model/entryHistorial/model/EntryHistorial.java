@@ -37,7 +37,7 @@ public class EntryHistorial {
 
 	// Método factoría GENERAL
 	public static EntryHistorial of(EntryHistorialId identificador, TableroId tableroId, TipoEntryHistorial tipo,
-			UsuarioId usuario, LocalDateTime timestamp, String detalles) throws EntryHistorialInvalidaException {
+			UsuarioId usuario, LocalDateTime timestamp, String detalles) {
 
 		if (identificador == null) {
 			throw new EntryHistorialInvalidaException("La entry del historial del historial debe tener identificador");
@@ -113,7 +113,7 @@ public class EntryHistorial {
 	// ---------- TABLEROS ----------
 	// TABLERO CREADO
 	public static EntryHistorial tableroCreado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, String nombreTablero) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, String nombreTablero) {
 
 		return of(id, tableroId, TipoEntryHistorial.TABLERO_CREADO, usuario, timestamp,
 				"nombreTablero=" + nombreTablero);
@@ -121,8 +121,7 @@ public class EntryHistorial {
 
 	// TABLERO CREADO DESDE PLANTILLA
 	public static EntryHistorial tableroCreadoDesdePlantilla(EntryHistorialId id, TableroId tableroId,
-			UsuarioId usuario, LocalDateTime timestamp, String nombreTablero, String nombrePlantilla)
-			throws EntryHistorialInvalidaException {
+			UsuarioId usuario, LocalDateTime timestamp, String nombreTablero, String nombrePlantilla) {
 
 		String detalles = "nombreTablero=" + nombreTablero + ", modo=plantilla" + ", plantillaNombre="
 				+ nombrePlantilla;
@@ -134,7 +133,7 @@ public class EntryHistorial {
 
 	// TABLERO EDITADO
 	public static EntryHistorial tableroEditado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, String nombreAnterior, String nombreNuevo) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, String nombreAnterior, String nombreNuevo) {
 
 		String detalles = "antiguo=" + nombreAnterior + ", nuevo=" + nombreNuevo;
 
@@ -143,7 +142,7 @@ public class EntryHistorial {
 
 	// TABLERO ELIMINADO
 	public static EntryHistorial tableroEliminado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp) {
 
 		String detalles = "tableroId=" + tableroId.getId();
 
@@ -152,7 +151,7 @@ public class EntryHistorial {
 
 	// TABLERO BLOQUEADO
 	public static EntryHistorial tableroBloqueado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, String descripcion) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, String descripcion) {
 
 		String detalles = "descripcion=" + descripcion;
 
@@ -161,7 +160,7 @@ public class EntryHistorial {
 
 	// TABLERO DESBLOQUEADO
 	public static EntryHistorial tableroDesbloqueado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp) {
 
 		return of(id, tableroId, TipoEntryHistorial.TABLERO_DESBLOQUEADO, usuario, timestamp, "Tablero desbloqueado");
 	}
@@ -169,7 +168,7 @@ public class EntryHistorial {
 	// ---------- LISTAS ----------
 	// LISTA CREADA
 	public static EntryHistorial listaCreada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, ListaId listaId, String nombreLista) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, ListaId listaId, String nombreLista) {
 
 		String detalles = "listaId=" + listaId.getId() + ", nombre=" + nombreLista;
 
@@ -178,8 +177,7 @@ public class EntryHistorial {
 
 	// LISTA EDITADA
 	public static EntryHistorial listaEditada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, ListaId listaId, String nombreAnterior, String nombreNuevo)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, ListaId listaId, String nombreAnterior, String nombreNuevo) {
 
 		String detalles = "listaId=" + listaId.getId() + ", antiguo=" + nombreAnterior + ", nuevo=" + nombreNuevo;
 
@@ -188,7 +186,7 @@ public class EntryHistorial {
 
 	// LISTA ELIMINADA
 	public static EntryHistorial listaEliminada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, ListaId listaId, String nombreLista) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, ListaId listaId, String nombreLista) {
 
 		String detalles = "listaId=" + listaId.getId() + ", nombre=" + nombreLista;
 
@@ -197,8 +195,7 @@ public class EntryHistorial {
 
 	// LIMITE LISTA CONFIGURADO
 	public static EntryHistorial limiteListaConfigurado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, ListaId listaId, Integer limiteAnterior, Integer limiteNuevo)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, ListaId listaId, Integer limiteAnterior, Integer limiteNuevo) {
 
 		String detalles = "listaId=" + listaId.getId() + ", limiteAnterior="
 				+ (limiteAnterior == null ? "-" : limiteAnterior) + ", limiteNuevo="
@@ -209,7 +206,7 @@ public class EntryHistorial {
 
 	// LISTA ESPECIAL DEFINIDA
 	public static EntryHistorial listaEspecialDefinida(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, ListaId listaId, boolean esEspecial) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, ListaId listaId, boolean esEspecial) {
 
 		String detalles = "listaId=" + listaId.getId() + ", esEspecial=" + esEspecial;
 
@@ -218,8 +215,7 @@ public class EntryHistorial {
 
 	// PRERREQUISITOS LISTA CONFIGURADOS
 	public static EntryHistorial prerrequisitosListaConfigurados(EntryHistorialId id, TableroId tableroId,
-			UsuarioId usuario, LocalDateTime timestamp, ListaId listaId, Set<PrerrequisitoInfo> prerrequisitos)
-			throws EntryHistorialInvalidaException {
+			UsuarioId usuario, LocalDateTime timestamp, ListaId listaId, Set<PrerrequisitoInfo> prerrequisitos) {
 
 		String prerrequisitosStr = prerrequisitos == null || prerrequisitos.isEmpty() ? "-"
 				: prerrequisitos.stream().map(p -> p.nombreLista() + "(" + p.listaId().getId() + ")")
@@ -233,7 +229,7 @@ public class EntryHistorial {
 	// ---------- TARJETAS ----------
 	// TARJETA CREADA
 	public static EntryHistorial tarjetaCreada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", listaId=" + listaId.getId();
 
@@ -243,7 +239,7 @@ public class EntryHistorial {
 	// TARJETA EDITADA
 	public static EntryHistorial tarjetaEditada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
 			LocalDateTime timestamp, TarjetaId tarjetaId, ContenidoTarjeta contenidoAnterior,
-			ContenidoTarjeta contenidoNuevo) throws EntryHistorialInvalidaException {
+			ContenidoTarjeta contenidoNuevo) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", contenidoAnterior=" + contenidoAnterior.toString()
 				+ ", contenidoNuevo=" + contenidoNuevo.toString();
@@ -253,8 +249,7 @@ public class EntryHistorial {
 
 	// TARJETA RENOMBRADA
 	public static EntryHistorial tarjetaRenombrada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, String nombreAnterior, String nombreNuevo)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, String nombreAnterior, String nombreNuevo) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", nombreAnterior=" + nombreAnterior + ", nombreNuevo="
 				+ nombreNuevo;
@@ -264,8 +259,7 @@ public class EntryHistorial {
 
 	// TARJETA ELIMINADA
 	public static EntryHistorial tarjetaEliminada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId, String titulo)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId, String titulo) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", listaId=" + listaId.getId() + ", titulo=" + titulo;
 
@@ -274,8 +268,7 @@ public class EntryHistorial {
 
 	// TARJETA MOVIDA
 	public static EntryHistorial tarjetaMovida(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId fromListId, ListaId toListId)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId fromListId, ListaId toListId) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", fromListId=" + fromListId.getId() + ", toListId="
 				+ toListId.getId();
@@ -285,8 +278,7 @@ public class EntryHistorial {
 
 	// TARJETA COMPLETADA
 	public static EntryHistorial tarjetaCompletada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId)
-			throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, ListaId listaId) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", listaId=" + listaId.getId();
 
@@ -295,7 +287,7 @@ public class EntryHistorial {
 
 	// TARJETA ETIQUETADA
 	public static EntryHistorial tarjetaEtiquetada(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, Etiqueta etiqueta) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, Etiqueta etiqueta) {
 
 		String detalles = "tarjetaId=" + tarjetaId.getId() + ", etiqueta=" + etiqueta.nombre() + ", color="
 				+ etiqueta.color();
@@ -305,7 +297,7 @@ public class EntryHistorial {
 
 	// ETIQUETA ELIMINADA DE TARJETA
 	public static EntryHistorial etiquetaEliminadaDeTarjeta(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
-			LocalDateTime timestamp, TarjetaId tarjetaId, Etiqueta etiqueta) throws EntryHistorialInvalidaException {
+			LocalDateTime timestamp, TarjetaId tarjetaId, Etiqueta etiqueta) {
 
 		String detalles = "accion=eliminada" + ", tarjetaId=" + tarjetaId.getId() + ", etiquetaNombre="
 				+ etiqueta.nombre() + ", etiquetaColor=" + etiqueta.color();
@@ -316,7 +308,7 @@ public class EntryHistorial {
 	// ETIQUETA MODIFICADA EN TARJETA
 	public static EntryHistorial etiquetaModificadaEnTarjeta(EntryHistorialId id, TableroId tableroId,
 			UsuarioId usuario, LocalDateTime timestamp, TarjetaId tarjetaId, Etiqueta etiquetaAnterior,
-			Etiqueta etiquetaNueva) throws EntryHistorialInvalidaException {
+			Etiqueta etiquetaNueva) {
 
 		String detalles = "accion=modificada" + ", tarjetaId=" + tarjetaId.getId() + ", etiquetaAnteriorNombre="
 				+ etiquetaAnterior.nombre() + ", etiquetaAnteriorColor=" + etiquetaAnterior.color()

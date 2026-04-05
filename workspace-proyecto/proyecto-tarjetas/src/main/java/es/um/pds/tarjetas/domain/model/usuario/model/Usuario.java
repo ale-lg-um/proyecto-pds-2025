@@ -17,7 +17,7 @@ public class Usuario {
 	}
 	
 	// Método factoría y reconstrucción
-	public static Usuario of(UsuarioId identificador, String nombre) throws UsuarioInvalidoException {
+	public static Usuario of(UsuarioId identificador, String nombre) {
 		if (identificador == null) {
 			throw new UsuarioInvalidoException("El usuario debe tener un correo electrónico");
 		}

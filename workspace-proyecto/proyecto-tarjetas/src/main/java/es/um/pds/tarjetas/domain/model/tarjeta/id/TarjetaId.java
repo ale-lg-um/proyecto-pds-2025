@@ -15,7 +15,7 @@ public class TarjetaId {
 	}
 	
 	// Método 'of' aplicando patrón creador y método factoría con identificador
-	public static TarjetaId of(String id) throws TarjetaInvalidaException{
+	public static TarjetaId of(String id) {
 		if(id == null) {
 			throw new TarjetaInvalidaException("El identificador de la tarjeta no puede ser nulo");
 		}
@@ -23,7 +23,7 @@ public class TarjetaId {
 	}
 	
 	// Método 'of' aplicando patrón creador y método factoría sin identificador
-	public static TarjetaId of() throws TarjetaInvalidaException{
+	public static TarjetaId of() {
 		String id = UUID.randomUUID().toString();
 		return new TarjetaId(id);
 	}

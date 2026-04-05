@@ -15,7 +15,7 @@ public class EntryHistorialId {
 	}
 	
 	// Método factoría con identificador
-	public static EntryHistorialId of(String id) throws EntryHistorialInvalidaException {
+	public static EntryHistorialId of(String id) {
 		if(id == null) {
 			throw new EntryHistorialInvalidaException("El código del tablero no puede ser nulo");
 		}
@@ -23,7 +23,7 @@ public class EntryHistorialId {
 	}
 	
 	// Método factoría sin identificador
-	public static EntryHistorialId of() throws EntryHistorialInvalidaException {
+	public static EntryHistorialId of() {
 		String id = UUID.randomUUID().toString();
 		return new EntryHistorialId(id);
 	}

@@ -20,7 +20,7 @@ public class Tablero {
 	private final Set<ListaId> listas;				// Aquí se guardan las listas del tablero
 	private ListaId listaEspecial;					// Lista de completadas, no definida al principio
 	private EstadoBloqueo estadoBloqueo;			// Desde, Hasta y Descripción
-	private UsuarioId creador;						// para lo de la lista de ids por usuario en el repositorio
+	private UsuarioId creador;						// Identificador del usuario que creó el tablero
 	
 	// Constructor para creación de un tablero nuevo
 	private Tablero(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador) {
@@ -73,8 +73,7 @@ public class Tablero {
 	}
 	
 	// Métodos auxiliares
-	private static void validarDatosBasicos(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador)
-			throws TableroInvalidoException {
+	private static void validarDatosBasicos(TableroId identificador, String nombre, String tokenUrl, UsuarioId creador) {
 		if (identificador == null) {
 			throw new TableroInvalidoException("El tablero debe tener un identificador");
 		}

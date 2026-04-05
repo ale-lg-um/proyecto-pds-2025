@@ -11,17 +11,21 @@ import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.Espe
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.output.PuertoParserYAML;
 
-// Adaptador de infraestructura encargado de transformar un String YAML
-// en una especificación Java que luego utilizará la capa de aplicación
-// Aquí NO se aplican reglas de negocio complejas: solo se traduce la estructura
+/*
+ * Adaptador de infraestructura encargado de transformar un String YAML
+ * en una especificación Java que luego utilizará la capa de aplicación
+ * Aquí NO se aplican reglas de negocio complejas: solo se traduce la estructura
+ */
 @Component
 public class ParserYAMLImpl implements PuertoParserYAML {
 
-	// Utilizamos SnakeYAML para parsear el texto YAML, disponible en SpringBoot
-	// SnakeYAML transforma el YAML en estructuras Java genéricas:
-	// - Map para objetos
-	// - List para listas
-	// - String / Number / Boolean para valores simples
+	/*
+	 * Utilizamos SnakeYAML para parsear el texto YAML, disponible en SpringBoot
+	 * SnakeYAML transforma el YAML en estructuras Java genéricas:
+	 * - Map para objetos
+	 * - List para listas
+	 * - String / Number / Boolean para valores simples
+	 */
 	private final Yaml yamlParser = new Yaml();
 
 	// Método auxiliar para transformar UNA lista del YAML en una EspecificacionListaPlantilla
@@ -97,8 +101,10 @@ public class ParserYAMLImpl implements PuertoParserYAML {
 				tarjetas);
 	}
 
-	// Método auxiliar para transformar UNA tarjeta del YAML
-	// en una EspecificacionTarjetaPlantilla
+	/*
+	 * Método auxiliar para transformar UNA tarjeta del YAML
+	 * en una EspecificacionTarjetaPlantilla
+	 */
 	private EspecificacionTarjetaPlantilla mapTarjeta(java.util.Map<?, ?> raw) {
 
 		// --- titulo ---
@@ -142,8 +148,10 @@ public class ParserYAMLImpl implements PuertoParserYAML {
 				itemsChecklist);
 	}
 
-	// Método auxiliar para convertir el valor textual del YAML
-	// al enum TipoContenidoTarjeta
+	/*
+	 * Método auxiliar para convertir el valor textual del YAML
+	 * al enum TipoContenidoTarjeta
+	 */
 	private TipoContenidoTarjeta parseTipoContenido(Object tipoObj) {
 
 		// Si no viene tipo, devolvemos null

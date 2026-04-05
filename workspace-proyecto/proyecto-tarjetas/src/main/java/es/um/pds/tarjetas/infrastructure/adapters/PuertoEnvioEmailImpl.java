@@ -8,8 +8,10 @@ import org.springframework.stereotype.Component;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.output.PuertoEnvioEmail;
 
-// Hacemos envío real de correos con Spring Boot. Añadir dependencia al pom
-// También hay que cambiar el application.properties de SpringBoot (src/main/resources)
+/*
+ * Hacemos envío real de correos con Spring Boot. Es necesario añadir dependencia
+ * en el pom.xml. También hay que cambiar el application.properties de SpringBoot
+ */
 @Component
 public class PuertoEnvioEmailImpl implements PuertoEnvioEmail {
 

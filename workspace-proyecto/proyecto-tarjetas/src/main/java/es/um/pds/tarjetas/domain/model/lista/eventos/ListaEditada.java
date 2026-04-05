@@ -7,13 +7,7 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
-public record ListaEditada(
-	ListaId listaId,
-	TableroId tableroId,
-	UsuarioId usuarioId,
-	LocalDateTime timestamp,
-	String nombreAnterior,
-	String nombreNuevo
-) implements EventoDominio {
+public record ListaEditada(ListaId listaId, TableroId tableroId, UsuarioId usuarioId, LocalDateTime timestamp,
+		String nombreAnterior, String nombreNuevo) implements EventoDominio {
 
 }

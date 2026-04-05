@@ -2,7 +2,10 @@ package es.um.pds.tarjetas.application.common;
 
 import java.util.List;
 
-//TODO Revisar
+/*
+ * Clase utilizada para mostrar contenido paginado en el historial o filtrado
+ * de tarjetas por etiquetas
+ */
 public class Page<T> {
 
 	private final List<T> contenido;

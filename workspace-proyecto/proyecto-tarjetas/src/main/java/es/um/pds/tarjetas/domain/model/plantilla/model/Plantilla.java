@@ -15,8 +15,7 @@ public class Plantilla {
 	private Plantilla(PlantillaId identificador, String nombre, String contenidoYaml) {
 		this.identificador = identificador;
 		this.nombre = nombre;
-		// Se parsea y se valida el fichero en el servicio de aplicación
-		// ServicioPlantilla
+		// Se parsea y se valida el fichero en el servicio de aplicación ServicioPlantilla
 		this.contenidoYaml = contenidoYaml;
 	}
 
@@ -51,7 +50,7 @@ public class Plantilla {
 	}
 
 	// Funcionalidades
-	public void renombrar(String nuevoNombre) throws PlantillaInvalidaException {
+	public void renombrar(String nuevoNombre) {
 		if (nuevoNombre == null || nuevoNombre.isBlank()) {
 			throw new PlantillaInvalidaException("El nombre de la plantilla no puede estar vacío");
 		}

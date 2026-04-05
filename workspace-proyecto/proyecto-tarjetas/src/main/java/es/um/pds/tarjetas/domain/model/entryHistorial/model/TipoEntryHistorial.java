@@ -1,6 +1,5 @@
 package es.um.pds.tarjetas.domain.model.entryHistorial.model;
 
-//TODO Revisar si hay más tipos
 public enum TipoEntryHistorial {
 	TABLERO_CREADO, TABLERO_EDITADO, TABLERO_ELIMINADO, TABLERO_BLOQUEADO, TABLERO_DESBLOQUEADO, LISTA_CREADA,
 	LISTA_EDITADA, LISTA_ELIMINADA, LIMITE_LISTA_CONFIGURADO, LISTA_ESPECIAL_DEFINIDA,

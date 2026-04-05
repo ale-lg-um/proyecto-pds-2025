@@ -15,7 +15,7 @@ public class PlantillaId {
 	}
 	
 	// Método factoría con identificador
-	public static PlantillaId of(String id) throws PlantillaInvalidaException {
+	public static PlantillaId of(String id) {
 		if (id == null) {
 			throw new PlantillaInvalidaException("El identificador de la plantilla no puede ser nulo");
 		}
@@ -23,7 +23,7 @@ public class PlantillaId {
 	}
 	
 	// Método factoría sin identificador
-	public static PlantillaId of() throws PlantillaInvalidaException {
+	public static PlantillaId of() {
 		String id = UUID.randomUUID().toString();
 		return new PlantillaId(id);
 	}

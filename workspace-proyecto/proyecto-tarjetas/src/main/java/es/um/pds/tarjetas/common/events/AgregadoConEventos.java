@@ -6,7 +6,7 @@ import java.util.List;
 public interface AgregadoConEventos {
 	List<EventoDominio> extraerEventos();
     
-	public static abstract class Impl implements AgregadoConEventos {
+	public abstract static class Impl implements AgregadoConEventos {
 		private final List<EventoDominio> eventos = new ArrayList<>();
 	
 		protected void registrarEvento(EventoDominio evento) {

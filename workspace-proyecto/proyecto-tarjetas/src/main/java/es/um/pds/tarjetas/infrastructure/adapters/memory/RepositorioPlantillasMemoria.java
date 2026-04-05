@@ -12,7 +12,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 
 @Repository
 public class RepositorioPlantillasMemoria implements RepositorioPlantillas {
-	// Atribuos
+	// Atributos
 	private final Map<PlantillaId, Plantilla> plantillas = new HashMap<>();
 	
 	@Override

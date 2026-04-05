@@ -27,7 +27,6 @@ public class Tarea extends ContenidoTarjeta{
 	// No redefinimos equals y hashCode porque podemos tener tareas con la misma
 	// descripción en diferentes tarjetas. Solo comparamos por oid
 	
-
 	@Override
 	public TipoContenidoTarjeta getTipo() {
 		return TipoContenidoTarjeta.TAREA;

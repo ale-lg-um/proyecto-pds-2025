@@ -2,7 +2,9 @@ package es.um.pds.tarjetas.domain.model.tablero.model;
 
 import java.time.LocalDateTime;
 
-// Value object
+/*
+ * Value object para modelar el estado de bloqueo del tablero
+ */
 public record EstadoBloqueo(LocalDateTime desde, LocalDateTime hasta, String descripcion) {
 	// Constructor
 	public EstadoBloqueo {
