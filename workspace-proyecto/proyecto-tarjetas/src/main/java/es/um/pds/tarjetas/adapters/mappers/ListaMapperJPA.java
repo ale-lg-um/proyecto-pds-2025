@@ -26,7 +26,7 @@ public class ListaMapperJPA {
 				d.getPrerrequisitos().stream().map(Object::toString).collect(Collectors.toSet()));
 	}
 	*/
-	public ListaEntity toEntity(Lista d) {
+	public static ListaEntity toEntity(Lista d) {
 		if (d == null) {
 			return null;
 		}
