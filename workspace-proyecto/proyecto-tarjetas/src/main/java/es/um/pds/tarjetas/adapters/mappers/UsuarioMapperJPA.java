@@ -12,8 +12,14 @@ public class UsuarioMapperJPA {
 	private UsuarioMapperJPA() {
 	}
 
+	/*
+	 * Versión anterior:
 	public static UsuarioEntity toEntity(Usuario d) {
 		return new UsuarioEntity(d.getIdentificador().toString(), d.getNombre());
+	}
+	*/
+	public static UsuarioEntity toEntity(Usuario d) {
+		return new UsuarioEntity(d.getIdentificador().getCorreo(), d.getNombre());
 	}
 
 	public static Usuario toDomain(UsuarioEntity e) {

@@ -14,7 +14,7 @@ public class PlantillaMapperJPA {
 	}
 
 	public static PlantillaEntity toEntity(Plantilla d) {
-		return new PlantillaEntity(d.getIdentificador().toString(), d.getNombre(), d.getContenidoYaml());
+		return new PlantillaEntity(d.getIdentificador().getId(), d.getNombre(), d.getContenidoYaml());
 	}
 
 	public static Plantilla toDomain(PlantillaEntity e) {

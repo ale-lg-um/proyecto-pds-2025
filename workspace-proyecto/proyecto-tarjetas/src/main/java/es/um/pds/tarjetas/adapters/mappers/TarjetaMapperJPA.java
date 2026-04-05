@@ -49,19 +49,17 @@ public class TarjetaMapperJPA {
 			tipoContenido = TIPO_CHECKLIST;
 			itemsChecklist = checklist.getItems().stream().map(TarjetaMapperJPA::toEmbeddableItemChecklist).toList();
 		}
-		default -> {
-			throw new IllegalStateException("Tipo de contenido de tarjeta no soportado");
-		}
+		default -> throw new IllegalStateException("Tipo de contenido de tarjeta no soportado");
 		}
 
 		List<EtiquetaEmbeddable> etiquetas = domain.getEtiquetas().stream().map(TarjetaMapperJPA::toEmbeddableEtiqueta)
 				.toList();
 
-		Set<String> listasVisitadas = domain.getListasVisitadas().stream().map(Object::toString)
+		Set<String> listasVisitadas = domain.getListasVisitadas().stream().map(ListaId::getId)
 				.collect(Collectors.toSet());
 
-		return new TarjetaEntity(domain.getIdentificador().toString(), domain.getTitulo(), domain.getFechaCreacion(),
-				domain.getListaActual().toString(), domain.getTablero() != null ? domain.getTablero().toString() : null,
+		return new TarjetaEntity(domain.getIdentificador().getId(), domain.getTitulo(), domain.getFechaCreacion(),
+				domain.getListaActual().getId(), domain.getTablero() != null ? domain.getTablero().getId() : null,
 				tipoContenido, tareaDescripcion, domain.isCompletada(), etiquetas, listasVisitadas, itemsChecklist);
 	}
 

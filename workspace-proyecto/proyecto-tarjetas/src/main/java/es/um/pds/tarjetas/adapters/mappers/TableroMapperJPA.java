@@ -19,10 +19,20 @@ public class TableroMapperJPA {
 	private TableroMapperJPA() {
 	}
 
+	/*
+	 * Versión anterior
 	public static TableroEntity toEntity(Tablero d) {
 		return new TableroEntity(d.getIdentificador().toString(), d.getNombre(), d.getTokenURL(),
 				d.getCreador().toString(), d.getListaEspecial() != null ? d.getListaEspecial().toString() : null,
 				d.getListas().stream().map(Object::toString).collect(Collectors.toSet()),
+				toEmbeddable(d.getEstadoBloqueo()));
+	}
+	*/
+	
+	public static TableroEntity toEntity(Tablero d) {
+		return new TableroEntity(d.getIdentificador().getId(), d.getNombre(), d.getTokenURL(),
+				d.getCreador().getCorreo(), d.getListaEspecial() != null ? d.getListaEspecial().getId() : null,
+				d.getListas().stream().map(ListaId::getId).collect(Collectors.toSet()),
 				toEmbeddable(d.getEstadoBloqueo()));
 	}
 

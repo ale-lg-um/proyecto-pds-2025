@@ -17,12 +17,26 @@ public class ListaMapperJPA {
 	private ListaMapperJPA() {
 	}
 
+	/*
+	 * Versión anterior
 	public static ListaEntity toEntity(Lista d) {
 		return new ListaEntity(d.getIdentificador().toString(), d.getNombreLista(), d.isEspecial(), d.getLimite(),
 				d.getTablero() != null ? d.getTablero().toString() : null,
 				d.getListaTarjetas().stream().map(Object::toString).toList(),
 				d.getPrerrequisitos().stream().map(Object::toString).collect(Collectors.toSet()));
 	}
+	*/
+	public ListaEntity toEntity(Lista d) {
+		if (d == null) {
+			return null;
+		}
+
+		return new ListaEntity(d.getIdentificador().getId(), d.getNombreLista(), d.isEspecial(), d.getLimite(),
+				d.getTablero() != null ? d.getTablero().getId() : null,
+				d.getListaTarjetas().stream().map(t -> t.getId()).toList(),
+				d.getPrerrequisitos().stream().map(l -> l.getId()).collect(Collectors.toSet()));
+	}
+
 
 	public static Lista toDomain(ListaEntity e) {
 		return Lista.reconstruir(ListaId.of(e.getId()), e.getNombreLista(),
