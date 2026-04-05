@@ -17,7 +17,7 @@ public class EntryHistorialMapperJPA {
 	}
 
 	public static EntryHistorialEntity toEntity(EntryHistorial d) {
-		return new EntryHistorialEntity(d.getIdentificador().toString(), d.getTableroId().getId(),
+		return new EntryHistorialEntity(d.getIdentificador().getId(), d.getTableroId().getId(),
 				d.getTipo().name(), d.getUsuario().getCorreo(), d.getTimestamp(), d.getDetalles());
 	}
 

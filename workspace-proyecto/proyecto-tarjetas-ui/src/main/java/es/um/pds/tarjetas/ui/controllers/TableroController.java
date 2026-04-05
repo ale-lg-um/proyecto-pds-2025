@@ -60,20 +60,25 @@ public class TableroController {
 		// Se llama en bucle a instanciarListaVisual()
 		
 		System.out.println("Cargando el tablero principal...");
+		this.actual = contextoUsuario.getIdTableroActual();
+		if(this.actual == null) {
+			System.err.println("Error: no se ha seleccionado ningún tablero");
+			return;
+		}
+		TableroId id = TableroId.of(this.actual);
+		
 		try {
-			TableroId id = TableroId.of();
-			UsuarioId creador = UsuarioId.of(contextoUsuario.getEmail());
-			
-			Tablero inicial = Tablero.of(id, "Tblero prueba", "token-prueba", creador);
-			repoTableros.guardar(inicial);
-			this.actual = id.getId();
-			
-			System.out.println("Tablero generado correctamente. ID: " + this.actual);
+			repoTableros.buscarPorId(id).ifPresent(tablero -> {
+				System.out.println("Tablero detectado: " + tablero.getNombre());
+				
+				repoListas.buscarPorTableroId(id).forEach(lista -> {
+					instanciarListaVisual(new ListaDTO(lista));
+				});
+			});
 		} catch(Exception e) {
+			System.err.println("Error al cargar los datos del tablero desde la base de datos.");
 			e.printStackTrace();
 		}
-		//this.servicioTablero = Configuracion.getInstancia().getServicioTablero();
-		//this.repoListas = Configuracion.getInstancia().getRepoListas();
 	}
 	
 	@FXML

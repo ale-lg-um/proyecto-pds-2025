@@ -33,6 +33,10 @@ public class SceneManager {
 		cargarYMostrar("TableroView");
 	}
 	
+	public void showDashboard() {
+		cargarYMostrar("DashboardView");
+	}
+	
 	private void cargarYMostrar(String vista) {
 	    try {
 	        String rutaCompleta = "/views/" + vista + ".fxml";

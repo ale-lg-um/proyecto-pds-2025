@@ -44,7 +44,7 @@ public class RepositorioListasAdapterJPA implements RepositorioListas {
 		if (listaId == null) {
 			throw new IllegalArgumentException("El identificador de la lista no puede ser nulo");
 		}
-		return listaRepositoryJPA.findById(listaId.toString()).map(ListaMapperJPA::toDomain);
+		return listaRepositoryJPA.findById(listaId.getId()).map(ListaMapperJPA::toDomain);
 	}
 
 	/*

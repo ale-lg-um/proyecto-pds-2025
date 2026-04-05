@@ -8,6 +8,7 @@ public class ContextoUsuario {
 	// Atributos
 	private String email;
 	private String tokenSesion;
+	private String idTableroActual;
 	
 	// Getters y setters
 	public String getEmail() {
@@ -24,5 +25,13 @@ public class ContextoUsuario {
 	
 	public void setTokensSesion(String tokenSesion) {
 		this.tokenSesion = tokenSesion;
+	}
+	
+	public String getIdTableroActual() {
+		return this.idTableroActual;
+	}
+	
+	public void setIdTableroActual(String idTableroActual) {
+		this.idTableroActual = idTableroActual;
 	}
 }

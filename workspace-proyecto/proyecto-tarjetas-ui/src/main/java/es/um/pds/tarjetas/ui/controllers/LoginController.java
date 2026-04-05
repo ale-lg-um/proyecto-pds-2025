@@ -74,7 +74,7 @@ public class LoginController {
 			contexto.setEmail(emailTemp);
 			contexto.setTokensSesion(tokenSesion);
 			
-			sceneManager.showTablero(); // Cambiar a vista de tablero
+			sceneManager.showDashboard(); // Cambiar a vista de dashboard
 		} catch(Exception e) {
 			mostrarError("Error", e.getMessage());
 		}

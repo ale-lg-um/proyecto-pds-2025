@@ -48,7 +48,8 @@ public class RepositorioTablerosAdapterJPA implements RepositorioTableros {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		return tableroRepositoryJPA.findById(tableroId.toString()).map(TableroMapperJPA::toDomain);
+		//return tableroRepositoryJPA.findById(tableroId.toString()).map(TableroMapperJPA::toDomain);
+		return tableroRepositoryJPA.findById(tableroId.getId()).map(TableroMapperJPA::toDomain);
 	}
 
 	/*
@@ -85,7 +86,7 @@ public class RepositorioTablerosAdapterJPA implements RepositorioTableros {
 		if (usuarioId == null) {
 			throw new IllegalArgumentException("El identificador del usuario no puede ser nulo");
 		}
-		return tableroRepositoryJPA.findByCreadorId(usuarioId.toString()).stream()
+		return tableroRepositoryJPA.findByCreadorId(usuarioId.getCorreo()).stream()
 				.map(entity -> TableroId.of(entity.getId())).toList();
 	}
 }
