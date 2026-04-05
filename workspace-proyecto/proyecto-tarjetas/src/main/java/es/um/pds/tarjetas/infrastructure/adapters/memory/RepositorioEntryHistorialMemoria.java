@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.application.common.Page;
@@ -16,7 +15,6 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
 
 @Repository
-@Primary
 public class RepositorioEntryHistorialMemoria implements RepositorioEntryHistorial {
 
 	private final Map<EntryHistorialId, EntryHistorial> entradas = new HashMap<>();

@@ -3,6 +3,7 @@ package es.um.pds.tarjetas.adapters.jpa.repository.implementations;
 import java.time.Instant;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.adapters.jpa.entity.SesionEntity;
@@ -11,6 +12,7 @@ import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioSesiones;
 
 @Repository
+@Primary
 public class RepositorioSesionesAdapterJPA implements RepositorioSesiones {
 
 	// Inyección de dependencias necesarias

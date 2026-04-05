@@ -3,6 +3,7 @@ package es.um.pds.tarjetas.adapters.jpa.repository.implementations;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,7 @@ import es.um.pds.tarjetas.domain.ports.output.ModoFiltradoEtiquetas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
 
 @Repository
+@Primary
 public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 
 	// Inyección de dependencias necesarias

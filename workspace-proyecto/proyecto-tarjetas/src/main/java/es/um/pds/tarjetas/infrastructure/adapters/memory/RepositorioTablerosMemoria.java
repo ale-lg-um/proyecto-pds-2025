@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
@@ -15,7 +14,6 @@ import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 
 @Repository
-@Primary
 public class RepositorioTablerosMemoria implements RepositorioTableros {
 	// Atributos
 	private final Map<TableroId, Tablero> baseDatos = new HashMap<>();

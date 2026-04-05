@@ -2,6 +2,7 @@ package es.um.pds.tarjetas.adapters.jpa.repository.implementations;
 
 import java.util.List;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,7 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
 
 @Repository
+@Primary
 public class RepositorioEntryHistorialAdapterJPA implements RepositorioEntryHistorial {
 
 	// Inyección de dependencias necesarias

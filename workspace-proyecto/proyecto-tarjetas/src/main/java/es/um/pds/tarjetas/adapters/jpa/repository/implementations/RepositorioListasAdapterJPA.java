@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.adapters.mappers.ListaMapperJPA;
@@ -14,6 +15,7 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 
 @Repository
+@Primary
 public class RepositorioListasAdapterJPA implements RepositorioListas {
 
 	private final ListaRepositoryJPA listaRepositoryJPA;
