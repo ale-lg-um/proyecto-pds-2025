@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.adapters.mappers.PlantillaMapperJPA;
 import es.um.pds.tarjetas.adapters.jpa.repository.PlantillaRepositoryJPA;
@@ -13,6 +14,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 
 @Repository
 @Primary
+@Transactional
 public class RepositorioPlantillasAdapterJPA implements RepositorioPlantillas {
 
 	// Inyección de dependencias necesarias

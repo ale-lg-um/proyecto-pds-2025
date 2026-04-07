@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.adapters.jpa.entity.SesionEntity;
 import es.um.pds.tarjetas.adapters.jpa.repository.SesionRepositoryJPA;
@@ -13,6 +14,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioSesiones;
 
 @Repository
 @Primary
+@Transactional
 public class RepositorioSesionesAdapterJPA implements RepositorioSesiones {
 
 	// Inyección de dependencias necesarias

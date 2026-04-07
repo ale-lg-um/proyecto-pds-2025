@@ -38,6 +38,7 @@ public class TableroController {
 	private final RepositorioTableros repoTableros;
 	private final ApplicationContext contextoApp;
 	private final ContextoUsuario contextoUsuario;
+	private final SceneManager sceneManager;
 	private int nListas = 0;
 	
 	private String actual;
@@ -45,13 +46,14 @@ public class TableroController {
 	@FXML private HBox contenedorListas;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario) {
+	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
 		this.servicioTablero = servicioTablero;
 		this.servicioLista = servicioLista;
 		this.repoListas = repoListas;
 		this.repoTableros = repoTableros;
 		this.contextoApp = contextoApp;
 		this.contextoUsuario = contextoUsuario;
+		this.sceneManager = sceneManager;
 	}
 	
 	@FXML
@@ -138,6 +140,17 @@ public class TableroController {
 			System.err.println("Error al cargar la vista de la lista: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	@FXML
+	public void accionVolverDashboard(ActionEvent evento) {
+		System.out.println("Saliendo del tablero y volviendo a la pantalla de selección...");
+		
+		// Olvidar el tablero en el que estábamos
+		contextoUsuario.setIdTableroActual(null);
+		
+		// Volver
+		sceneManager.showDashboard();
 	}
 	
 	// Mostrar ventanas de error

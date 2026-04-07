@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.adapters.jpa.entity.EntryHistorialEntity;
 import es.um.pds.tarjetas.adapters.mappers.EntryHistorialMapperJPA;
@@ -16,6 +17,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
 
 @Repository
 @Primary
+@Transactional
 public class RepositorioEntryHistorialAdapterJPA implements RepositorioEntryHistorial {
 
 	// Inyección de dependencias necesarias

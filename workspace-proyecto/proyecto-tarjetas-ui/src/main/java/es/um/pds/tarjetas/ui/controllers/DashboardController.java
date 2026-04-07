@@ -64,6 +64,7 @@ public class DashboardController {
 	private void cargarTableros() {
 		listaTableros.getItems().clear();
 		UsuarioId creador = UsuarioId.of(contextoUsuario.getEmail());
+		System.out.println("Buscando tableros para el usuario: " + contextoUsuario.getEmail());
 		
 		List<TableroId> ids = repoTableros.listarIdsPorUsuario(creador);
 		for(TableroId id : ids) {

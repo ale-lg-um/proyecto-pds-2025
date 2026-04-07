@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.adapters.mappers.UsuarioMapperJPA;
 import es.um.pds.tarjetas.adapters.jpa.repository.UsuarioRepositoryJPA;
@@ -13,6 +14,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioUsuarios;
 
 @Repository
 @Primary
+@Transactional
 public class RepositorioUsuariosAdapterJPA implements RepositorioUsuarios {
 
 	// Inyección de dependencias necesarias

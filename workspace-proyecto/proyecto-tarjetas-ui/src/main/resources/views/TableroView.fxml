@@ -8,13 +8,17 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.TableroController">
    <top>
-      <HBox prefHeight="47.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+      <HBox alignment="CENTER_LEFT" prefHeight="47.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Título del tablero">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
+            
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#accionVolverDashboard" style="-fx-font-weight: bold; -fx-cursor: hand;" text="Volver a mis tableros ➡" />
          </children>
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
@@ -26,7 +30,7 @@
          <content>
             <HBox fx:id="contenedorListas" prefHeight="100.0" prefWidth="200.0" spacing="15.0">
                <children>
-                  <Button fx:id="btnAnadirLista" mnemonicParsing="false" onAction="#accionAnadirLista" minWidth="280.0" prefWidth="280.0" text="+ Añadir Lista..." />
+                  <Button fx:id="btnAnadirLista" minWidth="280.0" mnemonicParsing="false" onAction="#accionAnadirLista" prefWidth="280.0" text="+ Añadir Lista..." />
                </children>
             </HBox>
          </content>
