@@ -13,6 +13,7 @@ import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
+import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
 //import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
@@ -44,23 +45,30 @@ public class ListaController {
 	// Atributos
 	private final ServicioTablero servicioTablero;
 	private final ServicioTarjeta servicioTarjeta;
+	private final ServicioLista servicioLista;
 	private final ApplicationContext contextoApp;
 	private final RepositorioTarjetas repoTarjetas;
 	private final ContextoUsuario contextoUsuario;
 	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
+	private Runnable funcionEliminarDeLaVista;
 	
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
 	@FXML private VBox contenedorTarjetas;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario) {
+	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ServicioLista servicioLista, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario) {
 		this.servicioTablero = servicioTablero;
 		this.servicioTarjeta = servicioTarjeta;
+		this.servicioLista = servicioLista;
 		this.contextoApp = contextoApp;
 		this.repoTarjetas = repoTarjetas;
 		this.contextoUsuario = contextoUsuario;
+	}
+	
+	public void setFuncionEliminarDeLaVista(Runnable funcion) {
+		this.funcionEliminarDeLaVista = funcion;
 	}
 	
 	// El tablero llama a este método depsués de crear la lista
@@ -80,17 +88,29 @@ public class ListaController {
 	}
 	
 	private void cargarTarjetasBD() {
-		try {
-			List<Tarjeta> tarjetas = repoTarjetas.buscarPorListaId(ListaId.of(this.listaDominio.id()));
-			System.out.println("Tarjetas encontradas para la lista: " + this.listaDominio.nombre());
-			
-			for(Tarjeta tarjeta : tarjetas) {
-				instanciarTarjetaVisual(new TarjetaDTO(tarjeta));
-			}
-		} catch(Exception e) {
-			System.err.println("Error al cargar las tarjetas de la base de datos: " + e.getMessage());
-			e.printStackTrace();
-		}
+	    try {
+	        System.out.println("📦 Intentando cargar tarjetas para lista: " + this.listaDominio.id());
+	        
+	        String listaId = this.listaDominio.id();
+	        System.out.println("   ListaId creado: " + listaId);
+	        
+	        List<Tarjeta> tarjetas = repoTarjetas.buscarPorListaId(ListaId.of(listaId));
+	        System.out.println("✅ Tarjetas encontradas: " + tarjetas.size());
+	        
+	        if (tarjetas.isEmpty()) {
+	            System.out.println("⚠️  No hay tarjetas para esta lista");
+	        }
+	        
+	        for(Tarjeta tarjeta : tarjetas) {
+	            System.out.println("   - Creando visual para tarjeta: " + tarjeta.getTitulo());
+	            instanciarTarjetaVisual(new TarjetaDTO(tarjeta));
+	        }
+	        
+	        System.out.println("✅ Se cargaron " + tarjetas.size() + " tarjetas en la UI");
+	    } catch(Exception e) {
+	        System.err.println("❌ Error al cargar tarjetas: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
 	
 	@FXML
@@ -184,19 +204,54 @@ public class ListaController {
 		});
 	}
 	
-	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MinitarjetaView.fxml"));
-			loader.setControllerFactory(contextoApp::getBean);
-			
-			VBox nodoTarjeta = loader.load();
-			MiniTarjetaController controlador = loader.getController();
-			controlador.configurarMiniTarjeta(tarjeta);
-			contenedorTarjetas.getChildren().add(nodoTarjeta);
-		} catch(Exception e) {
-			System.err.println("Error al instancias la tarjeta visual: " + e.getMessage());
-			e.printStackTrace();
+	@FXML
+	public void accionEliminarLista(ActionEvent evento) {
+		Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+		alerta.setTitle("Eliminar Lista");
+		alerta.setHeaderText(null);
+		alerta.setContentText("¿Seguro que quieres eliminar la lista '" + listaDominio.nombre() + "' y todas sus tarjetas?");
+		
+		if(alerta.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+			try {
+				servicioLista.eliminarLista(tableroId, listaDominio.id(), contextoUsuario.getEmail());
+				
+				if(funcionEliminarDeLaVista != null) {
+					funcionEliminarDeLaVista.run();
+				}
+				
+				System.out.println("Lista eliminada");
+			} catch(Exception e) {
+				e.printStackTrace();
+				mostrarError("Error al eliminar", "No se pudo eliminar la lista: " + e.getMessage());
+			}
 		}
+	}
+	
+	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {
+	    try {
+	        System.out.println("🎨 Instanciando tarjeta visual: " + tarjeta.titulo());
+	        
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MiniTarjetaView.fxml"));
+	        loader.setControllerFactory(contextoApp::getBean);
+	        
+	        VBox nodoTarjeta = loader.load();
+	        System.out.println("   ✅ FXML cargado");
+	        
+	        MiniTarjetaController controlador = loader.getController();
+	        controlador.configurarMiniTarjeta(tarjeta);
+	        System.out.println("   ✅ Controlador configurado");
+	        
+	        controlador.setFuncionEliminarDeLaVista(() -> {
+	        	contenedorTarjetas.getChildren().remove(nodoTarjeta);
+	        });
+	        
+	        contenedorTarjetas.getChildren().add(nodoTarjeta);
+	        System.out.println("   ✅ Tarjeta añadida al contenedor");
+	        
+	    } catch(Exception e) {
+	        System.err.println("❌ Error al instanciar tarjeta visual: " + e.getMessage());
+	        e.printStackTrace();
+	    }
 	}
 	
 	// Añadir el primer elemento a una checklist (no pueden estar vacías)

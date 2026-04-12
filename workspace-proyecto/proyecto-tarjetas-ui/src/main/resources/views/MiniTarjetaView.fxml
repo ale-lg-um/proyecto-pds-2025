@@ -7,6 +7,12 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#accionAbrirDetalle" onMouseEntered="#accionHoverEntrar" onMouseExited="#accionHoverSalir" prefWidth="250.0" style="-fx-background-radius: 5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.MiniTarjetaController">
    <children>
+   	  <HBox alignment="CENTER_RIGHT">
+   	  	 <children>
+   	  	 	<Region HBox.hgrow="ALWAYS" />
+   	  	 	<Button mnemonicParsing="false" onAction="#accionEliminarTarjeta" style="-fx-background-color: transparent; -fx-text-fill: #ff4444; -fx-cursos: hand; -fx-font-weight: bold;" text="❌" />
+   	  	 </children>
+   	  </HBox>
       <FlowPane fx:id="contenedorEtiquetas" prefWidth="200.0" VBox.vgrow="NEVER" />
       <Label fx:id="lblTitulo" text="Titulo" wrapText="true" />
       <Label fx:id="lblIconoTipo" text="Icono tipo" />

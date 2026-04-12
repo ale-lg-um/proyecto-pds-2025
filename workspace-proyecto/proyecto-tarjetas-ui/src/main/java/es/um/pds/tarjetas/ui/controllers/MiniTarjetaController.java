@@ -7,14 +7,18 @@ import org.springframework.stereotype.Controller;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
@@ -26,14 +30,23 @@ import javafx.stage.Stage;
 public class MiniTarjetaController {
 	// Atributos
 	private final ApplicationContext contextoApp;
+	private final ServicioTarjeta servicioTarjeta;
+	private final ContextoUsuario contextoUsuario;
 	private TarjetaDTO tarjetaDominio;
+	private Runnable funcionEliminarDeLaVista;
 	
 	@FXML private Label lblTitulo;
 	@FXML private Label lblIconoTipo;
 	@FXML private FlowPane contenedorEtiquetas;
 	
-	public MiniTarjetaController(ApplicationContext contextoApp) {
+	public MiniTarjetaController(ApplicationContext contextoApp, ServicioTarjeta servicioTarjeta, ContextoUsuario contextoUsuario) {
 		this.contextoApp = contextoApp;
+		this.servicioTarjeta = servicioTarjeta;
+		this.contextoUsuario = contextoUsuario;
+	}
+	
+	public void setFuncionEliminarDeLaVista(Runnable funcion) {
+		this.funcionEliminarDeLaVista = funcion;
 	}
 	
 	// Inyectar datos reales
@@ -91,6 +104,34 @@ public class MiniTarjetaController {
 	public void accionHoverEntrar(MouseEvent evento) {
 		Node nodoTarjeta = (Node) evento.getSource();
 		nodoTarjeta.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 5; -fx-border-color: #b0b0b0; -fx-border-radius: 5; -fx-cursor: hand;");
+	}
+	
+	@FXML
+	public void accionEliminarTarjeta(ActionEvent evento) {
+		evento.consume(); //Para que no se abra la tarjeta
+		
+		Alert alerta = new Alert(Alert.AlertType.CONFIRMATION);
+		alerta.setTitle("Eliminar Tarjeta");
+		alerta.setHeaderText(null);
+		alerta.setContentText("¿Estás seguro de que quieres eliminar esta tarjeta?");
+		
+		if(alerta.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+			try {
+				// Borrar de la base de datos
+				servicioTarjeta.eliminarTarjeta(contextoUsuario.getIdTableroActual(), tarjetaDominio.listaActualId(), tarjetaDominio.id(), contextoUsuario.getEmail());
+				
+				if(funcionEliminarDeLaVista != null) {
+					funcionEliminarDeLaVista.run();
+				}
+				
+				System.out.println("Tarjeta eliminada");
+			} catch (Exception e) {
+				e.printStackTrace();
+				Alert error = new Alert(Alert.AlertType.ERROR);
+				error.setContentText("No se pudo eliminar la tarjeta: " + e.getMessage());
+				error.showAndWait();
+			}
+		}
 	}
 	
 	@FXML

@@ -10,14 +10,20 @@ import org.springframework.stereotype.Component;
 public class DatabaseInitializer implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
-		String dbPath = "./datos:tarjetas.v.db";
-		
-		if(Files.exists(Paths.get(dbPath))) {
-			System.out.println("Base de datos encontrada en: " + Paths.get(dbPath).toAbsolutePath());
-		} else {
-			System.out.println("Base de datos creándose en: " + Paths.get(dbPath).toAbsolutePath());
+		try {
+			String workingDir = System.getProperty("user.dir");
+			String dbPath = workingDir + "\\datos_taarjetas.mv.db";
+			
+			System.out.println("Directorio de trabajo: " + workingDir);
+			System.out.println("Base de datos guardada en: " + dbPath);
+			
+			if(Files.exists(Paths.get(dbPath))) {
+				System.out.println("Base de datos encontrada");
+			} else {
+				System.out.println("Base de datos será creada en la primera ejecución");
+			}
+		} catch (Exception e) {
+			System.err.println("Error al verificar base de datos" + e.getMessage());
 		}
-		
-		System.out.println("Directorio de trabajo: " + System.getProperty("user.dir"));
 	}
 }

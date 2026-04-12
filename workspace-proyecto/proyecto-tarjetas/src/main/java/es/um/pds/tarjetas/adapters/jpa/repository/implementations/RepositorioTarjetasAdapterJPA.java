@@ -50,7 +50,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (tarjetaId == null) {
 			throw new IllegalArgumentException("El identificador de la tarjeta no puede ser nulo");
 		}
-		return tarjetaRepositoryJPA.findById(tarjetaId.toString()).map(TarjetaMapperJPA::toDomain);
+		return tarjetaRepositoryJPA.findById(tarjetaId.getId()).map(TarjetaMapperJPA::toDomain);
 	}
 
 	/*
@@ -63,7 +63,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (listaId == null) {
 			throw new IllegalArgumentException("El identificador de la lista no puede ser nulo");
 		}
-		return tarjetaRepositoryJPA.findByListaActualId(listaId.toString()).stream().map(TarjetaMapperJPA::toDomain)
+		return tarjetaRepositoryJPA.findByListaActualId(listaId.getId()).stream().map(TarjetaMapperJPA::toDomain)
 				.toList();
 	}
 
@@ -77,7 +77,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		return tarjetaRepositoryJPA.findByTableroId(tableroId.toString()).stream().map(TarjetaMapperJPA::toDomain)
+		return tarjetaRepositoryJPA.findByTableroId(tableroId.getId()).stream().map(TarjetaMapperJPA::toDomain)
 				.toList();
 	}
 
@@ -89,7 +89,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (tarjetaId == null) {
 			throw new IllegalArgumentException("El identificador de la tarjeta no puede ser nulo");
 		}
-		tarjetaRepositoryJPA.deleteById(tarjetaId.toString());
+		tarjetaRepositoryJPA.deleteById(tarjetaId.getId());
 	}
 
 	/*
@@ -102,7 +102,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (listaId == null) {
 			throw new IllegalArgumentException("El identificador de la lista no puede ser nulo");
 		}
-		tarjetaRepositoryJPA.deleteByListaActualId(listaId.toString());
+		tarjetaRepositoryJPA.deleteByListaActualId(listaId.getId());
 	}
 
 	/*
@@ -115,7 +115,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		tarjetaRepositoryJPA.deleteByTableroId(tableroId.toString());
+		tarjetaRepositoryJPA.deleteByTableroId(tableroId.getId());
 	}
 
 	/*
@@ -148,10 +148,10 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 		org.springframework.data.domain.Page<TarjetaEntity> resultado;
 
 		if (modo == ModoFiltradoEtiquetas.AND) {
-			resultado = tarjetaRepositoryJPA.filtrarPorEtiquetasAND(tableroId.toString(), nombresNormalizados,
+			resultado = tarjetaRepositoryJPA.filtrarPorEtiquetasAND(tableroId.getId(), nombresNormalizados,
 					nombresNormalizados.size(), pageable);
 		} else {
-			resultado = tarjetaRepositoryJPA.filtrarPorEtiquetasOR(tableroId.toString(), nombresNormalizados, pageable);
+			resultado = tarjetaRepositoryJPA.filtrarPorEtiquetasOR(tableroId.getId(), nombresNormalizados, pageable);
 		}
 
 		// Obtener las tarjetas que cumplen con el filtro

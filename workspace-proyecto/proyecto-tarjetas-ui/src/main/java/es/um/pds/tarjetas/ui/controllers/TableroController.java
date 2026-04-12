@@ -163,6 +163,11 @@ public class TableroController {
 			ListaController controlador = loader.getController();
 			controlador.configurarLista(lista, this.actual);
 			
+			// Borrar la lista de la pantalla
+			controlador.setFuncionEliminarDeLaVista(() -> {
+				contenedorListas.getChildren().remove(nodoLista);
+			});
+			
 			// Insertar la lista a la izquierda del botón de añadir lista
 			int posicionBoton = contenedorListas.getChildren().size() - 1;
 			contenedorListas.getChildren().add(posicionBoton, nodoLista);
