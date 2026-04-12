@@ -237,6 +237,8 @@ public class ListaController {
 	        VBox nodoTarjeta = loader.load();
 	        System.out.println("   ✅ FXML cargado");
 	        
+	        //nodoTarjeta.setId("t-" + tarjeta.id());
+	        
 	        MiniTarjetaController controlador = loader.getController();
 	        controlador.configurarMiniTarjeta(tarjeta);
 	        System.out.println("   ✅ Controlador configurado");

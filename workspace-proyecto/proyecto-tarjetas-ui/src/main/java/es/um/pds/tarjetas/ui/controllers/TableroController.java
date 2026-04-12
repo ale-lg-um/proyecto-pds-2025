@@ -1,5 +1,7 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,6 +15,7 @@ import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaCompletada;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 //import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
@@ -20,20 +23,33 @@ import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
+import javafx.application.Platform;
 //import es.um.pds.tarjetas.ui.Configuracion;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 
 @Controller
 @Scope("prototype")
 public class TableroController {
 	// Atributos
+	private final Map<String, VBox> nodosListas = new HashMap<>();
+	private final Map<String, VBox> nodosTarjetas = new HashMap<>();
+	
 	private final ServicioTablero servicioTablero;
 	private final ServicioLista servicioLista;
 	private final RepositorioListas repoListas;
@@ -84,7 +100,7 @@ public class TableroController {
 			e.printStackTrace();
 		}*/
 		
-		System.out.println("Cargando elt ablero principal...");
+		System.out.println("Cargando el tablero principal...");
 		this.actual = contextoUsuario.getIdTableroActual();
 		
 		if(this.actual == null) {
@@ -115,7 +131,7 @@ public class TableroController {
 	
 	@FXML
 	public void accionAnadirLista(ActionEvent evento) {
-		TextInputDialog dialogo = new TextInputDialog();
+		/*TextInputDialog dialogo = new TextInputDialog();
 		dialogo.setTitle("Nueva lista");
 		dialogo.setHeaderText("Añadir lista al tablero");
 		dialogo.setContentText("Nombre:");
@@ -145,6 +161,68 @@ public class TableroController {
 					mostrarError("Error", "Error desconocido: " + e.getMessage());
 				}
 			}
+		});*/
+		
+		// Buscar si hay una lista especial ya
+		boolean yaHayEspecial = repoListas.buscarPorTableroId(TableroId.of(this.actual)).stream()
+				.anyMatch(l -> l.isEspecial());
+		
+		Dialog<Pair<String, Boolean>> dialogo = new Dialog<>();
+		dialogo.setTitle("Nueva lista");
+		dialogo.setHeaderText("Crear una nueva lista");
+		
+		ButtonType btnAceptar = new ButtonType("Crear", ButtonData.OK_DONE);
+		dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
+		
+		GridPane grid = new GridPane();
+		grid.setHgap(10);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(20, 50, 10, 10));
+		
+		TextField txtNombre = new TextField();
+		txtNombre.setPromptText("Nombre de la lista");
+		
+		ComboBox<String> cbTipo = new ComboBox<>();
+		cbTipo.getItems().addAll("NORMAL", "ESPECIAL");
+		cbTipo.getSelectionModel().selectFirst();
+		
+		grid.add(new Label("Nombre: "), 0, 0);
+		grid.add(txtNombre, 1, 0);
+		
+		// Añadir la selección de tipo si no existe ya una lista especial
+		if(!yaHayEspecial) {
+			grid.add(new Label("Tipo: "), 0, 1);
+			grid.add(cbTipo, 1, 1);
+		}
+		
+		dialogo.getDialogPane().setContent(grid);
+		
+		dialogo.setResultConverter(dialogButton -> {
+			if(dialogButton == btnAceptar) {
+				boolean esEspecial = !yaHayEspecial && cbTipo.getValue().equals("ESPECIAL");
+				return new Pair<>(txtNombre.getText(), esEspecial);
+			}
+			return null;
+		});
+		
+		dialogo.showAndWait().ifPresent(resultado -> {
+			try {
+				String nombre = resultado.getKey();
+				boolean marcarComoEspecial = resultado.getValue();
+				String email = contextoUsuario.getEmail();
+				
+				ListaDTO nueva = servicioLista.crearLista(this.actual, nombre, email);
+				
+				if(marcarComoEspecial) {
+					servicioLista.definirListaEspecial(actual, nueva.id(), email);
+					// Recargar para que la vista sepa que la lista es especial
+					nueva = new ListaDTO(nueva.id(), nueva.nombre(), true, nueva.limite(), nueva.tarjetaIds(), nueva.prerrequisitoIds());
+				}
+				
+				instanciarListaVisual(nueva);
+			} catch(Exception e) {
+				mostrarError("Error", "No se pudo crear la lista: " + e.getMessage());
+			}
 		});
 	}
 	
@@ -158,6 +236,9 @@ public class TableroController {
 			loader.setControllerFactory(contextoApp::getBean);
 			
 			VBox nodoLista = loader.load();
+			
+			VBox contenedorInterno = (VBox) nodoLista.lookup("#contenedorTarjeta");
+			nodosListas.put(lista.id(), contenedorInterno);
 			
 			// recuperar el controlador
 			ListaController controlador = loader.getController();
@@ -175,6 +256,20 @@ public class TableroController {
 			System.err.println("Error al cargar la vista de la lista: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	@FXML
+	public void alCompletarTarjeta(TarjetaCompletada evento) {
+		Platform.runLater(() -> {
+			VBox nodo = nodosTarjetas.get(evento.tarjetaId().getId());
+			VBox listaDest = nodosListas.get(evento.listaId().getId());
+			
+			if(nodo != null && listaDest != null) {
+				((VBox) nodo.getParent()).getChildren().remove(nodo);
+				listaDest.getChildren().add(nodo);
+				System.out.println("Moviendo tarjeta a lista especial...");
+			}
+		});
 	}
 	
 	@FXML

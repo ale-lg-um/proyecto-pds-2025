@@ -9,12 +9,17 @@ import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
+import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ItemChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -26,15 +31,20 @@ import javafx.scene.layout.VBox;
 public class TarjetaController {
 	// Atributos
 	private final ApplicationContext contextoApp;
+	private final ContextoUsuario contextoUsuario;
+	private final ServicioTarjeta servicioTarjeta;
 	private TarjetaDTO tarjeta;
 	
 	@FXML private Label lblTitulo;
 	@FXML private FlowPane contenedorEtiquetas;
 	@FXML private TextArea txtDescripcion;
 	@FXML private VBox contenedorChecklist;
+	@FXML private Button btnCompletar;
 	
-	public TarjetaController(ApplicationContext contextoApp) {
+	public TarjetaController(ApplicationContext contextoApp, ContextoUsuario contextoUsuario, ServicioTarjeta servicioTarjeta) {
 		this.contextoApp = contextoApp;
+		this.contextoUsuario = contextoUsuario;
+		this.servicioTarjeta = servicioTarjeta;
 	}
 	
 	// la minitarjeta llama a este método al clicar en ella
@@ -85,6 +95,35 @@ public class TarjetaController {
 				else item.marcarComoPendiente();
 			});*/
 			contenedorChecklist.getChildren().add(cb);
+		}
+	}
+	
+	@FXML
+	public void accionCompletarTarjeta(ActionEvent evento) {
+		Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+		confirmacion.setTitle("ComplettarTarjeta");
+		confirmacion.setHeaderText("¿Quieres marcar esta tarjeta como completada?");
+		confirmacion.setContentText("La tarjeta se moverá a una lista especiald entro de este tablero.");
+		
+		if(confirmacion.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
+			try {
+				String tableroId = contextoUsuario.getIdTableroActual();
+				String email = contextoUsuario.getEmail();
+				
+				servicioTarjeta.completarTarjeta(tableroId, tarjeta.listaActualId(), tarjeta.id(), email);
+				
+				Alert exito = new Alert(Alert.AlertType.INFORMATION);
+				exito.setContentText("La tarjeta se ha compeltado correctamente");
+				exito.showAndWait();
+				
+				btnCompletar.getScene().getWindow().hide();
+			} catch(Exception e) {
+				Alert error = new Alert(Alert.AlertType.ERROR);
+				error.setTitle("Error de validación");
+				error.setHeaderText("No se puede completar la tarjeta");
+				error.setContentText(e.getMessage());
+				error.showAndWait();
+			}
 		}
 	}
 	

@@ -30,7 +30,7 @@
             <Button fx:id="btnEtiquetas" mnemonicParsing="false" prefWidth="150.0" text="Etiquetas" />
             <Button fx:id="btnChecklist" mnemonicParsing="false" prefWidth="150.0" text="Checklist" />
             <Button fx:id="btnFechas" mnemonicParsing="false" prefWidth="150.0" text="Fechas" />
-            <Button mnemonicParsing="false" prefWidth="150.0" text="..." />
+            <Button fx:id="btnCompletar" mnemonicParsing="false" onAction="#accionCompletarTarjeta" prefWidth="150.0" style="-fx-backgorund-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="✔ Completar" />
          </children>
       </VBox>
    </children>
