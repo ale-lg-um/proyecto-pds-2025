@@ -75,7 +75,7 @@ public class RepositorioTablerosAdapterJPA implements RepositorioTableros {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		tableroRepositoryJPA.deleteById(tableroId.toString());
+		tableroRepositoryJPA.deleteById(tableroId.getId());
 	}
 
 	/*

@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
@@ -30,6 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 @Controller
+@Scope("prototype")
 public class TableroController {
 	// Atributos
 	private final ServicioTablero servicioTablero;
@@ -61,7 +63,7 @@ public class TableroController {
 		// Se leen las líneas existentes de la base de datos
 		// Se llama en bucle a instanciarListaVisual()
 		
-		System.out.println("Cargando el tablero principal...");
+		/*System.out.println("Cargando el tablero principal...");
 		this.actual = contextoUsuario.getIdTableroActual();
 		if(this.actual == null) {
 			System.err.println("Error: no se ha seleccionado ningún tablero");
@@ -79,6 +81,34 @@ public class TableroController {
 			});
 		} catch(Exception e) {
 			System.err.println("Error al cargar los datos del tablero desde la base de datos.");
+			e.printStackTrace();
+		}*/
+		
+		System.out.println("Cargando elt ablero principal...");
+		this.actual = contextoUsuario.getIdTableroActual();
+		
+		if(this.actual == null) {
+			System.err.println("Error: no se ha seleccionado ningún tablero");
+			return;
+		}
+		
+		TableroId id = TableroId.of(this.actual);
+		
+		try {
+			Optional<Tablero> tableroOpt = repoTableros.buscarPorId(id);
+			if(tableroOpt.isPresent()) {
+				Tablero tab = tableroOpt.get();
+				System.out.println("Tablero detectado: " + tab.getNombre());
+				
+				for(ListaId listaId : tab.getListas()) {
+					Optional<Lista> listaOpt = repoListas.buscarPorId(listaId);
+					if(listaOpt.isPresent()) {
+						instanciarListaVisual(new ListaDTO(listaOpt.get()));
+					}
+				}
+			}
+		} catch(Exception e) {
+			System.err.println("Error al cargar los datos del tablero desde la base de datos");
 			e.printStackTrace();
 		}
 	}

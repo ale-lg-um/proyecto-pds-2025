@@ -81,7 +81,7 @@ public class RepositorioListasAdapterJPA implements RepositorioListas {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		return listaRepositoryJPA.findByTableroId(tableroId.toString()).stream().map(ListaMapperJPA::toDomain)
+		return listaRepositoryJPA.findByTableroId(tableroId.getId()).stream().map(ListaMapperJPA::toDomain)
 				.collect(Collectors.toSet());
 	}
 
@@ -93,7 +93,7 @@ public class RepositorioListasAdapterJPA implements RepositorioListas {
 		if (listaId == null) {
 			throw new IllegalArgumentException("El identificador de la lista no puede ser nulo");
 		}
-		listaRepositoryJPA.deleteById(listaId.toString());
+		listaRepositoryJPA.deleteById(listaId.getId());
 	}
 
 	/*
@@ -106,6 +106,6 @@ public class RepositorioListasAdapterJPA implements RepositorioListas {
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		listaRepositoryJPA.deleteByTableroId(tableroId.toString());
+		listaRepositoryJPA.deleteByTableroId(tableroId.getId());
 	}
 }

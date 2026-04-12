@@ -39,7 +39,7 @@ public class RepositorioCodigoLoginAdapterJPA implements RepositorioCodigosLogin
 			throw new IllegalArgumentException("La fecha de expiración no puede ser nula");
 		}
 
-		CodigoLoginEntity entity = new CodigoLoginEntity(usuarioId.toString(), codigo, expiraEn);
+		CodigoLoginEntity entity = new CodigoLoginEntity(usuarioId.getCorreo(), codigo, expiraEn);
 		codigoLoginRepositoryJPA.save(entity);
 	}
 
@@ -53,7 +53,7 @@ public class RepositorioCodigoLoginAdapterJPA implements RepositorioCodigosLogin
 		if (usuarioId == null) {
 			throw new IllegalArgumentException("El identificador del usuario no puede ser nulo");
 		}
-		return codigoLoginRepositoryJPA.findByUsuarioIdAndExpiraEnAfter(usuarioId.toString(), Instant.now())
+		return codigoLoginRepositoryJPA.findByUsuarioIdAndExpiraEnAfter(usuarioId.getCorreo(), Instant.now())
 				.map(CodigoLoginEntity::getCodigo);
 	}
 
@@ -67,6 +67,6 @@ public class RepositorioCodigoLoginAdapterJPA implements RepositorioCodigosLogin
 		if (usuarioId == null) {
 			throw new IllegalArgumentException("El identificador del usuario no puede ser nulo");
 		}
-		codigoLoginRepositoryJPA.deleteByUsuarioId(usuarioId.toString());
+		codigoLoginRepositoryJPA.deleteByUsuarioId(usuarioId.getCorreo());
 	}
 }

@@ -17,7 +17,7 @@ import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.ports.output.ModoFiltradoEtiquetas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
 
-@Repository
+//@Repository
 public class RepositorioTarjetasMemoria implements RepositorioTarjetas {
 	// Atributos
 	// Mapea el ID de la tarjeta con su tarjeta

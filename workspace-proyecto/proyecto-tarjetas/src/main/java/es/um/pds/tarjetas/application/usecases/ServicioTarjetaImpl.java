@@ -215,6 +215,9 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 
 		// 5. Validar reglas de negocio de creación
 		politicaTarjetas.validarCreacion(tablero, lista);
+		
+		// 6. Asignar el tablero a la tarjeta
+		nuevaTarjeta.asignarATablero(idTablero);
 
 		// 7. Actualizar la lista con la nueva tarjeta delegando la lógica en el dominio
 		// Se crea en la última posición de la lista

@@ -43,7 +43,7 @@ public class RepositorioUsuariosAdapterJPA implements RepositorioUsuarios {
 		if (usuarioId == null) {
 			throw new IllegalArgumentException("El identificador del usuario no puede ser nulo");
 		}
-		return usuarioRepositoryJPA.findById(usuarioId.toString())
+		return usuarioRepositoryJPA.findById(usuarioId.getCorreo())
 				.map(UsuarioMapperJPA::toDomain);
 	}
 }

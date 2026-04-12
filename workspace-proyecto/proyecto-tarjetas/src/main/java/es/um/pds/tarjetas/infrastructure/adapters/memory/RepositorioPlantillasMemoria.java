@@ -10,7 +10,7 @@ import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
 import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
 
-@Repository
+//@Repository
 public class RepositorioPlantillasMemoria implements RepositorioPlantillas {
 	// Atributos
 	private final Map<PlantillaId, Plantilla> plantillas = new HashMap<>();

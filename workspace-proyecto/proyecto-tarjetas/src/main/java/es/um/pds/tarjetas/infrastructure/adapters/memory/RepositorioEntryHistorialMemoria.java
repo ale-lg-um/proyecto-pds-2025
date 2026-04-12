@@ -14,7 +14,7 @@ import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
 
-@Repository
+//@Repository
 public class RepositorioEntryHistorialMemoria implements RepositorioEntryHistorial {
 
 	private final Map<EntryHistorialId, EntryHistorial> entradas = new HashMap<>();

@@ -57,9 +57,14 @@ public class TarjetaMapperJPA {
 
 		Set<String> listasVisitadas = domain.getListasVisitadas().stream().map(ListaId::getId)
 				.collect(Collectors.toSet());
+		
+		String tableroId = domain.getTablero() != null ? domain.getTablero().getId() : null;
+		if(tableroId == null) {
+			System.err.println("⚠️ AVISO: Tarjeta sin tablero asignado: " + domain.getIdentificador().getId());
+		}
 
 		return new TarjetaEntity(domain.getIdentificador().getId(), domain.getTitulo(), domain.getFechaCreacion(),
-				domain.getListaActual().getId(), domain.getTablero() != null ? domain.getTablero().getId() : null,
+				domain.getListaActual().getId(), tableroId,
 				tipoContenido, tareaDescripcion, domain.isCompletada(), etiquetas, listasVisitadas, itemsChecklist);
 	}
 

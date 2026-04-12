@@ -8,8 +8,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 //import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
@@ -18,6 +20,7 @@ import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,6 +45,8 @@ public class ListaController {
 	private final ServicioTablero servicioTablero;
 	private final ServicioTarjeta servicioTarjeta;
 	private final ApplicationContext contextoApp;
+	private final RepositorioTarjetas repoTarjetas;
+	private final ContextoUsuario contextoUsuario;
 	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
 	
@@ -50,10 +55,12 @@ public class ListaController {
 	@FXML private VBox contenedorTarjetas;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ApplicationContext contextoApp) {
+	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario) {
 		this.servicioTablero = servicioTablero;
 		this.servicioTarjeta = servicioTarjeta;
 		this.contextoApp = contextoApp;
+		this.repoTarjetas = repoTarjetas;
+		this.contextoUsuario = contextoUsuario;
 	}
 	
 	// El tablero llama a este método depsués de crear la lista
@@ -67,6 +74,22 @@ public class ListaController {
 			this.lblLimite.setText("(0/" + lista.limite() + ")");
 		} else {
 			this.lblLimite.setText("(\u221E)");
+		}
+		
+		cargarTarjetasBD();
+	}
+	
+	private void cargarTarjetasBD() {
+		try {
+			List<Tarjeta> tarjetas = repoTarjetas.buscarPorListaId(ListaId.of(this.listaDominio.id()));
+			System.out.println("Tarjetas encontradas para la lista: " + this.listaDominio.nombre());
+			
+			for(Tarjeta tarjeta : tarjetas) {
+				instanciarTarjetaVisual(new TarjetaDTO(tarjeta));
+			}
+		} catch(Exception e) {
+			System.err.println("Error al cargar las tarjetas de la base de datos: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 	
@@ -128,7 +151,8 @@ public class ListaController {
 				//TarjetaDTO tarjetaDTO = new TarjetaDTO(null, titulo, null, listaDominio.getIdentificador().getId(), 0, new TareaDTO(""), List.of(), Set.of());
 				
 				// CAMBIAR: tenemos que detectar al usuario que está con la sesión iniciada
-				String usuario = "usuario@ejemplo.com";
+				//String usuario = "usuario@ejemplo.com";
+				String usuario = contextoUsuario.getEmail();
 				ContenidoTarjetaCmd contenido;
 				if(TipoContenidoTarjeta.valueOf(opcion).equals(TipoContenidoTarjeta.TAREA)) {
 					contenido = new ContenidoTarjetaCmd(TipoContenidoTarjeta.valueOf(opcion), titulo, List.of(), usuario);
@@ -158,6 +182,21 @@ public class ListaController {
 				mostrarError("Error", "No se pudo crear la tarjeta: " +  e.getMessage());
 			}
 		});
+	}
+	
+	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MinitarjetaView.fxml"));
+			loader.setControllerFactory(contextoApp::getBean);
+			
+			VBox nodoTarjeta = loader.load();
+			MiniTarjetaController controlador = loader.getController();
+			controlador.configurarMiniTarjeta(tarjeta);
+			contenedorTarjetas.getChildren().add(nodoTarjeta);
+		} catch(Exception e) {
+			System.err.println("Error al instancias la tarjeta visual: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	// Añadir el primer elemento a una checklist (no pueden estar vacías)
