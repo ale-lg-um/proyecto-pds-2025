@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.stereotype.Repository;
+//import org.springframework.stereotype.Repository;
 
 import es.um.pds.tarjetas.application.common.Page;
 import es.um.pds.tarjetas.application.common.PageRequest;
