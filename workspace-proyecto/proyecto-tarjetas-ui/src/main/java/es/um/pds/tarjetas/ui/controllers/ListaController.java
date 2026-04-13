@@ -3,6 +3,7 @@ package es.um.pds.tarjetas.ui.controllers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -52,6 +53,7 @@ public class ListaController {
 	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
 	private Runnable funcionEliminarDeLaVista;
+	private BiConsumer<String, VBox> onTarjetaCreada;
 	
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
@@ -69,6 +71,10 @@ public class ListaController {
 	
 	public void setFuncionEliminarDeLaVista(Runnable funcion) {
 		this.funcionEliminarDeLaVista = funcion;
+	}
+	
+	public void setOnTarjetaCreada(BiConsumer<String, VBox> callback) {
+		this.onTarjetaCreada = callback;
 	}
 	
 	// El tablero llama a este método depsués de crear la lista
@@ -242,6 +248,10 @@ public class ListaController {
 	        MiniTarjetaController controlador = loader.getController();
 	        controlador.configurarMiniTarjeta(tarjeta);
 	        System.out.println("   ✅ Controlador configurado");
+	        
+	        if(onTarjetaCreada != null) {
+	        	onTarjetaCreada.accept(tarjeta.id(), nodoTarjeta);
+	        }
 	        
 	        controlador.setFuncionEliminarDeLaVista(() -> {
 	        	contenedorTarjetas.getChildren().remove(nodoTarjeta);

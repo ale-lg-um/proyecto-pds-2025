@@ -242,6 +242,10 @@ public class TableroController {
 			
 			// recuperar el controlador
 			ListaController controlador = loader.getController();
+			
+			controlador.setOnTarjetaCreada((id, nodo) -> {
+				nodosTarjetas.put(id, nodo);
+			});
 			controlador.configurarLista(lista, this.actual);
 			
 			// Borrar la lista de la pantalla
