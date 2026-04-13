@@ -1,7 +1,7 @@
 name: CI 
 on:
   push:
-    branches: [ main ]
+    branches: [ '*' ]
   pull_request:
     branches: [ '*' ]
 jobs:
@@ -15,7 +15,6 @@ jobs:
         with:
           java-version: '21'
       - name: Build with Maven
-        run: mvn clean install
+        run: cd workspace-proyecto/proyecto-tarjetas && mvn clean install
       - name: Run tests
-	working-directory: workspace-proyecto\proyecto-tarjetas-ui
-        run: mvn -B test
+        run: cd workspace-proyecto/proyecto-tarjetas && mvn -B test
