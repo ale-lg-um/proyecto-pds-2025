@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
 public class CodigoLoginEntity {
 
 	/**
-	 * Usamos el usuarioId como clave primaria Garantiza 1 código activo por usuario
+	 * Usamos el usuarioId como clave primaria, garantiza 1 código activo por usuario
 	 */
 	@Id
 	@Column(name = "usuario_id", nullable = false, length = 320)
