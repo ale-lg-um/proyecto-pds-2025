@@ -27,7 +27,7 @@
       <VBox prefHeight="200.0" prefWidth="150.0" spacing="10.0">
          <children>
             <Label fx:id="lblAnadir" text="Añadir a la tarjeta" />
-            <Button fx:id="btnEtiquetas" mnemonicParsing="false" prefWidth="150.0" text="Etiquetas" />
+            <Button fx:id="btnEtiquetas" onAction="#accionAnadirEtiqueta" mnemonicParsing="false" prefWidth="150.0" text="Añadir Etiquetas..." />
             <Button fx:id="btnChecklist" mnemonicParsing="false" prefWidth="150.0" text="Checklist" />
             <Button fx:id="btnFechas" mnemonicParsing="false" prefWidth="150.0" text="Fechas" />
             <Button fx:id="btnCompletar" mnemonicParsing="false" onAction="#accionCompletarTarjeta" prefWidth="150.0" style="-fx-backgorund-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="✔ Completar" />

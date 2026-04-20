@@ -9,6 +9,7 @@ import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import javafx.event.ActionEvent;
@@ -53,6 +54,7 @@ public class MiniTarjetaController {
 	public void configurarMiniTarjeta(TarjetaDTO tarjeta) {
 		this.tarjetaDominio = tarjeta;
 		this.lblTitulo.setText(tarjeta.titulo());
+		cargarEtiquetas();
 		
 		if(tarjeta.contenido() instanceof TareaDTO) {
 			this.lblIconoTipo.setText("📝: Tarea");
@@ -138,5 +140,16 @@ public class MiniTarjetaController {
 	public void accionHoverSalir(MouseEvent evento) {
 		Node nodoTarjeta = (Node) evento.getSource();
 		nodoTarjeta.setStyle("-fx-background-color: #ffffff; -fx-background-radius: 5; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-cursor: hand;");
+	}
+	
+	private void cargarEtiquetas() {
+		contenedorEtiquetas.getChildren().clear();
+		for(EtiquetaDTO etiq : tarjetaDominio.etiquetas()) {
+			Label lblEtiqueta = new Label(etiq.nombre());
+			lblEtiqueta.setStyle(String.format(
+					"-fx-background-color: %s; -fx-text-fill: white; -fx-padding: 3 8 3 8; -fx-backround.radius: 4; -fx-font-weight: bold",
+					etiq.color()));
+			contenedorEtiquetas.getChildren().add(lblEtiqueta);
+		}
 	}
 }

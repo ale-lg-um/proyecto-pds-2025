@@ -40,6 +40,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
 
@@ -57,6 +58,7 @@ public class TableroController {
 	private final ApplicationContext contextoApp;
 	private final ContextoUsuario contextoUsuario;
 	private final SceneManager sceneManager;
+	private final TableroEventBridge eventBridge;
 	private int nListas = 0;
 	
 	private String actual;
@@ -64,7 +66,7 @@ public class TableroController {
 	@FXML private HBox contenedorListas;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
+	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
 		this.servicioTablero = servicioTablero;
 		this.servicioLista = servicioLista;
 		this.repoListas = repoListas;
@@ -72,6 +74,7 @@ public class TableroController {
 		this.contextoApp = contextoApp;
 		this.contextoUsuario = contextoUsuario;
 		this.sceneManager = sceneManager;
+		this.eventBridge = eventBridge;
 	}
 	
 	@FXML
@@ -99,6 +102,8 @@ public class TableroController {
 			System.err.println("Error al cargar los datos del tablero desde la base de datos.");
 			e.printStackTrace();
 		}*/
+		
+		eventBridge.conectarConPantalla(this::alCompletarTarjeta);
 		
 		System.out.println("Cargando el tablero principal...");
 		this.actual = contextoUsuario.getIdTableroActual();
@@ -262,8 +267,7 @@ public class TableroController {
 		}
 	}
 	
-	@FXML
-	public void alCompletarTarjeta(TarjetaCompletada evento) {
+	/*public void alCompletarTarjeta(TarjetaCompletada evento) {
 		Platform.runLater(() -> {
 			VBox nodo = nodosTarjetas.get(evento.tarjetaId().getId());
 			VBox listaDest = nodosListas.get(evento.listaId().getId());
@@ -272,6 +276,24 @@ public class TableroController {
 				((VBox) nodo.getParent()).getChildren().remove(nodo);
 				listaDest.getChildren().add(nodo);
 				System.out.println("Moviendo tarjeta a lista especial...");
+			}
+		});
+	}*/
+	
+	public void alCompletarTarjeta(TarjetaCompletada evento) {
+		System.out.println("🎯 TABLERO: Orden de mover recibida. Recargando pantalla...");
+		
+		Platform.runLater(() -> {
+			try {
+				// Simplemente le decimos al SceneManager que vuelva a cargar el FXML.
+				// Esto destruirá la vista antigua y ejecutará el initialize() de nuevo,
+				// pintando todo exactamente como está en la base de datos ahora mismo.
+				sceneManager.showTablero();
+				
+				System.out.println("✅ Pantalla recargada con éxito.");
+			} catch (Exception e) {
+				System.out.println("❌ Error al recargar la pantalla: " + e.getMessage());
+				e.printStackTrace();
 			}
 		});
 	}
