@@ -44,7 +44,7 @@ import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 @Transactional
 class ServicioTableroListaIntegrationTest {
 
-	private static final String EMAIL_USUARIO = "ana@um.es";
+	private static final String EMAIL_USUARIO = "ejemplo@um.es";
 	private static final String NOMBRE_TABLERO = "Proyecto PDS";
 
 	@Autowired

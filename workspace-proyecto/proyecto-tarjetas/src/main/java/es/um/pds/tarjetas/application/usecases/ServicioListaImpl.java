@@ -117,6 +117,7 @@ public class ServicioListaImpl implements ServicioLista {
 		// Podríamos considerar posición de la Lista pero no tendriá mucho sentido de cara a la UI
 
 		Lista nuevaLista = Lista.of(nuevaListaId, nombre);
+		nuevaLista.asignarATablero(idTablero);
 		tablero.anadirLista(nuevaListaId);
 
 		// 6. Persistir cambios
