@@ -1,5 +1,6 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -17,10 +18,13 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaCompletada;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
+import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 //import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
+import es.um.pds.tarjetas.domain.ports.input.dto.EntryHistorialDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
+import es.um.pds.tarjetas.domain.ports.input.dto.PageDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import javafx.application.Platform;
@@ -31,11 +35,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.GridPane;
@@ -53,6 +59,7 @@ public class TableroController {
 	
 	private final ServicioTablero servicioTablero;
 	private final ServicioLista servicioLista;
+	private final ServicioHistorial servicioHistorial;
 	private final RepositorioListas repoListas;
 	private final RepositorioTableros repoTableros;
 	private final ApplicationContext contextoApp;
@@ -64,11 +71,15 @@ public class TableroController {
 	private String actual;
 	
 	@FXML private HBox contenedorListas;
+	@FXML private VBox panelHistorial;
+	@FXML private ListView<String> listaHistorial;
+	@FXML private Button btnToggleHistorial;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
+	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
 		this.servicioTablero = servicioTablero;
 		this.servicioLista = servicioLista;
+		this.servicioHistorial = servicioHistorial;
 		this.repoListas = repoListas;
 		this.repoTableros = repoTableros;
 		this.contextoApp = contextoApp;
@@ -307,6 +318,41 @@ public class TableroController {
 		
 		// Volver
 		sceneManager.showDashboard();
+	}
+	
+	@FXML
+	public void accionToggleHistorial(ActionEvent evento) {
+		boolean isVisible = panelHistorial.isVisible();
+		
+		panelHistorial.setVisible(!isVisible);
+		panelHistorial.setManaged(!isVisible);
+		
+		if(!isVisible) {
+			btnToggleHistorial.setText("Ocultar Historial");
+			cargarHistorial();
+		} else {
+			btnToggleHistorial.setText("Ver historial");
+		}
+	}
+	
+	private void cargarHistorial() {
+		listaHistorial.getItems().clear();
+		
+		try {
+			// Pedir página 0 con un máximo de 20 entradas
+			PageDTO<EntryHistorialDTO> pagina = servicioHistorial.consultarPorTablero(actual, 0, 20);
+			
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+			
+			for(EntryHistorialDTO entrada : pagina.contenido()) {
+				String fecha = entrada.timestamp().format(formatter);
+				String texto = "[" + fecha + "] " + entrada.usuario() + " -> " + entrada.detalles();
+				listaHistorial.getItems().add(texto);
+			}
+		} catch(Exception e) {
+			System.err.println("Erorr al cargar el historial" + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	// Mostrar ventanas de error
