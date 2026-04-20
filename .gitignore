@@ -26,3 +26,4 @@ replay_pid*
 workspace-proyecto/.sonarlint/storage/h2/sq-ide.mv.db
 workspace-proyecto/.sonarlint/storage/h2/sq-ide.mv.db
 workspace-proyecto/proyecto-tarjetas/src/main/resources/application-local.properties
+workspace-proyecto/.sonarlint/storage/h2/sq-ide.mv.db
