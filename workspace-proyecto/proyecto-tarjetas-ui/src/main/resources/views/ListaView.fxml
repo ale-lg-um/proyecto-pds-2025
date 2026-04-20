@@ -23,7 +23,7 @@
       </ScrollPane>
       <HBox spacing="10.0" VBox.vgrow="NEVER">
          <children>
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#accionAnadirTarjeta" text="+ Añadir tarjeta" HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnAnadirTarjeta" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#accionAnadirTarjeta" text="+ Añadir tarjeta" HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#accionEliminarLista" style="-fx-text-fill: #ff4444; -fx-font-weight: bold; -fx-cursor: hand;" text="🗑️" />
          </children>
       </HBox>

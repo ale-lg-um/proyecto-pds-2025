@@ -29,6 +29,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -58,6 +59,7 @@ public class ListaController {
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
 	@FXML private VBox contenedorTarjetas;
+	@FXML private Button btnAnadirTarjeta;
 	
 	// Aquí se inyecta el servicio
 	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ServicioLista servicioLista, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario) {
@@ -67,6 +69,18 @@ public class ListaController {
 		this.contextoApp = contextoApp;
 		this.repoTarjetas = repoTarjetas;
 		this.contextoUsuario = contextoUsuario;
+	}
+	
+	public void setTableroBloqueado(boolean bloqueado) {
+		if(bloqueado) {
+			btnAnadirTarjeta.setDisable(true);
+			btnAnadirTarjeta.setText("Bloqueado");
+			btnAnadirTarjeta.setStyle("-fx-opacity: 0.6; -fx-background-color: #cccccc;");
+		} else {
+			btnAnadirTarjeta.setDisable(false);
+			btnAnadirTarjeta.setText("+ Añadir Tarjeta");
+			btnAnadirTarjeta.setStyle("");
+		}
 	}
 	
 	public void setFuncionEliminarDeLaVista(Runnable funcion) {

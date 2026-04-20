@@ -18,7 +18,8 @@
             
             <Region HBox.hgrow="ALWAYS" />
             
-            <Button fx:id="btnToggleHistorial" mnemonicParsing="false" onAction="#accionToggleHistorial" style="-fx-cursos: hand;" text="Ver historial" />
+            <Button fx:id="btnBloquear" mnemonicParsing="false" onAction="#accionBloquearTablero" style="-fx-cursor: hand;" text="Bloquear tablero..." />
+            <Button fx:id="btnToggleHistorial" mnemonicParsing="false" onAction="#accionToggleHistorial" style="-fx-cursor: hand;" text="Ver historial" />
             <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#accionVolverDashboard" style="-fx-font-weight: bold; -fx-cursor: hand;" text="Volver a mis tableros ➡" />
          </children>
          <padding>

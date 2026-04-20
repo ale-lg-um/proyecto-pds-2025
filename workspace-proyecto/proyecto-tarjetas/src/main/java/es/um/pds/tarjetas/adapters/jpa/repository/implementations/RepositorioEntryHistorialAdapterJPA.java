@@ -59,7 +59,7 @@ public class RepositorioEntryHistorialAdapterJPA implements RepositorioEntryHist
 		// En resumen, adaptar nuestro modelo de paginación al de JPA
 		PageRequest pageable = PageRequest.of(pageRequest.getPage(), pageRequest.getSize());
 		org.springframework.data.domain.Page<EntryHistorialEntity> resultado = entryHistorialRepositoryJPA
-				.findByTableroIdOrderByTimestampDesc(tableroId.toString(), pageable);
+				.findByTableroIdOrderByTimestampDesc(tableroId.getId(), pageable);
 
 		List<EntryHistorial> contenido = resultado.getContent().stream().map(EntryHistorialMapperJPA::toDomain)
 				.toList();
@@ -78,6 +78,6 @@ public class RepositorioEntryHistorialAdapterJPA implements RepositorioEntryHist
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");
 		}
-		entryHistorialRepositoryJPA.deleteByTableroId(tableroId.toString());
+		entryHistorialRepositoryJPA.deleteByTableroId(tableroId.getId());
 	}
 }

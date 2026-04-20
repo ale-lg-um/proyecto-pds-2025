@@ -1,5 +1,6 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,11 +70,13 @@ public class TableroController {
 	private int nListas = 0;
 	
 	private String actual;
+	private boolean bloqueado = false;
 	
 	@FXML private HBox contenedorListas;
 	@FXML private VBox panelHistorial;
 	@FXML private ListView<String> listaHistorial;
 	@FXML private Button btnToggleHistorial;
+	@FXML private Button btnBloquear;
 	
 	// Inyectar servicio y contexto
 	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
@@ -132,10 +135,17 @@ public class TableroController {
 				Tablero tab = tableroOpt.get();
 				System.out.println("Tablero detectado: " + tab.getNombre());
 				
+				boolean bloqueado = tab.getEstadoBloqueo() != null && tab.getEstadoBloqueo().estaActivoAhora();
+				
+				if(bloqueado) {
+					btnBloquear.setText("Tablero bloqueado");
+					btnBloquear.setDisable(true);
+				}
+				
 				for(ListaId listaId : tab.getListas()) {
 					Optional<Lista> listaOpt = repoListas.buscarPorId(listaId);
 					if(listaOpt.isPresent()) {
-						instanciarListaVisual(new ListaDTO(listaOpt.get()));
+						instanciarListaVisual(new ListaDTO(listaOpt.get()), bloqueado);
 					}
 				}
 			}
@@ -235,7 +245,7 @@ public class TableroController {
 					nueva = new ListaDTO(nueva.id(), nueva.nombre(), true, nueva.limite(), nueva.tarjetaIds(), nueva.prerrequisitoIds());
 				}
 				
-				instanciarListaVisual(nueva);
+				instanciarListaVisual(nueva, bloqueado);
 			} catch(Exception e) {
 				mostrarError("Error", "No se pudo crear la lista: " + e.getMessage());
 			}
@@ -243,7 +253,7 @@ public class TableroController {
 	}
 	
 	// Fusión de JavaFX con Spring
-	private void instanciarListaVisual(ListaDTO lista) {
+	private void instanciarListaVisual(ListaDTO lista, boolean tableroBloqueado) {
 		try {
 			System.out.println("Cargando vista de lista: " + lista.nombre());
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/ListaView.fxml"));
@@ -258,6 +268,8 @@ public class TableroController {
 			
 			// recuperar el controlador
 			ListaController controlador = loader.getController();
+			
+			controlador.setTableroBloqueado(tableroBloqueado);
 			
 			controlador.setOnTarjetaCreada((id, nodo) -> {
 				nodosTarjetas.put(id, nodo);
@@ -333,6 +345,27 @@ public class TableroController {
 		} else {
 			btnToggleHistorial.setText("Ver historial");
 		}
+	}
+	
+	@FXML
+	public void accionBloquearTablero(ActionEvent evento) {
+		TextInputDialog dialogo = new TextInputDialog("60");
+		dialogo.setTitle("Bloquear Tablero");
+		dialogo.setHeaderText("Bloqueo temporal del tablero");
+		dialogo.setContentText("Minutos de bloqueo:");
+		
+		dialogo.showAndWait().ifPresent(minutosStr -> {
+			try {
+				Long minutos = Long.parseLong(minutosStr);
+				LocalDateTime desde = LocalDateTime.now();
+				LocalDateTime hasta = desde.plusMinutes(minutos);
+				
+				servicioTablero.bloquearTablero(this.actual, desde, hasta, "Bloqueo por el usuario", contextoUsuario.getEmail());
+				sceneManager.showTablero();
+			} catch (Exception e) {
+				mostrarError("Error al bloquear", e.getMessage());
+			}
+		});
 	}
 	
 	private void cargarHistorial() {
