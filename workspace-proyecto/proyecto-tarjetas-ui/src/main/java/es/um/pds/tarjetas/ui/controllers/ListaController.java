@@ -51,6 +51,7 @@ public class ListaController {
 	private final ApplicationContext contextoApp;
 	private final RepositorioTarjetas repoTarjetas;
 	private final ContextoUsuario contextoUsuario;
+	private final SceneManager sceneManager;
 	private ListaDTO listaDominio;		// Entidad real
 	private String tableroId;
 	private Runnable funcionEliminarDeLaVista;
@@ -62,13 +63,14 @@ public class ListaController {
 	@FXML private Button btnAnadirTarjeta;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ServicioLista servicioLista, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario) {
+	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ServicioLista servicioLista, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
 		this.servicioTablero = servicioTablero;
 		this.servicioTarjeta = servicioTarjeta;
 		this.servicioLista = servicioLista;
 		this.contextoApp = contextoApp;
 		this.repoTarjetas = repoTarjetas;
 		this.contextoUsuario = contextoUsuario;
+		this.sceneManager = sceneManager;
 	}
 	
 	public void setTableroBloqueado(boolean bloqueado) {
@@ -245,6 +247,39 @@ public class ListaController {
 				mostrarError("Error al eliminar", "No se pudo eliminar la lista: " + e.getMessage());
 			}
 		}
+	}
+	
+	@FXML
+	public void accionAjustarLimite(ActionEvent evento) {
+		String valorActual = (listaDominio.limite() != null) ? listaDominio.limite().toString() : "";
+		
+		TextInputDialog dialogo = new TextInputDialog(valorActual);
+		dialogo.setTitle("Límite");
+		dialogo.setHeaderText("Configurar límite de tarjetas para la lista: " + listaDominio.nombre());
+		dialogo.setContentText("Tarjetas máximas (nulo o 0 para sin límite):");
+		
+		dialogo.showAndWait().ifPresent(valor -> {
+			try {
+				Integer nuevoLimite = null;
+				if(!valor.isBlank()) {
+					int numero = Integer.parseInt(valor.trim());
+					if(numero > 0) {
+						nuevoLimite = numero;
+					}
+				}
+				
+				servicioLista.configurarLimiteLista(tableroId, listaDominio.id(), nuevoLimite, contextoUsuario.getEmail());
+				
+				sceneManager.showTablero();
+			} catch (NumberFormatException e) {
+				mostrarError("Error de formato", "Por favor, introduce un número válido.");
+			} catch (IllegalStateException e) {
+				// Este catch atrapará la excepción de tu dominio si intentas poner un límite de 2 en una lista que ya tiene 5
+				mostrarError("No se puede aplicar", e.getMessage());
+			} catch (Exception e) {
+				mostrarError("Error", "No se pudo configurar el límite: " + e.getMessage());
+			}
+		});
 	}
 	
 	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {
