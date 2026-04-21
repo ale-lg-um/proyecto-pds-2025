@@ -20,6 +20,7 @@
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="20.0">
          <children>
             <Button fx:id="btnCrear" mnemonicParsing="false" onAction="#accionCrearTablero" prefHeight="40.0" prefWidth="200.0" text="Crear tablero" />
+            <Button fx:id="btnUnirsePorUrl" mnemonicParsing="false" onAction="#accionUnirsePorUrl" prefHeight="40.0" prefWidth="200.0" text="Unirse por URL" />
             <Button fx:id="btnEntrar" mnemonicParsing="false" onAction="#accionEntrarTablero" prefHeight="40.0" prefWidth="200.0" text="Entrar al tablero" />
             <Button fx:id="btnBorrar" mnemonicParsing="false" onAction="#accionBorrarTableros" prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: red; -fx-text-fill: white; -fx-font-weight: bold;" text="Borrar tableros" />
          </children>
