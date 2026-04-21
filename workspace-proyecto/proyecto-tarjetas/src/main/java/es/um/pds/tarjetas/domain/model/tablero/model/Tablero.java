@@ -121,7 +121,16 @@ public class Tablero {
 	}
 	
 	public boolean isBloqueado() {
-		return (this.estadoBloqueo != null);
+		if(this.estadoBloqueo == null) {
+			return false;
+		}
+		
+		if(!this.estadoBloqueo.estaActivoAhora()) {
+			this.estadoBloqueo = null;
+			return false;
+		}
+		
+		return true;
 	}
 	
 	// Overrides

@@ -2,6 +2,7 @@ package es.um.pds.tarjetas.ui.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.PageDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 //import es.um.pds.tarjetas.ui.Configuracion;
 import javafx.event.ActionEvent;
@@ -49,6 +51,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 @Controller
@@ -135,12 +138,32 @@ public class TableroController {
 				Tablero tab = tableroOpt.get();
 				System.out.println("Tablero detectado: " + tab.getNombre());
 				
-				boolean bloqueado = tab.getEstadoBloqueo() != null && tab.getEstadoBloqueo().estaActivoAhora();
+				// --- DEJAMOS QUE EL DOMINIO DECIDA EL ESTADO ---
+				boolean estaBloqueado = tab.isBloqueado();
+				this.bloqueado = estaBloqueado;
 				
-				if(bloqueado) {
-					btnBloquear.setText("Tablero bloqueado");
+				if (estaBloqueado) {
+					btnBloquear.setText("🔒 Tablero Bloqueado");
 					btnBloquear.setDisable(true);
+					
+					// Calculamos el temporizador para el F5 automático
+					LocalDateTime momentoFin = tab.getEstadoBloqueo().getHasta();
+					if (momentoFin != null) {
+						long milisRestantes = ChronoUnit.MILLIS.between(LocalDateTime.now(), momentoFin);
+						if (milisRestantes > 0) {
+							PauseTransition temporizador = new PauseTransition(Duration.millis(milisRestantes));
+							temporizador.setOnFinished(event -> {
+								System.out.println("⏰ Desbloqueo automático. Recargando...");
+								sceneManager.showTablero(); 
+							});
+							temporizador.play();
+						}
+					}
+				} else {
+					btnBloquear.setText("🔒 Bloquear Tablero");
+					btnBloquear.setDisable(false);
 				}
+				// -----------------------------------------------
 				
 				for(ListaId listaId : tab.getListas()) {
 					Optional<Lista> listaOpt = repoListas.buscarPorId(listaId);
