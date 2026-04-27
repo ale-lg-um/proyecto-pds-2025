@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
+import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
@@ -22,6 +26,8 @@ import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,11 +38,16 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
@@ -50,6 +61,8 @@ public class ListaController {
 	private final ServicioLista servicioLista;
 	private final ApplicationContext contextoApp;
 	private final RepositorioTarjetas repoTarjetas;
+	private final RepositorioListas repoListas;
+	private final RepositorioTableros repoTableros;
 	private final ContextoUsuario contextoUsuario;
 	private final SceneManager sceneManager;
 	private ListaDTO listaDominio;		// Entidad real
@@ -59,17 +72,23 @@ public class ListaController {
 	
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
-	@FXML private Label lblPrerrequisitos;
+	//@FXML private Label lblPrerrequisitos;
 	@FXML private VBox contenedorTarjetas;
 	@FXML private Button btnAnadirTarjeta;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, ServicioLista servicioLista, ApplicationContext contextoApp, RepositorioTarjetas repoTarjetas, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
+	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, 
+			ServicioLista servicioLista, ApplicationContext contextoApp, 
+			RepositorioTarjetas repoTarjetas, RepositorioListas repoListas,
+			RepositorioTableros repoTableros, ContextoUsuario contextoUsuario, 
+			SceneManager sceneManager) {
 		this.servicioTablero = servicioTablero;
 		this.servicioTarjeta = servicioTarjeta;
 		this.servicioLista = servicioLista;
 		this.contextoApp = contextoApp;
 		this.repoTarjetas = repoTarjetas;
+		this.repoListas = repoListas;
+		this.repoTableros = repoTableros;
 		this.contextoUsuario = contextoUsuario;
 		this.sceneManager = sceneManager;
 	}
@@ -107,8 +126,26 @@ public class ListaController {
 			this.lblLimite.setText("(\u221E)");
 		}
 		
+		//actualizarMuestraPrerrequisitos();
+		
 		cargarTarjetasBD();
 	}
+	
+	/*private void actualizarMuestraPrerrequisitos() {
+		try {
+			if(listaDominio.prerrequisitoIds() == null || listaDominio.prerrequisitoIds().isEmpty()) {
+				lblPrerrequisitos.setText("Sin prerrequisitos");
+			} else {
+				String nombre = listaDominio.prerrequisitoIds().stream()
+						.map(listaId -> repoListas.buscarPorId(ListaId.of(listaId)))
+						.filter(opt -> opt.isPresent())
+						.map(opt -> opt.get().getNombreLista())
+						.collect(Collectors.joining(", "));
+			}
+		} catch (Exception e) {
+			lblPrerrequisitos.setText("Sin prerrequisitos");
+		}
+	}*/
 	
 	private void cargarTarjetasBD() {
 	    try {
@@ -285,11 +322,136 @@ public class ListaController {
 	
 	@FXML
 	public void accionConfigurarPrerrequisitos(ActionEvent evento) {
-		TextInputDialog dialogo = new TextInputDialog();
-		dialogo.setTitle("Configurar prerrequisitos");
-		dialogo.setHeaderText("Configurar prerrequisitos para la lista: " + listaDominio.nombre());
-		dialogo.setContentText("Prerrequisitos...");
-		dialogo.showAndWait();
+		try {
+			Tablero tab = repoTableros.buscarPorId(TableroId.of(tableroId)).orElseThrow(() -> new IllegalArgumentException("Tablero no encontrado"));
+			
+			List<Lista> listasDisp = tab.getListas().stream()
+					.filter(listaId -> !listaId.getId().equals(listaDominio.id()))
+					.map(listaId -> repoListas.buscarPorId(listaId))
+					.filter(opt -> opt.isPresent())
+					.map(opt -> opt.get())
+					.toList();
+			
+			if(listasDisp.isEmpty()) {
+				mostrarError("No hay listas", "Necesitaas al menos dos listas para poder configurar prerrequisitos");
+				return;
+			}
+			
+			Dialog<Set<String>> dialogo = new Dialog<>();
+			dialogo.setTitle("Configurar prerrequisitos");
+			dialogo.setHeaderText("Selecciona las listas por las que deben pasar antes las tarjetas");
+			
+			ButtonType btnAceptar = new ButtonType("Aceptar", ButtonData.OK_DONE);
+			dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
+			
+			VBox contenedor = new VBox();
+			contenedor.setSpacing(10);
+			contenedor.setPadding(new Insets(15));
+			
+			List<CheckBox> checks = new ArrayList<>();
+			for(Lista lista : listasDisp) {
+				CheckBox box = new CheckBox(lista.getNombreLista());
+				box.setUserData(lista.getIdentificador().getId());
+				box.setSelected(listaDominio.prerrequisitoIds().contains(lista.getIdentificador().getId()));
+				checks.add(box);
+				contenedor.getChildren().add(box);
+			}
+			
+			ScrollPane scroll = new ScrollPane(contenedor);
+			dialogo.getDialogPane().setContent(scroll);
+			
+			dialogo.setResultConverter(button -> {
+				if(button == btnAceptar) {
+					return checks.stream()
+							.filter(cb -> cb.isSelected())
+							.map(cb -> (String) cb.getUserData())
+							.collect(Collectors.toSet());
+				}
+				
+				return null;
+			});
+			
+			dialogo.showAndWait().ifPresent(prerreq -> {
+				try {
+					servicioLista.configurarPrerrequisitosLista(tableroId, listaDominio.id(), prerreq, contextoUsuario.getEmail());
+					sceneManager.showTablero();
+				} catch(Exception e) {
+					mostrarError("Error", "No se pudieron configurar los prerrequisitos.");
+				}
+			});
+		} catch(Exception e) {
+			mostrarError("Error", "Error al abrir el diálogo: " + e.getMessage());
+		}
+	}
+	
+	@FXML
+	public void accionDragOver(DragEvent evento) {
+		if(evento.getDragboard().hasString()) {
+			evento.acceptTransferModes(TransferMode.MOVE);
+			contenedorTarjetas.setStyle("-fx-border-color: #4CAF50; -fx-border-width: 2;");
+		}
+		evento.consume();
+	}
+	
+	@FXML
+	public void accionDragDropped(DragEvent evento) {
+		Dragboard db = evento.getDragboard();
+		boolean exito = false;
+		
+		if(db.hasString()) {
+			String[] datos = db.getString().split("\\|");
+			String tarjetaId = datos[0];
+			String listaOrigenId = datos[1];
+			
+			if(listaOrigenId.equals(listaDominio.id())) {
+				mostrarError("Error", "La tarjeta ya está en esta lista");
+				evento.setDropCompleted(exito);
+				evento.consume();
+				return;
+			}
+			
+			try {
+				System.out.println("Intentando mover tarjeta: " + tarjetaId + " a lista: " + listaOrigenId);
+				
+				Tarjeta tarjeta = repoTarjetas.buscarPorId(TarjetaId.of(tarjetaId)).orElseThrow(() -> new IllegalArgumentException("Tarjeta no encontrada"));
+				
+				Lista dest = repoListas.buscarPorId(ListaId.of(listaDominio.id())).orElseThrow(() -> new IllegalArgumentException("Lista no encontrada"));
+				
+				System.out.println("Tarjeta encontrada: " + tarjeta.getTitulo());
+				System.out.println("Lista encontrada: " + dest.getNombreLista());
+				
+				if(!dest.getPrerrequisitos().isEmpty()) {
+					System.out.println("📋 Validando prerequisitos: " + dest.getPrerrequisitos().size());
+					
+					for(ListaId prerrequisito : dest.getPrerrequisitos()) {
+						if(!tarjeta.getListasVisitadas().contains(prerrequisito)) {
+							String nombreListaPrerrequisito = repoListas.buscarPorId(prerrequisito)
+									.map(Lista::getNombreLista)
+									.orElse(prerrequisito.getId());
+							
+							mostrarError("Prerrequisitos incumplidos", "La tarjeta debe pasar por la lista '" + nombreListaPrerrequisito + "' antes de poder moverla a '" + dest.getNombreLista() + "'");
+							System.out.println("Prerrequisito no cumplido: " + nombreListaPrerrequisito);
+							evento.setDropCompleted(exito);
+							evento.consume();
+							return;
+						}
+					}
+				}
+				
+				System.out.println("Todos los prerrequisitos se han cumplido. Moviendo tarjeta...");
+				servicioTarjeta.moverTarjeta(tableroId, tarjetaId, listaOrigenId, listaDominio.id(), contextoUsuario.getEmail());
+				exito = true;
+				System.out.println("Tarjeta movida con éxito");
+				sceneManager.showTablero();
+			} catch(Exception e) {
+				e.printStackTrace();
+				mostrarError("Error", "No se pudo mover la tarjeta: " + e.getMessage());
+				exito = false;
+			}
+		}
+		
+		evento.setDropCompleted(exito);
+		evento.consume();
 	}
 	
 	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {

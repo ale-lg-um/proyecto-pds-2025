@@ -21,7 +21,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.FlowPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -106,6 +109,19 @@ public class MiniTarjetaController {
 	public void accionHoverEntrar(MouseEvent evento) {
 		Node nodoTarjeta = (Node) evento.getSource();
 		nodoTarjeta.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 5; -fx-border-color: #b0b0b0; -fx-border-radius: 5; -fx-cursor: hand;");
+	}
+	
+	@FXML
+	public void accionIniciarDrag(MouseEvent evento) {
+		if(evento.isPrimaryButtonDown()) {
+			Dragboard db = ((Node) evento.getSource()).startDragAndDrop(TransferMode.MOVE);
+			ClipboardContent content = new ClipboardContent();
+			content.putString(tarjetaDominio.id() + "|" + tarjetaDominio.listaActualId());
+			db.setContent(content);
+			
+			System.out.println("Iniciando drag de tarjeta: " + tarjetaDominio.id());
+			evento.consume();
+		}
 	}
 	
 	@FXML
