@@ -10,12 +10,14 @@
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <children>
-      <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="21.0" prefWidth="260.0" spacing="5.0">
+      <HBox alignment="CENTER_LEFT" fillHeight="false" prefHeight="21.0" prefWith="260.0" spacing="5.0">
          <children>
             <Label fx:id="lblNombreLista" text="Nombre de lista" />
             <Label fx:id="lblLimite" text="(0/Límite)" textFill="#888888" />
+            <Label fx:id="lblPrerrequisitos" text="" textFill="#666666" tyle="-fx-font-size: 10;" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#accionAjustarLimite" style="-fx-background-color: transparent; -fx-cursor: hand;" text="⚙️ Configurar Límite" />
+            <Button mnemonicParsing="false" onAction="#accionAjustarLimite" style="-fx-background-color: transparent; -fx-cursos: hand;" text="⚙️ Límite" />
+            <Button mnemonicParsing="false" onAction="#accionConfigurarPrerrequisitos" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🔗 Prerequisitos" />
          </children>
       </HBox>
       <ScrollPane fitToWidth="true" prefHeight="316.0" prefWidth="260.0">

@@ -59,6 +59,7 @@ public class ListaController {
 	
 	@FXML private Label lblNombreLista;
 	@FXML private Label lblLimite;
+	@FXML private Label lblPrerrequisitos;
 	@FXML private VBox contenedorTarjetas;
 	@FXML private Button btnAnadirTarjeta;
 	
@@ -280,6 +281,15 @@ public class ListaController {
 				mostrarError("Error", "No se pudo configurar el límite: " + e.getMessage());
 			}
 		});
+	}
+	
+	@FXML
+	public void accionConfigurarPrerrequisitos(ActionEvent evento) {
+		TextInputDialog dialogo = new TextInputDialog();
+		dialogo.setTitle("Configurar prerrequisitos");
+		dialogo.setHeaderText("Configurar prerrequisitos para la lista: " + listaDominio.nombre());
+		dialogo.setContentText("Prerrequisitos...");
+		dialogo.showAndWait();
 	}
 	
 	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {
