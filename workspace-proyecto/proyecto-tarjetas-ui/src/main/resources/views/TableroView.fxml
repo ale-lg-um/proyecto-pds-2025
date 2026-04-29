@@ -8,8 +8,6 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.TableroController">
    <top>
-      <TextField fx:id="txtFiltroEtiqueta" promptText="Filtrar por etiqueta..." prefWidth="200.0" />
-      <Separator orientation="VERTICAL" />
       <HBox alignment="CENTER_LEFT" prefHeight="47.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <Label text="Título del tablero">
@@ -17,6 +15,9 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
+            
+            <TextField fx:id="txtFiltroEtiqueta" promptText="Filtrar por etiqueta..." prefWidth="200.0" />
+      		<Separator orientation="VERTICAL" />
             
             <Region HBox.hgrow="ALWAYS" />
             
