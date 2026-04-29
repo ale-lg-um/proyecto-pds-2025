@@ -47,6 +47,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -71,6 +73,7 @@ public class TableroController {
 	private final SceneManager sceneManager;
 	private final TableroEventBridge eventBridge;
 	private int nListas = 0;
+	private String filtroActual = "";
 	
 	private String actual;
 	private boolean bloqueado = false;
@@ -80,6 +83,7 @@ public class TableroController {
 	@FXML private ListView<String> listaHistorial;
 	@FXML private Button btnToggleHistorial;
 	@FXML private Button btnBloquear;
+	@FXML private TextField txtFiltroEtiqueta;
 	
 	// Inyectar servicio y contexto
 	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
@@ -172,6 +176,10 @@ public class TableroController {
 					}
 				}
 			}
+			txtFiltroEtiqueta.textProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
+				filtroActual = valorNuevo.trim().toLowerCase();
+				actualizarFiltroTarjetas();
+			});
 		} catch(Exception e) {
 			System.err.println("Error al cargar los datos del tablero desde la base de datos");
 			e.printStackTrace();
@@ -409,6 +417,46 @@ public class TableroController {
 			System.err.println("Erorr al cargar el historial" + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	private void actualizarFiltroTarjetas() {
+		System.out.println("Aplicando filtro: '" + filtroActual + "'");
+		
+		for(int i = 0; i < contenedorListas.getChildren().size(); i++) {
+			var nodo = contenedorListas.getChildren().get(i);
+			
+			if(nodo instanceof VBox listaVBox) {
+				VBox contenedorTarjetas = (VBox) listaVBox.lookup("#contenedorTarjetas");
+				
+				if(contenedorTarjetas != null) {
+					for(var tarjeta : contenedorTarjetas.getChildren()) {
+						if(tarjeta instanceof VBox tarjetaVBox) {
+							boolean mostrar = true;
+							
+							if(!filtroActual.isEmpty()) {
+								FlowPane contenedorEtiquetas = (FlowPane) tarjetaVBox.lookup("#contenedorEtiquetas");
+								
+								if(contenedorEtiquetas != null) {
+									boolean tieneEtiqueta = contenedorEtiquetas.getChildren().stream()
+											.filter(e -> e instanceof Label)
+											.map(e -> ((Label) e).getText().toLowerCase())
+											.anyMatch(texto -> texto.contains(filtroActual));
+									
+									mostrar = tieneEtiqueta;
+								} else {
+									mostrar = false;
+								}
+							}
+							
+							tarjetaVBox.setVisible(mostrar);
+							tarjetaVBox.setManaged(mostrar);
+						}
+					}
+				}
+			}
+		}
+		
+		System.out.println("✅ Filtro aplicado");
 	}
 	
 	// Mostrar ventanas de error
