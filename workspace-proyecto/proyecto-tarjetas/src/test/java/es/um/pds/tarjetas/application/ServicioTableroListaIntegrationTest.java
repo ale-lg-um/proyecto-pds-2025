@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +30,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.EntryHistorialDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.PageDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
+import es.um.pds.tarjetas.domain.ports.output.PuertoEnvioEmail;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 
@@ -63,7 +63,7 @@ class ServicioTableroListaIntegrationTest {
 	private RepositorioListas repoListas;
 
 	@MockBean
-	private JavaMailSender javaMailSender;
+	private PuertoEnvioEmail puertoEnvioEmail;
 
 	private ResultadoCrearTableroDTO crearTableroBase() {
 		CrearTableroCmd cmd = new CrearTableroCmd(NOMBRE_TABLERO, EMAIL_USUARIO, null, null, null);
