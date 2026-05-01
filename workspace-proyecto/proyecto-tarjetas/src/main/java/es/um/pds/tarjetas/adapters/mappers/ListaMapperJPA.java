@@ -17,15 +17,6 @@ public class ListaMapperJPA {
 	private ListaMapperJPA() {
 	}
 
-	/*
-	 * Versión anterior
-	public static ListaEntity toEntity(Lista d) {
-		return new ListaEntity(d.getIdentificador().toString(), d.getNombreLista(), d.isEspecial(), d.getLimite(),
-				d.getTablero() != null ? d.getTablero().toString() : null,
-				d.getListaTarjetas().stream().map(Object::toString).toList(),
-				d.getPrerrequisitos().stream().map(Object::toString).collect(Collectors.toSet()));
-	}
-	*/
 	public static ListaEntity toEntity(Lista d) {
 		if (d == null) {
 			return null;

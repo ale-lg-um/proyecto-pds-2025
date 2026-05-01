@@ -39,7 +39,7 @@ public class RepositorioSesionesAdapterJPA implements RepositorioSesiones {
 			throw new IllegalArgumentException("La fecha de expiración no puede ser nula");
 		}
 
-		SesionEntity entity = new SesionEntity(token, usuarioId.toString(), expiraEn);
+		SesionEntity entity = new SesionEntity(token, usuarioId.getCorreo(), expiraEn);
 		sesionRepositoryJPA.save(entity);
 	}
 

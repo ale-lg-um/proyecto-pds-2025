@@ -34,8 +34,13 @@ import es.um.pds.tarjetas.domain.ports.output.PuertoEnvioEmail;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 
+//Levanta el contexto de la aplicación con test SpringBoot
 @SpringBootTest
+
+//Activa el perfil test de Spring, porque se pueden tener distintos entornos
 @ActiveProfiles("test")
+
+//Propiedades específicas para este test
 @TestPropertySource(properties = { "spring.datasource.url=jdbc:h2:mem:tarjetasdb_test;DB_CLOSE_DELAY=-1",
 		"spring.datasource.driverClassName=org.h2.Driver", "spring.datasource.username=sa",
 		"spring.datasource.password=", "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
