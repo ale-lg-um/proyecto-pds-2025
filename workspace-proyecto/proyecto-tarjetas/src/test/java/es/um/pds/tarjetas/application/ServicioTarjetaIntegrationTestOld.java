@@ -11,13 +11,34 @@ import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 
+import es.um.pds.tarjetas.adapters.jpa.repository.EntryHistorialRepositoryJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.ListaRepositoryJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.PlantillaRepositoryJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.TableroRepositoryJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.TarjetaRepositoryJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioEntryHistorialAdapterJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioListasAdapterJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioPlantillasAdapterJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioTablerosAdapterJPA;
+import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioTarjetasAdapterJPA;
 import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
+import es.um.pds.tarjetas.application.usecases.ManejadorEventosHistorial;
+import es.um.pds.tarjetas.application.usecases.ServicioFiltradoTarjetasImpl;
+import es.um.pds.tarjetas.application.usecases.ServicioHistorialImpl;
+import es.um.pds.tarjetas.application.usecases.ServicioListaImpl;
+import es.um.pds.tarjetas.application.usecases.ServicioTableroImpl;
+import es.um.pds.tarjetas.application.usecases.ServicioTarjetaImpl;
+import es.um.pds.tarjetas.common.events.EventBus;
+import es.um.pds.tarjetas.common.events.EventBusImpl;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.TipoEntryHistorial;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
@@ -35,23 +56,37 @@ import es.um.pds.tarjetas.domain.ports.input.dto.PageDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import es.um.pds.tarjetas.domain.ports.output.ModoFiltradoEtiquetas;
-import es.um.pds.tarjetas.domain.ports.output.PuertoEnvioEmail;
+import es.um.pds.tarjetas.domain.ports.output.PuertoParserYAML;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioEntryHistorial;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioPlantillas;
+import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
+import es.um.pds.tarjetas.domain.rules.PoliticaListas;
+import es.um.pds.tarjetas.domain.rules.PoliticaTarjetas;
+import es.um.pds.tarjetas.infrastructure.adapters.ParserYAMLImpl;
+import jakarta.transaction.Transactional;
 
-// Levanta el contexto de la aplicación con test SpringBoot
-@SpringBootTest
+@DataJpaTest
 @Transactional
 
-//Activa el perfil test de Spring, porque se pueden tener distintos entornos
+// Activa el perfil test de Spring, porque se pueden tener distintos entornos
 @ActiveProfiles("test")
 
-//Propiedades específicas para este test
+// Fuerza el uso de la base de datos embebida H2 en tests
+// Si hay una base de datos configurada, sustituirla por una base en memoria
+// Importante para no conectarse a la real y romper datos
+@AutoConfigureTestDatabase(replace = Replace.ANY)
+
+// Propiedades específicas para este test
 @TestPropertySource(properties = { "spring.datasource.url=jdbc:h2:mem:tarjetasdb_test;DB_CLOSE_DELAY=-1",
 		"spring.datasource.driverClassName=org.h2.Driver", "spring.datasource.username=sa",
 		"spring.datasource.password=", "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
-		"spring.jpa.hibernate.ddl-auto=create-drop", "spring.jpa.show-sql=false",
-		"spring.mail.username=test@ejemplo.com" })
-class ServicioTarjetaIntegrationTest {
+		"spring.jpa.hibernate.ddl-auto=create-drop", "spring.jpa.show-sql=false" })
+
+// Importar una configuración personalizada de beans para el test
+@Import(ServicioTarjetaIntegrationTestOld.JpaTestConfig.class)
+class ServicioTarjetaIntegrationTestOld {
 
 	private static final String EMAIL_USUARIO = "ejemplo@um.es";
 
@@ -72,9 +107,6 @@ class ServicioTarjetaIntegrationTest {
 
 	@Autowired
 	private RepositorioTarjetas repoTarjetas;
-
-	@MockBean
-	private PuertoEnvioEmail puertoEnvioEmail;
 
 	private ResultadoCrearTableroDTO crearTablero() {
 		return servicioTablero.crearTablero(new CrearTableroCmd("Tablero tarjetas", EMAIL_USUARIO, null, null, null));
@@ -186,5 +218,97 @@ class ServicioTarjetaIntegrationTest {
 				.filter(entry -> entry.tipo().equals(TipoEntryHistorial.TARJETA_ETIQUETADA.name())).count();
 
 		assertEquals(3, etiquetasCreadas);
+	}
+
+	@TestConfiguration
+	static class JpaTestConfig {
+
+		@Bean
+		RepositorioTableros repoTableros(TableroRepositoryJPA tableroRepositoryJPA) {
+			return new RepositorioTablerosAdapterJPA(tableroRepositoryJPA);
+		}
+
+		@Bean
+		RepositorioListas repoListas(ListaRepositoryJPA listaRepositoryJPA) {
+			return new RepositorioListasAdapterJPA(listaRepositoryJPA);
+		}
+
+		@Bean
+		RepositorioTarjetas repoTarjetas(TarjetaRepositoryJPA tarjetaRepositoryJPA) {
+			return new RepositorioTarjetasAdapterJPA(tarjetaRepositoryJPA);
+		}
+
+		@Bean
+		RepositorioPlantillas repoPlantillas(PlantillaRepositoryJPA plantillaRepositoryJPA) {
+			return new RepositorioPlantillasAdapterJPA(plantillaRepositoryJPA);
+		}
+
+		@Bean
+		RepositorioEntryHistorial repoHistorial(EntryHistorialRepositoryJPA entryHistorialRepositoryJPA) {
+			return new RepositorioEntryHistorialAdapterJPA(entryHistorialRepositoryJPA);
+		}
+		
+		// Aunque no lo utilicemos, necesario para el bean de servicioTablero
+		@Bean
+		PuertoParserYAML parserYAML() {
+			return new ParserYAMLImpl();
+		}
+		
+		@Bean
+		PoliticaListas politicaListas(RepositorioListas repoListas) {
+			return new PoliticaListas(repoListas);
+		}
+
+		@Bean
+		PoliticaTarjetas politicaTarjetas() {
+			return new PoliticaTarjetas();
+		}
+
+		@Bean
+		EventBus eventBus(EventBusImpl eventBusImpl) {
+			return eventBusImpl;
+		}
+
+		@Bean
+		ServicioTablero servicioTablero(RepositorioTableros repoTableros, RepositorioListas repoListas,
+				RepositorioTarjetas repoTarjetas, RepositorioPlantillas repoPlantillas, PuertoParserYAML parserYAML,
+				EventBus eventBus) {
+			return new ServicioTableroImpl(repoTableros, repoListas, repoTarjetas, repoPlantillas, parserYAML,
+					eventBus);
+		}
+
+		@Bean
+		ServicioLista servicioLista(RepositorioTableros repoTableros, RepositorioListas repoListas,
+				RepositorioTarjetas repoTarjetas, EventBus eventBus, PoliticaListas politicaListas,
+				PoliticaTarjetas politicaTarjetas) {
+			return new ServicioListaImpl(repoTableros, repoListas, repoTarjetas, eventBus, politicaListas,
+					politicaTarjetas);
+		}
+
+		@Bean
+		ServicioTarjeta servicioTarjeta(RepositorioTableros repoTableros, RepositorioListas repoListas,
+				RepositorioTarjetas repoTarjetas, EventBus eventBus, PoliticaTarjetas politicaTarjetas) {
+			return new ServicioTarjetaImpl(repoTableros, repoListas, repoTarjetas, eventBus, politicaTarjetas);
+		}
+
+		@Bean
+		ServicioFiltradoTarjetas servicioFiltradoTarjetas(RepositorioTarjetas repoTarjetas) {
+			return new ServicioFiltradoTarjetasImpl(repoTarjetas);
+		}
+
+		@Bean
+		ServicioHistorial servicioHistorial(RepositorioEntryHistorial repoHistorial) {
+			return new ServicioHistorialImpl(repoHistorial);
+		}
+
+		@Bean
+		EventBusImpl eventBusImpl(org.springframework.context.ApplicationEventPublisher publisher) {
+			return new EventBusImpl(publisher);
+		}
+
+		@Bean
+		ManejadorEventosHistorial manejadorEventosHistorial(RepositorioEntryHistorial repoHistorial) {
+			return new ManejadorEventosHistorial(repoHistorial);
+		}
 	}
 }
