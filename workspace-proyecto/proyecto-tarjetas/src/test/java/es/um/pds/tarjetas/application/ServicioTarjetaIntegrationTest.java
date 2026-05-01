@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
+import es.um.pds.tarjetas.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.TipoEntryHistorial;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;

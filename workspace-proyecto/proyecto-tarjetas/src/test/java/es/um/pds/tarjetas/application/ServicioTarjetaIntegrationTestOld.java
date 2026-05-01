@@ -30,7 +30,6 @@ import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioLis
 import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioPlantillasAdapterJPA;
 import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioTablerosAdapterJPA;
 import es.um.pds.tarjetas.adapters.jpa.repository.implementations.RepositorioTarjetasAdapterJPA;
-import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.application.usecases.ManejadorEventosHistorial;
 import es.um.pds.tarjetas.application.usecases.ServicioFiltradoTarjetasImpl;
 import es.um.pds.tarjetas.application.usecases.ServicioHistorialImpl;
@@ -39,6 +38,7 @@ import es.um.pds.tarjetas.application.usecases.ServicioTableroImpl;
 import es.um.pds.tarjetas.application.usecases.ServicioTarjetaImpl;
 import es.um.pds.tarjetas.common.events.EventBus;
 import es.um.pds.tarjetas.common.events.EventBusImpl;
+import es.um.pds.tarjetas.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.TipoEntryHistorial;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;

@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.um.pds.tarjetas.adapters.jpa.entity.TarjetaEntity;
 import es.um.pds.tarjetas.adapters.mappers.TarjetaMapperJPA;
+import es.um.pds.tarjetas.common.pagination.Page;
 import es.um.pds.tarjetas.adapters.jpa.repository.TarjetaRepositoryJPA;
-import es.um.pds.tarjetas.application.common.Page;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
@@ -124,7 +124,7 @@ public class RepositorioTarjetasAdapterJPA implements RepositorioTarjetas {
 	 */
 	@Override
 	public Page<Tarjeta> filtrarPorEtiquetas(TableroId tableroId, List<String> nombresEtiquetas,
-			ModoFiltradoEtiquetas modo, es.um.pds.tarjetas.application.common.PageRequest pageRequest) {
+			ModoFiltradoEtiquetas modo, es.um.pds.tarjetas.common.pagination.PageRequest pageRequest) {
 
 		if (tableroId == null) {
 			throw new IllegalArgumentException("El identificador del tablero no puede ser nulo");

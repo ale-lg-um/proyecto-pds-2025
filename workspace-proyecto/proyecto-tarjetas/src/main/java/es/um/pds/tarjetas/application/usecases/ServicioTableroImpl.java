@@ -11,12 +11,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla;
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionListaPlantilla;
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionTarjetaPlantilla;
 import es.um.pds.tarjetas.common.events.EventBus;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla.EspecificacionListaPlantilla;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla.EspecificacionTarjetaPlantilla;
 import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
 import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
 import es.um.pds.tarjetas.domain.model.tablero.eventos.LimiteTableroConfigurado;

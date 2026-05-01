@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-//import org.springframework.stereotype.Repository;
-
-import es.um.pds.tarjetas.application.common.Page;
-import es.um.pds.tarjetas.application.common.PageRequest;
+import es.um.pds.tarjetas.common.pagination.Page;
+import es.um.pds.tarjetas.common.pagination.PageRequest;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;

@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.tablero.id;
 import java.util.Objects;
 import java.util.UUID;
 
-import es.um.pds.tarjetas.application.common.exceptions.TableroInvalidoException;
+import es.um.pds.tarjetas.common.exceptions.TableroInvalidoException;
 
 public class TableroId {
 	// Atributos

@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.lista.id;
 import java.util.Objects;
 import java.util.UUID;
 
-import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.ListaInvalidaException;
 
 public class ListaId {
 	// Atributos

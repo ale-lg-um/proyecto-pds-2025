@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
 
-import es.um.pds.tarjetas.application.common.exceptions.EntryHistorialInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.EntryHistorialInvalidaException;
 import es.um.pds.tarjetas.domain.model.entryHistorial.id.EntryHistorialId;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.PrerrequisitoInfo;

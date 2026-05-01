@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import es.um.pds.tarjetas.application.common.exceptions.LimiteListaSuperadoException;
-import es.um.pds.tarjetas.application.common.exceptions.ListaEspecialInvalidaException;
-import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
-import es.um.pds.tarjetas.application.common.exceptions.TableroBloqueadoException;
-import es.um.pds.tarjetas.application.common.exceptions.TarjetaYaCompletadaException;
+import es.um.pds.tarjetas.common.exceptions.LimiteListaSuperadoException;
+import es.um.pds.tarjetas.common.exceptions.ListaEspecialInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.PrerrequisitosNoCumplidosException;
+import es.um.pds.tarjetas.common.exceptions.TableroBloqueadoException;
+import es.um.pds.tarjetas.common.exceptions.TarjetaYaCompletadaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.model.EstadoBloqueo;

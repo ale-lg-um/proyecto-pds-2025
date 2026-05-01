@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import es.um.pds.tarjetas.application.common.exceptions.TarjetaInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.TarjetaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;

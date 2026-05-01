@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.usuario.id;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import es.um.pds.tarjetas.application.common.exceptions.UsuarioInvalidoException;
+import es.um.pds.tarjetas.common.exceptions.UsuarioInvalidoException;
 
 public class UsuarioId {
 	// Constantes

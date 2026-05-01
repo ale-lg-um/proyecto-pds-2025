@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.application.common.exceptions;
+package es.um.pds.tarjetas.common.exceptions;
 
 public class PlantillaInvalidaException extends RuntimeException {
 	// Identificador de versión para que no salga el warning

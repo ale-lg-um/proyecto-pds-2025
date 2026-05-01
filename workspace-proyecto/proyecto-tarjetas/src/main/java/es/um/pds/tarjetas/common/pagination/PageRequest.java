@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.application.common;
+package es.um.pds.tarjetas.common.pagination;
 
 /*
  * Clase que utilizamos para modelar la petición que se hace

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla;
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionListaPlantilla;
-import es.um.pds.tarjetas.application.common.EspecificacionTableroPlantilla.EspecificacionTarjetaPlantilla;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla.EspecificacionListaPlantilla;
+import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla.EspecificacionTarjetaPlantilla;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.output.PuertoParserYAML;
 

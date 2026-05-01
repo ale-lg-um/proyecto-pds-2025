@@ -16,11 +16,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.TipoEntryHistorial;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
 import es.um.pds.tarjetas.domain.ports.input.ServicioLista;

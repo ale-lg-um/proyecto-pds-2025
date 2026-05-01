@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import es.um.pds.tarjetas.application.common.exceptions.ListaInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.ListaInvalidaException;
 import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;

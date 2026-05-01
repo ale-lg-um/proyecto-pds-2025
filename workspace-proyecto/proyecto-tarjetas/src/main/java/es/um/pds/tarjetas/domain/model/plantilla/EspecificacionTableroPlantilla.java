@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.application.common;
+package es.um.pds.tarjetas.domain.model.plantilla;
 
 import java.util.List;
 

@@ -3,8 +3,8 @@ package es.um.pds.tarjetas.application.usecases;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import es.um.pds.tarjetas.application.common.Page;
-import es.um.pds.tarjetas.application.common.PageRequest;
+import es.um.pds.tarjetas.common.pagination.Page;
+import es.um.pds.tarjetas.common.pagination.PageRequest;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;

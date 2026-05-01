@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.plantilla.id;
 import java.util.Objects;
 import java.util.UUID;
 
-import es.um.pds.tarjetas.application.common.exceptions.PlantillaInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.PlantillaInvalidaException;
 
 public class PlantillaId {
 	// Atributos

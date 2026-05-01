@@ -3,7 +3,7 @@ package es.um.pds.tarjetas.domain.model.entryHistorial.id;
 import java.util.Objects;
 import java.util.UUID;
 
-import es.um.pds.tarjetas.application.common.exceptions.EntryHistorialInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.EntryHistorialInvalidaException;
 
 public class EntryHistorialId {
 	// Atributos

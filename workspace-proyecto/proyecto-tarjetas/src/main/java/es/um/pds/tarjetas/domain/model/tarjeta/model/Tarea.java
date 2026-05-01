@@ -1,6 +1,6 @@
 package es.um.pds.tarjetas.domain.model.tarjeta.model;
 
-import es.um.pds.tarjetas.application.common.exceptions.TareaInvalidaException;
+import es.um.pds.tarjetas.common.exceptions.TareaInvalidaException;
 
 public class Tarea extends ContenidoTarjeta{
 	// Atributos

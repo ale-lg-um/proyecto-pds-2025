@@ -1,9 +1,9 @@
 package es.um.pds.tarjetas.domain.ports.output;
 
+import es.um.pds.tarjetas.common.pagination.Page;
+import es.um.pds.tarjetas.common.pagination.PageRequest;
 import es.um.pds.tarjetas.domain.model.entryHistorial.model.EntryHistorial;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
-import es.um.pds.tarjetas.application.common.Page;
-import es.um.pds.tarjetas.application.common.PageRequest;
 
 public interface RepositorioEntryHistorial {
 

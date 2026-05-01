@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
-import es.um.pds.tarjetas.application.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.common.events.EventBus;
+import es.um.pds.tarjetas.common.exceptions.PrerrequisitosNoCumplidosException;
 import es.um.pds.tarjetas.domain.model.lista.eventos.LimiteListaConfigurado;
 import es.um.pds.tarjetas.domain.model.lista.eventos.ListaCreada;
 import es.um.pds.tarjetas.domain.model.lista.eventos.ListaEditada;
