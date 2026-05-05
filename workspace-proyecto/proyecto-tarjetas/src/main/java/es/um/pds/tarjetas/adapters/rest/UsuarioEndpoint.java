@@ -32,17 +32,22 @@ public class UsuarioEndpoint {
 	@PostMapping("/{usuarioId}/login")
 	public ResponseEntity<Void> login(@PathVariable UsuarioId usuarioId) {
 		servicioAutenticacion.enviarCodigoLogin(usuarioId.getCorreo());
-		return ResponseEntity.status(HttpStatus.OK).build();
+		return ResponseEntity.status(HttpStatus.OK)
+							 .build();
 	}
 	
 	// POST http://localhost:8080/usuarios/{usuarioId}/verificar?codigo={codigo}
 	@PostMapping("/{usuarioId}/verificar")
-	public ResponseEntity<?> verificarToken(@PathVariable UsuarioId usuarioId, @RequestParam String codigo) {
+	public ResponseEntity<?> verificarToken(@PathVariable UsuarioId usuarioId, 
+											@RequestParam String codigo) {
 		try {
-			String new_token = servicioAutenticacion.verificarCodigoLogin(usuarioId.getCorreo(), codigo);
-			return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.AUTHORIZATION, "Bearer " + new_token).body("Login exitoso");
+			String token = servicioAutenticacion.verificarCodigoLogin(usuarioId.getCorreo(), codigo);
+			return ResponseEntity.status(HttpStatus.OK)
+								 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+								 .body("Login exitoso");
 		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+								 .body(e.getMessage());
 		}
 	}
 	
@@ -50,10 +55,14 @@ public class UsuarioEndpoint {
 	@GetMapping("/validar")
 	public ResponseEntity<?> validarYRenovar(@RequestHeader("Authorization") String token) {
 		try {
-			UsuarioId usuarioId = servicioSesion.validarYRenovarToken(token.replace("Bearer ", "").trim());
-			return ResponseEntity.status(HttpStatus.OK).header("Access-Control-Expose-Headers", "New-Token").header("New-Token", token).body(usuarioId);
+			UsuarioId usuarioId = servicioSesion.validarYRenovarToken(token.replace("Bearer ", "").trim());		// Eliminamos el prefijo "Bearer " del valor de la cabecera "Authorization" para que no se incluya en el token.
+			return ResponseEntity.status(HttpStatus.OK)
+								 .header("Access-Control-Expose-Headers", "New-Token")							// Para que el cliente pueda leer el campo "New-Token" que almacena el token de la sesión
+								 .header("New-Token", token)
+								 .body(usuarioId);
 		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+								 .body(e.getMessage());
 		}
 	}
 
