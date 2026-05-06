@@ -20,11 +20,9 @@ import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
 //import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
-import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
@@ -56,7 +54,6 @@ import javafx.util.Pair;
 @Scope("prototype")
 public class ListaController {
 	// Atributos
-	private final ServicioTablero servicioTablero;
 	private final ServicioTarjeta servicioTarjeta;
 	private final ServicioLista servicioLista;
 	private final ApplicationContext contextoApp;
@@ -77,12 +74,11 @@ public class ListaController {
 	@FXML private Button btnAnadirTarjeta;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTablero servicioTablero, ServicioTarjeta servicioTarjeta, 
+	public ListaController(ServicioTarjeta servicioTarjeta, 
 			ServicioLista servicioLista, ApplicationContext contextoApp, 
 			RepositorioTarjetas repoTarjetas, RepositorioListas repoListas,
 			RepositorioTableros repoTableros, ContextoUsuario contextoUsuario, 
 			SceneManager sceneManager) {
-		this.servicioTablero = servicioTablero;
 		this.servicioTarjeta = servicioTarjeta;
 		this.servicioLista = servicioLista;
 		this.contextoApp = contextoApp;
@@ -126,26 +122,8 @@ public class ListaController {
 			this.lblLimite.setText("(\u221E)");
 		}
 		
-		//actualizarMuestraPrerrequisitos();
-		
 		cargarTarjetasBD();
 	}
-	
-	/*private void actualizarMuestraPrerrequisitos() {
-		try {
-			if(listaDominio.prerrequisitoIds() == null || listaDominio.prerrequisitoIds().isEmpty()) {
-				lblPrerrequisitos.setText("Sin prerrequisitos");
-			} else {
-				String nombre = listaDominio.prerrequisitoIds().stream()
-						.map(listaId -> repoListas.buscarPorId(ListaId.of(listaId)))
-						.filter(opt -> opt.isPresent())
-						.map(opt -> opt.get().getNombreLista())
-						.collect(Collectors.joining(", "));
-			}
-		} catch (Exception e) {
-			lblPrerrequisitos.setText("Sin prerrequisitos");
-		}
-	}*/
 	
 	private void cargarTarjetasBD() {
 	    try {
@@ -215,11 +193,6 @@ public class ListaController {
 			}
 			return null;
 		});
-		
-		/*TextInputDialog dialogo = new TextInputDialog();
-		dialogo.setTitle("Nueva tarea");
-		dialogo.setHeaderText("Añadir tarjeta a: " + listaDominio.nombre());
-		dialogo.setContentText("Título:");*/
 		
 		dialogo.showAndWait().ifPresent(resultado -> {
 			String titulo = resultado.getKey();

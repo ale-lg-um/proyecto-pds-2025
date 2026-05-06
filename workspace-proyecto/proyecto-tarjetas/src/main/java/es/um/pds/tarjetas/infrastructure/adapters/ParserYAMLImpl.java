@@ -67,7 +67,7 @@ public class ParserYAMLImpl implements PuertoParserYAML {
 		 * Si el campo que marca una lista como especial no está presente,
 		 * asumimos que no lo es por defecto
 		 */
-		Boolean especial = raw.get("especial") instanceof Boolean b ? b : false;
+		Boolean especial = raw.get("especial") instanceof Boolean b && b;
 
 		/* TARJETAS:
 		 * Cada lista puede incluir tarjetas predeterminadas

@@ -1,20 +1,16 @@
 package es.um.pds.tarjetas.ui.controllers;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
-import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
 import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
 import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TableroDTO;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

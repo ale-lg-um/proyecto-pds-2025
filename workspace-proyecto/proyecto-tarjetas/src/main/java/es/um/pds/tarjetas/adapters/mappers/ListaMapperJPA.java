@@ -25,7 +25,7 @@ public class ListaMapperJPA {
 		return new ListaEntity(d.getIdentificador().getId(), d.getNombreLista(), d.isEspecial(), d.getLimite(),
 				d.getTablero() != null ? d.getTablero().getId() : null,
 				d.getListaTarjetas().stream().map(t -> t.getId()).toList(),
-				d.getPrerrequisitos().stream().map(l -> l.getId()).collect(Collectors.toSet()));
+				d.getPrerrequisitos().stream().map(ListaId::getId).collect(Collectors.toSet()));
 	}
 
 

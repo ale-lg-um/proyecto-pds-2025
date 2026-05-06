@@ -1,7 +1,5 @@
 package es.um.pds.tarjetas.ui.controllers;
 
-import java.io.IOException;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 

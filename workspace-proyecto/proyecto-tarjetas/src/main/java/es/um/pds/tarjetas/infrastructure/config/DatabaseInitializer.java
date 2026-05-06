@@ -12,7 +12,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		try {
 			String workingDir = System.getProperty("user.dir");
-			String dbPath = workingDir + "\\datos_taarjetas.mv.db";
+			String dbPath = workingDir + "\\datos_tarjetas.mv.db";
 			
 			System.out.println("Directorio de trabajo: " + workingDir);
 			System.out.println("Base de datos guardada en: " + dbPath);

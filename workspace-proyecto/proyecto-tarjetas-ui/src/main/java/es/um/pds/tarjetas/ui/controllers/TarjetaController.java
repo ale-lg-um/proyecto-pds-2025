@@ -4,11 +4,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Checklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Etiqueta;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarea;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;

@@ -62,30 +62,10 @@ class ServicioAutenticacionImplTest {
 		assertNotNull(repoUsuarios.buscarPorEmail(usuarioId).orElse(null));
 		assertNotNull(repoCodigos.buscarCodigoVigente(usuarioId).orElse(null));
 	}
-
-	/*
-	@Test
-	@DisplayName("Verificar código válido genera una sesión usable")
-	void verificarCodigoLogin_generaTokenDeSesionValido() {
-		UsuarioId usuarioId = UsuarioId.of("sesion@um.es");
-
-		servicioAutenticacion.enviarCodigoLogin(usuarioId.getCorreo());
-
-		String codigo = repoCodigos.buscarCodigoVigente(usuarioId).orElseThrow();
-		String token = servicioAutenticacion.verificarCodigoLogin(usuarioId.getCorreo(), codigo);
-
-		UsuarioId usuarioSesion = servicioSesion.validarYRenovarToken(token);
-
-		assertNotNull(token);
-		assertEquals(usuarioId, usuarioSesion);
-
-		assertThrows(
-				IllegalArgumentException.class,
-				() -> servicioAutenticacion.verificarCodigoLogin(usuarioId.getCorreo(), codigo));
-	}
-	*/
+	
 	
 	@Test
+	@DisplayName("Verificar código válido genera una sesión usable")
 	void verificarCodigoLogin_generaTokenDeSesionValido() {
 	    UsuarioId usuarioId = UsuarioId.of("ejemplo@um.es");
 	    servicioAutenticacion.enviarCodigoLogin(usuarioId.getCorreo());

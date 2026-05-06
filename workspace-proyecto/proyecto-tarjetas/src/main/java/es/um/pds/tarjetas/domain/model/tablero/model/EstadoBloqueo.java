@@ -14,13 +14,6 @@ public record EstadoBloqueo(LocalDateTime desde, LocalDateTime hasta, String des
 		
 		// Si no se especifica hasta (hasta == null) es un bloqueo indefinido
 		
-		// No hacer esta comprobación para cuando carguemos un bloqueo no dé problemas, con la persistencia
-		/*
-		if (desde.isBefore(LocalDateTime.now())) {
-			throw new IllegalArgumentException("La fecha de comienzo del bloqueo no puede ser anterior a la fecha actual");
-		}
-		*/
-		
 		if (hasta!= null && hasta.isBefore(desde)) {
 			throw new IllegalArgumentException("La fecha de fin del bloqueo no puede ser anterior a la fecha de comienzo");
 		}

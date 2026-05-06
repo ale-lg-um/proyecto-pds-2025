@@ -11,6 +11,7 @@ public record ChecklistDTO(List<ItemChecklistDTO> items) implements ContenidoTar
 		this(checklist.getItems().stream().map(ItemChecklistDTO::new).toList());
 	}
 	
+	@Override
 	public Checklist toDomain() {
 		List<ItemChecklist> items = this.items.stream()
 				.map(ItemChecklistDTO::toDomain)
