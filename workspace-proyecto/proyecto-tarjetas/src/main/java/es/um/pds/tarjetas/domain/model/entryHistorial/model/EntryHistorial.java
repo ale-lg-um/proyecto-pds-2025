@@ -116,14 +116,14 @@ public class EntryHistorial {
 			LocalDateTime timestamp, String nombreTablero) {
 
 		return of(id, tableroId, TipoEntryHistorial.TABLERO_CREADO, usuario, timestamp,
-				"nombreTablero=" + nombreTablero);
+				"Tablero creado. Nombre del tablero: " + nombreTablero);
 	}
 
 	// TABLERO CREADO DESDE PLANTILLA
 	public static EntryHistorial tableroCreadoDesdePlantilla(EntryHistorialId id, TableroId tableroId,
 			UsuarioId usuario, LocalDateTime timestamp, String nombreTablero, String nombrePlantilla) {
 
-		String detalles = "nombreTablero=" + nombreTablero + ", modo=plantilla" + ", plantillaNombre="
+		String detalles = "Tablero creado. Nombre del tablero: " + nombreTablero + ", creado desde la plantilla "
 				+ nombrePlantilla;
 
 		return of(id, tableroId,
@@ -135,7 +135,7 @@ public class EntryHistorial {
 	public static EntryHistorial tableroEditado(EntryHistorialId id, TableroId tableroId, UsuarioId usuario,
 			LocalDateTime timestamp, String nombreAnterior, String nombreNuevo) {
 
-		String detalles = "antiguo=" + nombreAnterior + ", nuevo=" + nombreNuevo;
+		String detalles = "Tablero editado. Nombre antiguo: " + nombreAnterior + ", nombre nuevo: " + nombreNuevo;
 
 		return of(id, tableroId, TipoEntryHistorial.TABLERO_EDITADO, usuario, timestamp, detalles);
 	}
