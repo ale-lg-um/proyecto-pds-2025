@@ -79,7 +79,8 @@ public class MiniTarjetaController {
 			
 			// recuperar el controlador de la vista de tarjeta
 			TarjetaController controlador = loader.getController();
-			controlador.configurarDetalleTarjeta(tarjetaDominio);
+			TarjetaDTO actualizada = servicioTarjeta.obtenerTarjeta(tarjetaDominio.id());
+			controlador.configurarDetalleTarjeta(actualizada);
 			
 			// Crear ventana
 			Stage ventana = new Stage();

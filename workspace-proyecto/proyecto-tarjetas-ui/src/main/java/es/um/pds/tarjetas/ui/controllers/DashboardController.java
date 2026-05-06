@@ -135,6 +135,7 @@ public class DashboardController {
 		TableroItem seleccionado = listaTableros.getSelectionModel().getSelectedItem();
 		if(seleccionado != null) {
 			contextoUsuario.setIdTableroActual(seleccionado.getId());
+			contextoUsuario.setNombreTableroActual(seleccionado.getNombre());
 			sceneManager.showTablero();
 		}
 	}
@@ -196,9 +197,13 @@ public class DashboardController {
 			return this.id;
 		}
 		
+		public String getNombre() {
+			return this.nombre;
+		}
+		
 		@Override
 		public String toString() {
-			return this.nombre;
+			return this.nombre; // para que no se raye al listar
 		}
 	}
 	

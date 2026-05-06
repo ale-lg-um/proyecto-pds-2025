@@ -78,6 +78,7 @@ public class TableroController {
 	@FXML private Button btnToggleHistorial;
 	@FXML private Button btnBloquear;
 	@FXML private TextField txtFiltroEtiqueta;
+	@FXML private Label lblTituloTablero;
 	
 	// Inyectar servicio y contexto
 	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
@@ -122,6 +123,7 @@ public class TableroController {
 		
 		System.out.println("Cargando el tablero principal...");
 		this.actual = contextoUsuario.getIdTableroActual();
+		this.lblTituloTablero.setText(contextoUsuario.getNombreTableroActual());
 		
 		if(this.actual == null) {
 			System.err.println("Error: no se ha seleccionado ningún tablero");

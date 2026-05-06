@@ -236,6 +236,14 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	}
 	
 	@Override
+	@Transactional(readOnly = true)
+	public TarjetaDTO obtenerTarjeta(String tarjetaId) {
+		TarjetaId id = construirTarjetaId(tarjetaId);
+		Tarjeta t = cargarTarjeta(id);
+		return new TarjetaDTO(t);
+	}
+	
+	@Override
 	@Transactional
 	public void editarContenidoTarjeta(String tableroId, String listaId, String tarjetaId, ContenidoTarjetaCmd cmd) {
 

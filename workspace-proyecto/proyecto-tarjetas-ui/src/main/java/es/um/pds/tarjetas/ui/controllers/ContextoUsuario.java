@@ -9,6 +9,7 @@ public class ContextoUsuario {
 	private String email;
 	private String tokenSesion;
 	private String idTableroActual;
+	private String nombreTableroActual;
 	
 	// Getters y setters
 	public String getEmail() {
@@ -33,5 +34,13 @@ public class ContextoUsuario {
 	
 	public void setIdTableroActual(String idTableroActual) {
 		this.idTableroActual = idTableroActual;
+	}
+	
+	public String getNombreTableroActual() {
+		return this.nombreTableroActual;
+	}
+	
+	public void setNombreTableroActual(String nombreTableroActual) {
+		this.nombreTableroActual = nombreTableroActual;
 	}
 }

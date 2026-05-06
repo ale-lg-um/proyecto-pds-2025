@@ -6,6 +6,7 @@ import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
 public interface ServicioTarjeta {
 	// La tarjeta se crea dentro de una lista
 	TarjetaDTO crearTarjeta(String tableroId, String listaId, String nombre, ContenidoTarjetaCmd cmd);
+	TarjetaDTO obtenerTarjeta(String tarjetaId);
 	// Modificar el contenido de la tarjeta. Se puede cambiar de tarea a checklist o viceversa
 	void editarContenidoTarjeta(String tableroId, String listaId, String tarjetaId, ContenidoTarjetaCmd cmd);
 	void renombrarTarjeta(String tableroId, String listaId, String tarjetaId, String nuevoNombre, String emailUsuario);

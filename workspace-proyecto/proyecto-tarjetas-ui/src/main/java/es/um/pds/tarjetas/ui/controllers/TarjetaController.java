@@ -1,15 +1,24 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
+import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
+import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
+import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
 import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.ItemChecklistDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
 import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -23,6 +32,7 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -36,18 +46,34 @@ public class TarjetaController {
 	private final ApplicationContext contextoApp;
 	private final ContextoUsuario contextoUsuario;
 	private final ServicioTarjeta servicioTarjeta;
+	private final ObservableList<ItemChecklistDTO> checklistObservable = FXCollections.observableArrayList();
 	private TarjetaDTO tarjeta;
+	private String descripcionActual;
 	
 	@FXML private Label lblTitulo;
 	@FXML private FlowPane contenedorEtiquetas;
 	@FXML private TextArea txtDescripcion;
 	@FXML private VBox contenedorChecklist;
 	@FXML private Button btnCompletar;
+	@FXML private Button btnChecklist;
 	
 	public TarjetaController(ApplicationContext contextoApp, ContextoUsuario contextoUsuario, ServicioTarjeta servicioTarjeta) {
 		this.contextoApp = contextoApp;
 		this.contextoUsuario = contextoUsuario;
 		this.servicioTarjeta = servicioTarjeta;
+	}
+	
+	@FXML
+	public void initialize() {
+	    txtDescripcion.focusedProperty().addListener((obs, teniaFoco, tieneFoco) -> {
+	    	if(!tieneFoco) {
+	    		guardarDescripcionTarea();
+	    	}
+	    });
+		
+		checklistObservable.addListener((ListChangeListener<ItemChecklistDTO>) c -> {
+	        redibujarChecklist();
+	    });
 	}
 	
 	// la minitarjeta llama a este método al clicar en ella
@@ -71,34 +97,110 @@ public class TarjetaController {
 		
 		contenedorChecklist.setVisible(false);
 		contenedorChecklist.setManaged(false);
+		btnChecklist.setVisible(false);
 		
-		txtDescripcion.setText(tarea.descripcion());
+		descripcionActual = tarea.descripcion();
+		txtDescripcion.setText(descripcionActual);
 	}
 	
 	private void mostrarModoChecklist(ChecklistDTO checklist) {
-		// Ocultar texto y mostrar VBox de checkboxes
-		txtDescripcion.setVisible(false);
-		txtDescripcion.setManaged(false);
-		
-		contenedorChecklist.setVisible(true);
-		contenedorChecklist.setManaged(true);
-		
-		contenedorChecklist.getChildren().clear();
-		
-		// Crear un checkbox por cada ítem
-		for(ItemChecklistDTO item : checklist.items()) {
-			CheckBox cb = new CheckBox(item.descripcion());
-			cb.setSelected(item.completado());
-			
-			// Al clicar, se actualiza el dominio
-			/*cb.setOnAction(e -> {
-				if(cb.isSelected()) {
-					item.marcarComoCompletado();
-				}
-				else item.marcarComoPendiente();
-			});*/
-			contenedorChecklist.getChildren().add(cb);
+	    txtDescripcion.setVisible(false);
+	    txtDescripcion.setManaged(false);
+
+	    contenedorChecklist.setVisible(true);
+	    contenedorChecklist.setManaged(true);
+	    btnChecklist.setVisible(true);
+	    btnCompletar.setVisible(false);
+
+	    checklistObservable.setAll(checklist.items());
+	}
+	
+	private void guardarDescripcionTarea() {
+		if((tarjeta == null) || !(tarjeta.contenido() instanceof TareaDTO)) {
+			return;
 		}
+		
+		String nuevaDesc = txtDescripcion.getText(); // Esto es lo que escribe manualmene en la vista
+		
+		if(nuevaDesc == null || nuevaDesc.isBlank()) {
+			mostrarError("Error", "La descripción de la tarea no puede estar vacía");
+			txtDescripcion.setText(descripcionActual); // Se restablece el texto al que habíia previamente
+			return;
+		} else if (nuevaDesc.equals(descripcionActual)) {
+			return; // No hacer nada si no hay modificación
+		}
+		
+		try {
+			ContenidoTarjetaCmd cmd = new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, nuevaDesc, List.of(), contextoUsuario.getEmail());
+			servicioTarjeta.editarContenidoTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), cmd);
+			descripcionActual = nuevaDesc;
+			
+			tarjeta = new TarjetaDTO(tarjeta.id(), tarjeta.titulo(), tarjeta.fechaCreacion(), tarjeta.listaActualId(), new TareaDTO(nuevaDesc), tarjeta.etiquetas(), tarjeta.listasVisitadas());
+		} 
+		catch (Exception e) {
+	        txtDescripcion.setText(descripcionActual);
+	        mostrarError("Error", "No se pudo guardar la descripción: " + e.getMessage());
+	    }
+
+	}
+	
+	private void redibujarChecklist() {
+	    contenedorChecklist.getChildren().clear();
+
+	    for (int i = 0; i < checklistObservable.size(); i++) {
+	        ItemChecklistDTO item = checklistObservable.get(i);
+	        CheckBox cb = crearCheckbox(item, i);
+	        contenedorChecklist.getChildren().add(cb);
+	    }
+	}
+	
+	private CheckBox crearCheckbox(ItemChecklistDTO item, int indiceItem) {
+	    CheckBox cb = new CheckBox(item.descripcion());
+	    cb.setSelected(item.completado());
+
+	    cb.setOnAction(e -> {
+	        boolean nuevoEstado = cb.isSelected();
+
+	        try {
+	            if (nuevoEstado) {
+	                servicioTarjeta.completarItemChecklist(
+	                    contextoUsuario.getIdTableroActual(),
+	                    tarjeta.listaActualId(),
+	                    tarjeta.id(),
+	                    indiceItem,
+	                    contextoUsuario.getEmail()
+	                );
+	            } else {
+	                servicioTarjeta.marcarItemChecklistComoPendiente(
+	                    contextoUsuario.getIdTableroActual(),
+	                    tarjeta.listaActualId(),
+	                    tarjeta.id(),
+	                    indiceItem,
+	                    contextoUsuario.getEmail()
+	                );
+	            }
+
+	            checklistObservable.set(
+	                indiceItem,
+	                new ItemChecklistDTO(item.descripcion(), nuevoEstado)
+	            );
+
+	            if (nuevoEstado && todosLosCheckboxesMarcados()) {
+	                btnCompletar.getScene().getWindow().hide();
+	            }
+
+	        } catch (Exception ex) {
+	            cb.setSelected(!nuevoEstado);
+	            mostrarError("Error", ex.getMessage());
+	        }
+	    });
+
+	    return cb;
+	}
+	
+	private boolean todosLosCheckboxesMarcados() {
+	    return checklistObservable.stream()
+	            .allMatch(ItemChecklistDTO::completado);
 	}
 	
 	@FXML
@@ -202,6 +304,56 @@ public class TarjetaController {
 		});
 	}
 	
+	@FXML
+	public void accionAnadirCheckbox(ActionEvent accion) {
+
+	    if (!(tarjeta.contenido() instanceof ChecklistDTO)) {
+	        mostrarError("Error", "La tarjeta no es de tipo checklist");
+	        return;
+	    }
+
+	    TextInputDialog dialogo = new TextInputDialog();
+	    dialogo.setTitle("Nuevo ítem");
+	    dialogo.setHeaderText("Añadir ítem a la checklist");
+	    dialogo.setContentText("Ítem:");
+
+	    dialogo.showAndWait().ifPresent(texto -> {
+	        try {
+	            if (texto == null || texto.isBlank()) {
+	                mostrarError("Error", "El ítem no puede estar vacío");
+	                return;
+	            }
+
+	            List<String> items = new ArrayList<>();
+
+	            for (ItemChecklistDTO item : checklistObservable) {
+	                items.add(item.descripcion());
+	            }
+
+	            items.add(texto);
+
+	            ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(
+	                TipoContenidoTarjeta.CHECKLIST,
+	                tarjeta.titulo(),
+	                items,
+	                contextoUsuario.getEmail()
+	            );
+
+	            servicioTarjeta.editarContenidoTarjeta(
+	                contextoUsuario.getIdTableroActual(),
+	                tarjeta.listaActualId(),
+	                tarjeta.id(),
+	                contenido
+	            );
+
+	            checklistObservable.add(new ItemChecklistDTO(texto, false));
+
+	        } catch (Exception e) {
+	            mostrarError("Error", e.getMessage());
+	        }
+	    });
+	}
+	
 	private void cargarEtiquetas() {
 		contenedorEtiquetas.getChildren().clear();
 		for(EtiquetaDTO etiq : tarjeta.etiquetas()) {
@@ -211,5 +363,13 @@ public class TarjetaController {
 					etiq.color()));
 			contenedorEtiquetas.getChildren().add(lblEtiqueta);
 		}
+	}
+	
+	private void mostrarError(String titulo, String mensaje) {
+	    Alert alerta = new Alert(Alert.AlertType.ERROR);
+	    alerta.setTitle(titulo);
+	    alerta.setHeaderText(null);
+	    alerta.setContentText(mensaje);
+	    alerta.showAndWait();
 	}
 }
