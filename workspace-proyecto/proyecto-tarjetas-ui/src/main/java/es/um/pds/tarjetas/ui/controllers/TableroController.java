@@ -143,8 +143,9 @@ public class TableroController {
 				this.bloqueado = estaBloqueado;
 				
 				if (estaBloqueado) {
-					btnBloquear.setText("🔒 Tablero Bloqueado");
-					btnBloquear.setDisable(true);
+					//btnBloquear.setText("🔒 Tablero Bloqueado");
+					//btnBloquear.setDisable(true);
+					btnBloquear.setText("Desbloquear");
 					
 					// Calculamos el temporizador para el F5 automático
 					LocalDateTime momentoFin = tab.getEstadoBloqueo().getHasta();
@@ -376,23 +377,29 @@ public class TableroController {
 	
 	@FXML
 	public void accionBloquearTablero(ActionEvent evento) {
-		TextInputDialog dialogo = new TextInputDialog("60");
-		dialogo.setTitle("Bloquear Tablero");
-		dialogo.setHeaderText("Bloqueo temporal del tablero");
-		dialogo.setContentText("Minutos de bloqueo:");
+		if(!this.bloqueado) { 
+			TextInputDialog dialogo = new TextInputDialog("60");
+			dialogo.setTitle("Bloquear Tablero");
+			dialogo.setHeaderText("Bloqueo temporal del tablero");
+			dialogo.setContentText("Minutos de bloqueo:");
 		
-		dialogo.showAndWait().ifPresent(minutosStr -> {
-			try {
-				Long minutos = Long.parseLong(minutosStr);
-				LocalDateTime desde = LocalDateTime.now();
-				LocalDateTime hasta = desde.plusMinutes(minutos);
+			dialogo.showAndWait().ifPresent(minutosStr -> {
+				try {
+					Long minutos = Long.parseLong(minutosStr);
+					LocalDateTime desde = LocalDateTime.now();
+					LocalDateTime hasta = desde.plusMinutes(minutos);
 				
-				servicioTablero.bloquearTablero(this.actual, desde, hasta, "Bloqueo por el usuario", contextoUsuario.getEmail());
-				sceneManager.showTablero();
-			} catch (Exception e) {
-				mostrarError("Error al bloquear", e.getMessage());
-			}
-		});
+					servicioTablero.bloquearTablero(this.actual, desde, hasta, "Bloqueo por el usuario", contextoUsuario.getEmail());
+					sceneManager.showTablero();
+				} catch (Exception e) {
+					mostrarError("Error al bloquear", e.getMessage());
+				}
+			});
+		} else {
+			this.btnBloquear.setText("Bloquear tablero...");
+			servicioTablero.desbloquearTablero(actual, contextoUsuario.getEmail());
+			sceneManager.showTablero();
+		}
 	}
 	
 	private void cargarHistorial() {
