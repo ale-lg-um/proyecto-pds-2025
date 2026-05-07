@@ -6,6 +6,8 @@ interface RepositorioTableros {
     void guardar(Tablero tablero);
     
     Optional<Tablero> buscarPorId(TableroId tableroId);
+    
+    Optional<Tablero> buscarPorURL(String tokenURL);
 
     // Necesario para HA6 (hard delete)
     void eliminarPorId(TableroId tableroId);
