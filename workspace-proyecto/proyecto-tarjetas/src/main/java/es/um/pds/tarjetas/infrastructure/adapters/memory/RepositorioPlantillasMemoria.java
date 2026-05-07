@@ -1,6 +1,7 @@
 package es.um.pds.tarjetas.infrastructure.adapters.memory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,5 +24,11 @@ public class RepositorioPlantillasMemoria implements RepositorioPlantillas {
 	@Override
 	public Optional<Plantilla> buscarPorId(PlantillaId id) {
 		return Optional.ofNullable(plantillas.get(id));
+	}
+
+	@Override
+	public List<Plantilla> buscarTodas() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

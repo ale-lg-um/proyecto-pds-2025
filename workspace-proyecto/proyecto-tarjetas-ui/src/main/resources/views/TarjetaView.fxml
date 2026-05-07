@@ -28,6 +28,8 @@
          <children>
             <Label fx:id="lblAnadir" text="Añadir a la tarjeta" />
             <Button fx:id="btnEtiquetas" onAction="#accionAnadirEtiqueta" mnemonicParsing="false" prefWidth="150.0" text="Añadir Etiquetas..." />
+            <Button fx:id="btnEliminarEtiqueta" onAction="#accionEliminarEtiqueta" mnemonicParsing="false" prefWidth="150.0" text="Eliminar Etiqueta..." />
+            <Button fx:id="btnModificarEtiqueta" onAction="#accionModificarEtiqueta" mnemonicParsing="false" prefWidth="150.0" text="Modificar Etiqueta..." />
             <Button fx:id="btnChecklist" onAction="#accionAnadirCheckbox" mnemonicParsing="false" prefWidth="150.0" text="Añadir Checkbox..." />
             <Button fx:id="btnCompletar" mnemonicParsing="false" onAction="#accionCompletarTarjeta" prefWidth="150.0" style="-fx-backgorund-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="✔ Completar" />
          </children>

@@ -234,4 +234,10 @@ public class ServicioPlantillaImpl implements ServicioPlantilla {
 		// 4. Devolver DTO de salida
 		return toDTO(plantilla);
 	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<PlantillaDTO> listarPlantillas() {
+		return repoPlantillas.buscarTodas().stream().map(PlantillaDTO::new).toList();
+	}
 }

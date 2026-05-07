@@ -79,6 +79,8 @@ public class TableroController {
 	@FXML private Button btnBloquear;
 	@FXML private TextField txtFiltroEtiqueta;
 	@FXML private Label lblTituloTablero;
+	@FXML private Button btnRenombrarTablero;
+	@FXML private Button btnAnadirLista;
 	
 	// Inyectar servicio y contexto
 	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
@@ -123,7 +125,7 @@ public class TableroController {
 		
 		System.out.println("Cargando el tablero principal...");
 		this.actual = contextoUsuario.getIdTableroActual();
-		this.lblTituloTablero.setText(contextoUsuario.getNombreTableroActual());
+		//this.lblTituloTablero.setText(contextoUsuario.getNombreTableroActual());
 		
 		if(this.actual == null) {
 			System.err.println("Error: no se ha seleccionado ningún tablero");
@@ -137,6 +139,8 @@ public class TableroController {
 			if(tableroOpt.isPresent()) {
 				Tablero tab = tableroOpt.get();
 				System.out.println("Tablero detectado: " + tab.getNombre());
+				this.lblTituloTablero.setText(tab.getNombre());
+				contextoUsuario.setNombreTableroActual(tab.getNombre());
 				
 				// --- DEJAMOS QUE EL DOMINIO DECIDA EL ESTADO ---
 				boolean estaBloqueado = tab.isBloqueado();
@@ -146,6 +150,10 @@ public class TableroController {
 					//btnBloquear.setText("🔒 Tablero Bloqueado");
 					//btnBloquear.setDisable(true);
 					btnBloquear.setText("Desbloquear");
+					btnAnadirLista.setText("Bloqueado");
+					btnAnadirLista.setDisable(true);
+					btnRenombrarTablero.setText("Bloqueado");
+					btnRenombrarTablero.setDisable(true);
 					
 					// Calculamos el temporizador para el F5 automático
 					LocalDateTime momentoFin = tab.getEstadoBloqueo().getHasta();
@@ -163,6 +171,10 @@ public class TableroController {
 				} else {
 					btnBloquear.setText("🔒 Bloquear Tablero");
 					btnBloquear.setDisable(false);
+					btnAnadirLista.setText("+ Añadir Lista...");
+					btnAnadirLista.setDisable(false);
+					btnRenombrarTablero.setText("Renombrar...");
+					btnRenombrarTablero.setDisable(false);
 				}
 				// -----------------------------------------------
 				
@@ -399,6 +411,27 @@ public class TableroController {
 			this.btnBloquear.setText("Bloquear tablero...");
 			servicioTablero.desbloquearTablero(actual, contextoUsuario.getEmail());
 			sceneManager.showTablero();
+		}
+	}
+	
+	@FXML
+	public void accionRenombrarTablero(ActionEvent evento) {
+		if(!this.bloqueado) {
+			TextInputDialog dialogo = new TextInputDialog();
+			dialogo.setTitle("Renombrar tablero...");
+			dialogo.setHeaderText("Renombrar el tablero");
+			dialogo.setContentText("Nuevo nombre:");
+			dialogo.showAndWait().ifPresent(nombre -> {
+				try {
+					servicioTablero.renombrarTablero(this.actual, nombre, contextoUsuario.getEmail());
+					contextoUsuario.setNombreTableroActual(nombre);
+					lblTituloTablero.setText(nombre);
+					sceneManager.showTablero();
+				} catch (Exception e) {
+					mostrarError("Error", "No se pudo renombrar el tablero");
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 	

@@ -15,7 +15,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            
+            <Button fx:id="btnRenombrarTablero" mnemonicParsing="false" onAction="#accionRenombrarTablero" style="-fx-cursor: hand;" text="Renombrar..." />
             <TextField fx:id="txtFiltroEtiqueta" promptText="Filtrar por etiqueta..." prefWidth="200.0" />
       		<Separator orientation="VERTICAL" />
             

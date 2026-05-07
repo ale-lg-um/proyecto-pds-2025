@@ -30,11 +30,13 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
@@ -47,6 +49,7 @@ public class TarjetaController {
 	private final ContextoUsuario contextoUsuario;
 	private final ServicioTarjeta servicioTarjeta;
 	private final ObservableList<ItemChecklistDTO> checklistObservable = FXCollections.observableArrayList();
+	private final ObservableList<EtiquetaDTO> etiquetasObservable = FXCollections.observableArrayList();
 	private TarjetaDTO tarjeta;
 	private String descripcionActual;
 	
@@ -74,13 +77,18 @@ public class TarjetaController {
 		checklistObservable.addListener((ListChangeListener<ItemChecklistDTO>) c -> {
 	        redibujarChecklist();
 	    });
+		
+		etiquetasObservable.addListener((ListChangeListener<EtiquetaDTO>) c -> {
+			redibujarEtiquetas();
+		});
 	}
 	
 	// la minitarjeta llama a este método al clicar en ella
 	public void configurarDetalleTarjeta(TarjetaDTO tarjeta) {
 		this.tarjeta = tarjeta;
 		this.lblTitulo.setText(tarjeta.titulo());
-		cargarEtiquetas();
+		//cargarEtiquetas();
+		etiquetasObservable.setAll(tarjeta.etiquetas());
 		
 		// Detectar si es tarjeta de tareas o de checklist
 		if(tarjeta.contenido() instanceof TareaDTO tarea) {
@@ -232,6 +240,14 @@ public class TarjetaController {
 		}
 	}
 	
+	private String convertirColorAHex(Color color) {
+	    int r = (int) Math.round(color.getRed() * 255);
+	    int g = (int) Math.round(color.getGreen() * 255);
+	    int b = (int) Math.round(color.getBlue() * 255);
+
+	    return String.format("#%02X%02X%02X", r, g, b);
+	}
+	
 	@FXML
 	public void accionAnadirEtiqueta(ActionEvent evento) {
 		Dialog<Pair<String, String>> dialogo = new Dialog<>();
@@ -260,16 +276,25 @@ public class TarjetaController {
 		dialogo.getDialogPane().setContent(grid);
 		
 		dialogo.setResultConverter(dialogButton -> {
-			if(dialogButton == btnAceptar) {
-				String hexColor = "#" + Integer.toHexString(picker.getValue().hashCode()).substring(0, 6).toUpperCase();
-				return new Pair<>(txtNombre.getText(), hexColor);
-			}
-			return null;
+		    if (dialogButton == btnAceptar) {
+		        String nombre = txtNombre.getText();
+		        String hexColor = convertirColorAHex(picker.getValue());
+
+		        return new Pair<>(nombre, hexColor);
+		    }
+
+		    return null;
 		});
 		
 		dialogo.showAndWait().ifPresent(resultado -> {
 			try {
 				String nombre = resultado.getKey();
+
+				if (nombre == null || nombre.isBlank()) {
+					mostrarError("Error", "El nombre de la etiqueta no puede estar vacío.");
+					return;
+				}
+
 				String colorHex = resultado.getValue();
 				
 				servicioTarjeta.addEtiquetaATarjeta(
@@ -280,7 +305,7 @@ public class TarjetaController {
 					colorHex,
 					contextoUsuario.getEmail()
 				);
-				
+				/*
 				Label lblEtiqueta = new Label(nombre);
 				// (He corregido un pequeño typo que tenías en background-radius)
 				lblEtiqueta.setStyle(String.format(
@@ -290,6 +315,11 @@ public class TarjetaController {
 				
 				// 3. F5 AL TABLERO: Le decimos al SceneManager que recargue el tablero de fondo
 				// Extraemos el SceneManager del contexto de Spring porque no lo teníamos inyectado en el constructor
+				SceneManager manager = contextoApp.getBean(SceneManager.class);
+				manager.showTablero();*/
+				
+				etiquetasObservable.add(new EtiquetaDTO(nombre, colorHex));
+				
 				SceneManager manager = contextoApp.getBean(SceneManager.class);
 				manager.showTablero();
 				
@@ -354,12 +384,192 @@ public class TarjetaController {
 	    });
 	}
 	
-	private void cargarEtiquetas() {
+	@FXML
+	public void accionEliminarEtiqueta(ActionEvent evento) {
+		Dialog<List<EtiquetaDTO>> dialogo = new Dialog<>();
+		dialogo.setTitle("Eliminar etiquetas...");
+		dialogo.setHeaderText("Selecciona las etiquetas a eliminar");
+		ButtonType btnAceptar = new ButtonType("Aceptar", ButtonData.OK_DONE);
+		dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
+		
+		VBox contenedor = new VBox();
+		contenedor.setSpacing(10);
+		contenedor.setPadding(new Insets(15));
+		
+		List<Pair<CheckBox, EtiquetaDTO>> checks = new ArrayList<>();
+		
+		if(etiquetasObservable.isEmpty()) {
+			contenedor.getChildren().add(new Label("No hay etiquetas disponibles."));
+		} else {
+			for(EtiquetaDTO etiqueta : etiquetasObservable) {
+				CheckBox cb = new CheckBox(etiqueta.nombre() + "(" + etiqueta.color() + ")");
+				
+				Label color = new Label("");
+				color.setStyle(String.format("-fx-background-color: %s; -fx-background-radius: 4; -fx-padding: 4 12 4 12;", etiqueta.color()));
+				
+				HBox fila = new HBox(10);
+				fila.getChildren().addAll(cb, color);
+				
+				checks.add(new Pair<>(cb, etiqueta));
+				contenedor.getChildren().add(fila);
+			}
+		}
+		
+		ScrollPane scroll = new ScrollPane(contenedor);
+		scroll.setFitToWidth(true);
+		scroll.setPrefHeight(380);
+		scroll.setPrefHeight(260);
+		
+		dialogo.getDialogPane().setContent(scroll);
+		
+		dialogo.setResultConverter(boton -> {
+			if(boton == btnAceptar) {
+				return checks.stream().filter(pair -> pair.getKey().isSelected()).map(Pair::getValue).toList();
+			}
+			return null;
+		});
+		
+		dialogo.showAndWait().ifPresent(seleccion -> {
+			try {
+				if(seleccion.isEmpty()) {
+					mostrarError("Error", "No se ha seleccionado ninguna etiqueta.");
+					return;
+				}
+				
+				for(EtiquetaDTO et : seleccion) {
+					System.out.println("Eliminando etiqueta: " + et.nombre());
+					servicioTarjeta.eliminarEtiquetaDeTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), contextoUsuario.getEmail());
+				}
+				etiquetasObservable.removeAll(seleccion);
+				
+				SceneManager manager = contextoApp.getBean(SceneManager.class);
+				manager.showTablero();
+			} catch(Exception e) {
+				mostrarError("Error", "No se han podido eliminar las etiquetas.");
+				e.printStackTrace();
+			}
+		});
+	}
+	
+	@FXML
+	public void accionModificarEtiqueta(ActionEvent evento) {
+		Dialog<List<EtiquetaDTO>> dialogo = new Dialog<>();
+		dialogo.setTitle("Eliminar etiquetas...");
+		dialogo.setHeaderText("Selecciona las etiquetas a eliminar");
+		ButtonType btnAceptar = new ButtonType("Aceptar", ButtonData.OK_DONE);
+		dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
+		
+		VBox contenedor = new VBox();
+		contenedor.setSpacing(10);
+		contenedor.setPadding(new Insets(15));
+		
+		List<Pair<CheckBox, EtiquetaDTO>> checks = new ArrayList<>();
+		
+		if(etiquetasObservable.isEmpty()) {
+			contenedor.getChildren().add(new Label("No hay etiquetas disponibles."));
+		} else {
+			for(EtiquetaDTO etiqueta : etiquetasObservable) {
+				CheckBox cb = new CheckBox(etiqueta.nombre() + "(" + etiqueta.color() + ")");
+				
+				Label color = new Label("");
+				color.setStyle(String.format("-fx-background-color: %s; -fx-background-radius: 4; -fx-padding: 4 12 4 12;", etiqueta.color()));
+				
+				HBox fila = new HBox(10);
+				fila.getChildren().addAll(cb, color);
+				
+				checks.add(new Pair<>(cb, etiqueta));
+				contenedor.getChildren().add(fila);
+			}
+		}
+		
+		ScrollPane scroll = new ScrollPane(contenedor);
+		scroll.setFitToWidth(true);
+		scroll.setPrefHeight(380);
+		scroll.setPrefHeight(260);
+		
+		dialogo.getDialogPane().setContent(scroll);
+		
+		dialogo.setResultConverter(boton -> {
+			if(boton == btnAceptar) {
+				return checks.stream().filter(pair -> pair.getKey().isSelected()).map(Pair::getValue).toList();
+			}
+			return null;
+		});
+		
+		dialogo.showAndWait().ifPresent(seleccion -> {
+			try {
+				if(seleccion.size() > 1 || seleccion.isEmpty()) {
+					mostrarError("Error", "Solo se puede cambiar el nombre de una etiqueta a la vez");
+					return;
+				}
+				Dialog<Pair<String, String>> dialogoDos = new Dialog<>();
+				dialogoDos.setTitle("Modificar Etiqueta...");
+				dialogoDos.setHeaderText("Modificar la etiqueta.");
+				
+				ButtonType btnAceptarDos = new ButtonType("Modificar", ButtonData.OK_DONE);
+				dialogoDos.getDialogPane().getButtonTypes().addAll(btnAceptarDos, ButtonType.CANCEL);
+				
+				GridPane grid = new GridPane();
+				grid.setHgap(10);
+				grid.setVgap(10);
+				grid.setPadding(new Insets(20, 50, 10, 10));
+				
+				TextField txtNombre = new TextField();
+				txtNombre.setPromptText("Ej: Bug, Importante, Pista, ...");
+				
+				ColorPicker picker = new ColorPicker();
+				picker.setValue(Color.DARKRED);
+				
+				grid.add(new Label("Nombre:"), 0, 0);
+				grid.add(txtNombre, 1, 0);
+				grid.add(new Label("Color:"), 0, 1);
+				grid.add(picker, 1, 1);
+				
+				dialogoDos.getDialogPane().setContent(grid);
+				
+				dialogoDos.setResultConverter(dialogButton -> {
+				    if (dialogButton == btnAceptarDos) {
+				        String nombre = txtNombre.getText();
+				        String hexColor = convertirColorAHex(picker.getValue());
+
+				        return new Pair<>(nombre, hexColor);
+				    }
+
+				    return null;
+				});
+				dialogoDos.showAndWait().ifPresent(resultado -> {
+					try {
+						EtiquetaDTO et = seleccion.get(0); // La vieja
+						int indice = etiquetasObservable.indexOf(et);
+						String nombre = resultado.getKey();
+
+						if (nombre == null || nombre.isBlank()) {
+							mostrarError("Error", "El nombre de la etiqueta no puede estar vacío.");
+							return;
+						}
+
+						String colorHex = resultado.getValue();
+						EtiquetaDTO nueva = new EtiquetaDTO(nombre, colorHex);
+						servicioTarjeta.modificarEtiquetaEnTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), nombre, colorHex, contextoUsuario.getEmail());
+						etiquetasObservable.set(indice, nueva); // Para que se actualice la vista
+						SceneManager manager = contextoApp.getBean(SceneManager.class);
+						manager.showTablero();
+					} catch(Exception e) {
+						mostrarError("Error", "No se ha podido modificar la etiqueta.");
+					}
+				});
+			} catch(Exception e) {
+				mostrarError("Error", "No se ha podido modificar la etiqueta.");
+			}
+		});
+	}
+	
+	private void redibujarEtiquetas() {
 		contenedorEtiquetas.getChildren().clear();
-		for(EtiquetaDTO etiq : tarjeta.etiquetas()) {
+		for(EtiquetaDTO etiq : etiquetasObservable) {
 			Label lblEtiqueta = new Label(etiq.nombre());
 			lblEtiqueta.setStyle(String.format(
-					"-fx-background-color: %s; -fx-text-fill: white; -fx-padding: 3 8 3 8; -fx-backround.radius: 4; -fx-font-weight: bold",
+					"-fx-background-color: %s; -fx-text-fill: white; -fx-padding: 3 8 3 8; -fx-backround-radius: 4; -fx-font-weight: bold",
 					etiq.color()));
 			contenedorEtiquetas.getChildren().add(lblEtiqueta);
 		}

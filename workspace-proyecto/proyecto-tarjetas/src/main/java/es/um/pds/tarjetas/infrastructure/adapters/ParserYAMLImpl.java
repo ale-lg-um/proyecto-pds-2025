@@ -1,6 +1,8 @@
 package es.um.pds.tarjetas.infrastructure.adapters;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -11,226 +13,180 @@ import es.um.pds.tarjetas.domain.model.plantilla.EspecificacionTableroPlantilla.
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 import es.um.pds.tarjetas.domain.ports.output.PuertoParserYAML;
 
-/*
- * Adaptador de infraestructura encargado de transformar un String YAML
- * en una especificación Java que luego utilizará la capa de aplicación
- * Aquí NO se aplican reglas de negocio complejas: solo se traduce la estructura
- */
 @Component
 public class ParserYAMLImpl implements PuertoParserYAML {
 
-	/*
-	 * Utilizamos SnakeYAML para parsear el texto YAML, disponible en SpringBoot
-	 * SnakeYAML transforma el YAML en estructuras Java genéricas:
-	 * - Map para objetos
-	 * - List para listas
-	 * - String / Number / Boolean para valores simples
-	 */
-	private final Yaml yamlParser = new Yaml();
+    private final Yaml yamlParser = new Yaml();
 
-	// Método auxiliar para transformar UNA lista del YAML en una EspecificacionListaPlantilla
-	private EspecificacionListaPlantilla mapLista(java.util.Map<?, ?> raw) {
+    @Override
+    public EspecificacionTableroPlantilla parse(String yaml) {
+        try {
+            if (yaml == null || yaml.isBlank()) {
+                return null;
+            }
 
-		/* NOMBRE:
-		 * Obtenemos el nombre de la lista. Si no existe, dejamos null
-		 * y la validación semántica se hará después
-		 */
-		String nombre = raw.get("nombre") != null ? raw.get("nombre").toString() : null;
+            Object cargado = yamlParser.load(yaml);
 
-		/* LÍMITE:
-		 * SnakeYAML puede devolver Integer, Long, etc. Por eso usamos
-		 * Number y luego convertimos con intValue()
-		 */
-		Number limiteNum = raw.get("limite") instanceof Number n ? n : null;
-		Integer limite = limiteNum != null ? limiteNum.intValue() : null;
+            if (!(cargado instanceof Map<?, ?> rawRoot)) {
+                throw new RuntimeException("El YAML debe tener una estructura de objeto");
+            }
 
-		/* PRERREQUISITOS:
-		 * Esperamos una lista de nombres de listas. Si no aparece el campo,
-		 * usamos lista vacía
-		 */
-		Object prerreqObj = raw.get("prerrequisitos");
-		List<String> prerrequisitos;
+            Map<?, ?> root = rawRoot;
 
-		if (prerreqObj == null) {
-			prerrequisitos = List.of();
-		} else if (prerreqObj instanceof List<?> list) {
-			// Convertimos todos los elementos a String
-			prerrequisitos = list.stream()
-					.map(Object::toString)
-					.toList();
-		} else {
-			// Si el tipo no es correcto, el YAML tiene una forma inválida
-			throw new RuntimeException("El campo 'prerrequisitos' debe ser una lista");
-		}
+            /*
+             * Aceptamos nombrePlantilla como formato principal.
+             * También aceptamos nombre como alias por compatibilidad.
+             */
+            Object nombreObj = root.containsKey("nombrePlantilla")
+                    ? root.get("nombrePlantilla")
+                    : root.get("nombre");
 
-		/* ESPECIAL:
-		 * Si el campo que marca una lista como especial no está presente,
-		 * asumimos que no lo es por defecto
-		 */
-		Boolean especial = raw.get("especial") instanceof Boolean b && b;
+            String nombrePlantilla = nombreObj != null ? nombreObj.toString() : null;
 
-		/* TARJETAS:
-		 * Cada lista puede incluir tarjetas predeterminadas
-		 * Si no aparece el campo, consideramos que la lista no trae tarjetas
-		 */
-		Object tarjetasObj = raw.get("tarjetas");
-		List<EspecificacionTarjetaPlantilla> tarjetas;
+            Object listasObj = root.get("listas");
 
-		if (tarjetasObj == null) {
-			tarjetas = List.of();
-		} else if (tarjetasObj instanceof List<?> list) {
-			// Transformamos cada elemento de la lista en una tarjeta de plantilla
-			tarjetas = list.stream()
-					.map(item -> {
-						if (!(item instanceof java.util.Map<?, ?> rawMap)) {
-							throw new RuntimeException("Elemento de tarjeta inválido en YAML");
-						}
-						return mapTarjeta(rawMap);
-					})
-					.toList();
-		} else {
-			throw new RuntimeException("El campo 'tarjetas' debe ser una lista");
-		}
+            List<EspecificacionListaPlantilla> listas = new ArrayList<>();
 
-		// Finalmente creamos el objeto de especificación de lista
-		return new EspecificacionListaPlantilla(
-				nombre,
-				limite,
-				prerrequisitos,
-				especial,
-				tarjetas);
-	}
+            if (listasObj instanceof List<?> rawListas) {
+                for (Object objLista : rawListas) {
+                    if (!(objLista instanceof Map<?, ?> rawLista)) {
+                        throw new RuntimeException("Cada lista de la plantilla debe ser un objeto");
+                    }
 
-	/*
-	 * Método auxiliar para transformar UNA tarjeta del YAML
-	 * en una EspecificacionTarjetaPlantilla
-	 */
-	private EspecificacionTarjetaPlantilla mapTarjeta(java.util.Map<?, ?> raw) {
+                    listas.add(mapLista(rawLista));
+                }
+            } else if (listasObj != null) {
+                throw new RuntimeException("El campo 'listas' debe ser una lista");
+            }
 
-		// --- titulo ---
-		// Título visible de la tarjeta
-		String titulo = raw.get("titulo") != null ? raw.get("titulo").toString() : null;
+            return new EspecificacionTableroPlantilla(nombrePlantilla, listas);
 
-		// --- tipo ---
-		// El YAML debe indicar si la tarjeta es de tipo TAREA o CHECKLIST
-		// Convertimos el texto a enum
-		TipoContenidoTarjeta tipoContenido = parseTipoContenido(raw.get("tipo"));
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("No se ha podido parsear el YAML de la plantilla", e);
+        }
+    }
 
-		// --- descripcion de tarea ---
-		// Permitimos leer tanto "descripcionTarea" como "descripcion" por comodidad en el YAML
-		Object descripcionObj = raw.containsKey("descripcionTarea")
-				? raw.get("descripcionTarea")
-				: raw.get("descripcion");
+    private EspecificacionListaPlantilla mapLista(Map<?, ?> raw) {
+        String nombre = raw.get("nombre") != null
+                ? raw.get("nombre").toString()
+                : null;
 
-		String descripcionTarea = descripcionObj != null ? descripcionObj.toString() : null;
+        Integer limite = null;
+        Object limiteObj = raw.get("limite");
 
-		// --- items de checklist ---
-		// Solo tendrá sentido si la tarjeta es de tipo CHECKLIST,
-		// pero aquí simplemente parseamos la estructura.
-		Object itemsObj = raw.get("itemsChecklist");
-		List<String> itemsChecklist;
+        if (limiteObj instanceof Number number) {
+            limite = number.intValue();
+        } else if (limiteObj != null && !limiteObj.toString().equalsIgnoreCase("null")) {
+            limite = Integer.parseInt(limiteObj.toString());
+        }
 
-		if (itemsObj == null) {
-			itemsChecklist = List.of();
-		} else if (itemsObj instanceof List<?> list) {
-			itemsChecklist = list.stream()
-					.map(Object::toString)
-					.toList();
-		} else {
-			throw new RuntimeException("El campo 'itemsChecklist' debe ser una lista");
-		}
+        boolean especial = false;
+        Object especialObj = raw.get("especial");
 
-		// Creamos la especificación de tarjeta
-		return new EspecificacionTarjetaPlantilla(
-				titulo,
-				tipoContenido,
-				descripcionTarea,
-				itemsChecklist);
-	}
+        if (especialObj instanceof Boolean bool) {
+            especial = bool;
+        } else if (especialObj != null) {
+            especial = Boolean.parseBoolean(especialObj.toString());
+        }
 
-	/*
-	 * Método auxiliar para convertir el valor textual del YAML
-	 * al enum TipoContenidoTarjeta
-	 */
-	private TipoContenidoTarjeta parseTipoContenido(Object tipoObj) {
+        List<String> prerrequisitos = new ArrayList<>();
+        Object prerrequisitosObj = raw.get("prerrequisitos");
 
-		// Si no viene tipo, devolvemos null
-		// La validación de negocio posterior decidirá si eso es aceptable o no
-		if (tipoObj == null) {
-			return null;
-		}
+        if (prerrequisitosObj instanceof List<?> rawPrerrequisitos) {
+            for (Object p : rawPrerrequisitos) {
+                if (p != null) {
+                    prerrequisitos.add(p.toString());
+                }
+            }
+        } else if (prerrequisitosObj != null) {
+            throw new RuntimeException("El campo 'prerrequisitos' debe ser una lista");
+        }
 
-		// Normalizamos el texto a mayúsculas
-		String tipo = tipoObj.toString().trim().toUpperCase();
+        List<EspecificacionTarjetaPlantilla> tarjetas = new ArrayList<>();
+        Object tarjetasObj = raw.get("tarjetas");
 
-		try {
-			return TipoContenidoTarjeta.valueOf(tipo);
-		} catch (IllegalArgumentException e) {
-			// Si el texto no coincide con ningún valor del enum,
-			// lanzamos error indicando que el YAML es inválido
-			throw new RuntimeException("Tipo de contenido de tarjeta no válido: " + tipo);
-		}
-	}
+        if (tarjetasObj instanceof List<?> rawTarjetas) {
+            for (Object objTarjeta : rawTarjetas) {
+                if (!(objTarjeta instanceof Map<?, ?> rawTarjeta)) {
+                    throw new RuntimeException("Cada tarjeta de la plantilla debe ser un objeto");
+                }
 
-	@Override
-	public EspecificacionTableroPlantilla parse(String yaml) {
+                tarjetas.add(mapTarjeta(rawTarjeta));
+            }
+        } else if (tarjetasObj != null) {
+            throw new RuntimeException("El campo 'tarjetas' debe ser una lista");
+        }
 
-		try {
-			// Primero parseamos el YAML a un objeto Java genérico, normalmente un Map
-			Object loaded = yamlParser.load(yaml);
+        return new EspecificacionListaPlantilla(
+                nombre,
+                limite,
+                prerrequisitos,
+                especial,
+                tarjetas
+        );
+    }
 
-			/*
-			 * Validamos que el YAML raíz tenga forma de objeto:
-			 *
-			 * nombre: ...
-			 * listas: ...
-			 *
-			 * Es decir, esperamos un Map y no una lista suelta o un valor simple
-			 */
-			if (!(loaded instanceof java.util.Map<?, ?> data)) {
-				throw new RuntimeException("El YAML no tiene una estructura válida");
-			}
+    private EspecificacionTarjetaPlantilla mapTarjeta(Map<?, ?> raw) {
+        String titulo = raw.get("titulo") != null
+                ? raw.get("titulo").toString()
+                : null;
 
-			// --- nombre de la plantilla ---
-			// Leemos el campo "nombre" de la plantilla
-			Object nombreObj = data.get("nombre");
-			String nombrePlantilla = nombreObj != null ? nombreObj.toString() : null;
+        /*
+         * Aceptamos tipoContenido como formato principal.
+         * También aceptamos tipo como alias.
+         */
+        Object tipoObj = raw.containsKey("tipoContenido")
+                ? raw.get("tipoContenido")
+                : raw.get("tipo");
 
-			// --- listas ---
-			// Leemos el campo "listas" de la plantilla
-			Object listasObj = data.get("listas");
+        TipoContenidoTarjeta tipoContenido = parseTipoContenido(tipoObj);
 
-			/*
-			 * Validamos que "listas" sea realmente una lista:
-			 *
-			 * listas:
-			 *   - nombre: PENDIENTES
-			 *   - nombre: COMPLETADAS
-			 */
-			if (!(listasObj instanceof List<?> listasRaw)) {
-				throw new RuntimeException("El campo 'listas' debe ser una lista");
-			}
+        /*
+         * Aceptamos descripcionTarea como formato principal.
+         * También aceptamos descripcion como alias.
+         */
+        Object descripcionObj = raw.containsKey("descripcionTarea")
+                ? raw.get("descripcionTarea")
+                : raw.get("descripcion");
 
-			// Convertimos cada elemento del YAML en una EspecificacionListaPlantilla.
-			List<EspecificacionListaPlantilla> listas = listasRaw.stream()
-					.map(item -> {
-						// Cada elemento de "listas" debe ser un objeto/mapa
-						if (!(item instanceof java.util.Map<?, ?> rawMap)) {
-							throw new RuntimeException("Elemento de lista inválido en YAML");
-						}
+        String descripcionTarea = descripcionObj != null
+                ? descripcionObj.toString()
+                : null;
 
-						// Transformamos ese mapa en un objeto más expresivo
-						return mapLista(rawMap);
-					})
-					.toList();
+        List<String> itemsChecklist = new ArrayList<>();
+        Object itemsObj = raw.get("itemsChecklist");
 
-			// Finalmente construimos la especificación completa de la plantilla
-			return new EspecificacionTableroPlantilla(nombrePlantilla, listas);
+        if (itemsObj instanceof List<?> rawItems) {
+            for (Object item : rawItems) {
+                if (item != null) {
+                    itemsChecklist.add(item.toString());
+                }
+            }
+        } else if (itemsObj != null) {
+            throw new RuntimeException("El campo 'itemsChecklist' debe ser una lista");
+        }
 
-		} catch (Exception e) {
-			// Envolvemos cualquier error para indicar claramente que el problema
-			// ha sucedido durante el parseo del YAML de la plantilla
-			throw new RuntimeException("Error parseando YAML de plantilla", e);
-		}
-	}
+        return new EspecificacionTarjetaPlantilla(
+                titulo,
+                tipoContenido,
+                descripcionTarea,
+                itemsChecklist
+        );
+    }
+
+    private TipoContenidoTarjeta parseTipoContenido(Object tipoObj) {
+        if (tipoObj == null) {
+            return null;
+        }
+
+        String tipo = tipoObj.toString().trim().toUpperCase();
+
+        try {
+            return TipoContenidoTarjeta.valueOf(tipo);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Tipo de contenido de tarjeta no válido: " + tipo);
+        }
+    }
 }

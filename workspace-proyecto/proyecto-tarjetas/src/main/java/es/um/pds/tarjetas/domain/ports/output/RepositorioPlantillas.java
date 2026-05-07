@@ -1,5 +1,6 @@
 package es.um.pds.tarjetas.domain.ports.output;
 
+import java.util.List;
 import java.util.Optional;
 
 import es.um.pds.tarjetas.domain.model.plantilla.id.PlantillaId;
@@ -10,4 +11,6 @@ public interface RepositorioPlantillas {
 	void guardar(Plantilla plantilla);
 
 	Optional<Plantilla> buscarPorId(PlantillaId plantillaId);
+	
+	List<Plantilla> buscarTodas();
 }

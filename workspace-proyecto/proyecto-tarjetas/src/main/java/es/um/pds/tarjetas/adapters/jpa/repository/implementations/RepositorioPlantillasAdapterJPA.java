@@ -1,5 +1,6 @@
 package es.um.pds.tarjetas.adapters.jpa.repository.implementations;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
@@ -43,6 +44,15 @@ public class RepositorioPlantillasAdapterJPA implements RepositorioPlantillas {
 		if (plantillaId == null) {
 			throw new IllegalArgumentException("El identificador de la plantilla no puede ser nulo");
 		}
-		return plantillaRepositoryJPA.findById(plantillaId.toString()).map(PlantillaMapperJPA::toDomain);
+		return plantillaRepositoryJPA.findById(plantillaId.getId()).map(PlantillaMapperJPA::toDomain);
+	}
+	
+
+	@Override
+	public List<Plantilla> buscarTodas() {
+		return plantillaRepositoryJPA.findAll()
+				.stream()
+				.map(PlantillaMapperJPA::toDomain)
+				.toList();
 	}
 }

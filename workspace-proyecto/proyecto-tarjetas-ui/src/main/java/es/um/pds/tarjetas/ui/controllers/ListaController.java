@@ -72,6 +72,7 @@ public class ListaController {
 	//@FXML private Label lblPrerrequisitos;
 	@FXML private VBox contenedorTarjetas;
 	@FXML private Button btnAnadirTarjeta;
+	@FXML private Button btnRenombrarLista;
 	
 	// Aquí se inyecta el servicio
 	public ListaController(ServicioTarjeta servicioTarjeta, 
@@ -94,10 +95,18 @@ public class ListaController {
 			btnAnadirTarjeta.setDisable(true);
 			btnAnadirTarjeta.setText("Bloqueado");
 			btnAnadirTarjeta.setStyle("-fx-opacity: 0.6; -fx-background-color: #cccccc;");
+			
+			btnRenombrarLista.setDisable(true);
+			btnRenombrarLista.setText("Bloqueado");
+			btnRenombrarLista.setStyle("-fx-opacity: 0.6; -fx-background-color: #cccccc;");
 		} else {
 			btnAnadirTarjeta.setDisable(false);
 			btnAnadirTarjeta.setText("+ Añadir Tarjeta");
 			btnAnadirTarjeta.setStyle("");
+			
+			btnRenombrarLista.setDisable(false);
+			btnRenombrarLista.setText("Renombrar...");
+			btnRenombrarLista.setStyle("");
 		}
 	}
 	
@@ -425,6 +434,24 @@ public class ListaController {
 		
 		evento.setDropCompleted(exito);
 		evento.consume();
+	}
+	
+	@FXML
+	public void accionRenombrarLista(ActionEvent evento) {
+		TextInputDialog dialogo = new TextInputDialog();
+		dialogo.setTitle("Renombrar lista...");
+		dialogo.setHeaderText("Renombrar la lista");
+		dialogo.setContentText("Nuevo nombre:");
+		dialogo.showAndWait().ifPresent(nombre -> {
+			try {
+				servicioLista.renombrarLista(tableroId, listaDominio.id(), nombre, contextoUsuario.getEmail());
+				lblNombreLista.setText(nombre);
+				sceneManager.showTablero();
+			} catch(Exception e) {
+				mostrarError("Error", "No se ha podido renombrar la lista.");
+				e.printStackTrace();
+			}
+		});
 	}
 	
 	private void instanciarTarjetaVisual(TarjetaDTO tarjeta) {

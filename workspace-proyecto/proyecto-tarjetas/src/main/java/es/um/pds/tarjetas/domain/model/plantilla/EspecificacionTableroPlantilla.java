@@ -2,6 +2,9 @@ package es.um.pds.tarjetas.domain.model.plantilla;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
 
 public class EspecificacionTableroPlantilla {
@@ -12,7 +15,8 @@ public class EspecificacionTableroPlantilla {
 	private final String nombrePlantilla;
 	private final List<EspecificacionListaPlantilla> listas;
 
-	public EspecificacionTableroPlantilla(String nombrePlantilla, List<EspecificacionListaPlantilla> listas) {
+	@JsonCreator
+	public EspecificacionTableroPlantilla(@JsonProperty("nombrePlantilla") String nombrePlantilla, @JsonProperty("listas") List<EspecificacionListaPlantilla> listas) {
 		this.nombrePlantilla = nombrePlantilla;
 		// Sin listas por defecto
 		this.listas = listas == null ? List.of() : List.copyOf(listas);
@@ -35,8 +39,9 @@ public class EspecificacionTableroPlantilla {
 		// Esta, a su vez, contiene los detalles de las tarjetas
 		private final List<EspecificacionTarjetaPlantilla> tarjetas;
 
-		public EspecificacionListaPlantilla(String nombre, Integer limite, List<String> prerrequisitos,
-				boolean especial, List<EspecificacionTarjetaPlantilla> tarjetas) {
+		@JsonCreator
+		public EspecificacionListaPlantilla(@JsonProperty("nombre") String nombre, @JsonProperty("limite") Integer limite, @JsonProperty("prerrequisitos") List<String> prerrequisitos,
+				@JsonProperty("especial") boolean especial, @JsonProperty("tarjetas") List<EspecificacionTarjetaPlantilla> tarjetas) {
 			this.nombre = nombre;
 			this.limite = limite;
 			// Sin prerrequisitos por defecto
@@ -74,8 +79,9 @@ public class EspecificacionTableroPlantilla {
 		private final String descripcionTarea;
 		private final List<String> itemsChecklist;
 
-		public EspecificacionTarjetaPlantilla(String titulo, TipoContenidoTarjeta tipoContenido,
-				String descripcionTarea, List<String> itemsChecklist) {
+		@JsonCreator
+		public EspecificacionTarjetaPlantilla(@JsonProperty("titulo") String titulo, @JsonProperty("tipoContenido") TipoContenidoTarjeta tipoContenido,
+				@JsonProperty("descripcionTarea") String descripcionTarea, @JsonProperty("itemsChecklist") List<String> itemsChecklist) {
 			this.titulo = titulo;
 			this.tipoContenido = tipoContenido;
 			this.descripcionTarea = descripcionTarea;
