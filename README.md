@@ -1,6 +1,12 @@
 # Tareax
 Proyecto final para la asignatura de Programación de Desarrollo de Software en la Universidad de Murcia para el curso 2025/26. Este proyecto presenta un sistema de gestión de trabajo colaborativo a través de tableros de tareas, usando como referencia modelos de aplicación como Trello (https://www.trello.com/).
 
+## Autores
+
+- Alejandro López Galián -> [@ale-lg-um](https://www.github.com/ale-lg-um)
+- Daniel Marín Sánchez -> [@skyscrabble](https://www.github.com/skyscrabble)
+- David Sergio Anishchenko Halkina -> [@davidanish](https://www.github.com/davidanish)
+
 ## Características de Tareax
 La versión actual de la aplicación contiene las siguientes funcionalidades:
 - Crear y modificar tableros donde hay listas de tareas. Una lista de tareas tiene tarjetas de manera que las tarjetas sirven para asignar tareas o para anotar información relevante.
@@ -67,13 +73,8 @@ La aplicación usa una base de datos H2 en fichero. Se creará automáticamente 
 - Si se completa una tarjeta se moverá directamente a la lista definida como "especial". Debe haber una lista especial para completar tarjetas.
 - No se permite crear listas con nombres duplicados.
 
-## Autores
-
-- Alejandro López Galián -> [@ale-lg-um](https://www.github.com/ale-lg-um)
-- Daniel Marín Sánchez -> [@skyscrabble](https://www.github.com/skyscrabble)
-- David Sergio Anishchenko Halkina -> [@davidanish](https://www.github.com/davidanish)
-
-
+## Créditos
+En el fichero [CREDITOS.md](CREDITOS.md) se presenta información sobre en qué ha participado cada componente del grupo para reflejar la participación de todos los miembros del equipo.
 
 ## Anexo
 
