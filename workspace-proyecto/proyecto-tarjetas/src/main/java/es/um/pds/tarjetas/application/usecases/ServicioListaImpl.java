@@ -232,7 +232,6 @@ public class ServicioListaImpl implements ServicioLista {
 
 		// 4. Obtener datos necesarios para el evento
 		String nombreLista = lista.getNombreLista();
-		boolean esEspecial = lista.isEspecial();
 		
 		// 5. Persistir cambios
 		repoListas.guardar(lista);
@@ -240,7 +239,7 @@ public class ServicioListaImpl implements ServicioLista {
 		
 		// 6. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new ListaEspecialDefinida(idLista, idTablero, idUsuario, timestamp, nombreLista, esEspecial));
+		eventBus.publicar(new ListaEspecialDefinida(idLista, idTablero, idUsuario, timestamp, nombreLista));
 	}
 
 	// Si la lista es especial no se puede configurar un límite

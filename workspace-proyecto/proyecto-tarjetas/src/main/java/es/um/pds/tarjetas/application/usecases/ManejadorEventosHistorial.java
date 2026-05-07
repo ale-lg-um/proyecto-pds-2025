@@ -153,8 +153,8 @@ public class ManejadorEventosHistorial {
 	public void manejar(LimiteListaConfigurado evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.limiteListaConfigurado(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.limiteAnterior(),
-					evento.limiteNuevo());
+					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreLista(),
+					evento.limiteAnterior(), evento.limiteNuevo());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -166,7 +166,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(ListaEspecialDefinida evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.listaEspecialDefinida(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.esEspecial());
+					evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreLista());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -178,7 +178,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(PrerrequisitosListaConfigurados evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.prerrequisitosListaConfigurados(EntryHistorialId.of(),
-					evento.tableroId(), evento.usuarioId(), evento.timestamp(), evento.listaId(),
+					evento.tableroId(), evento.usuarioId(), evento.timestamp(), evento.listaId(), evento.nombreLista(),
 					evento.prerrequisitos());
 
 			repoHistorial.guardar(entry);
@@ -193,7 +193,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(TarjetaCreada evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaCreada(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId());
+					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.nombreTarjeta(), evento.nombreLista());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -205,7 +205,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(TarjetaEditada evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaEditada(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.contenidoAnterior(),
+					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.nombreTarjeta(), evento.contenidoAnterior(),
 					evento.contenidoNuevo());
 
 			repoHistorial.guardar(entry);
@@ -243,7 +243,8 @@ public class ManejadorEventosHistorial {
 	public void manejar(TarjetaCompletada evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaCompletada(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaId());
+					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.nombreTarjeta(),
+					evento.nombreLista());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -255,8 +256,8 @@ public class ManejadorEventosHistorial {
 	public void manejar(TarjetaMovida evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaMovida(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.listaOrigenId(),
-					evento.listaDestinoId());
+					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.nombreTarjeta(), evento.listaOrigen(),
+					evento.listaDestino());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -268,7 +269,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(EtiquetaAnadidaATarjeta evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.tarjetaEtiquetada(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiqueta());
+					evento.usuarioId(), evento.timestamp(), evento.nombreTarjeta(), evento.etiqueta());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -280,7 +281,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(EtiquetaEliminadaDeTarjeta evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.etiquetaEliminadaDeTarjeta(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiqueta());
+					evento.usuarioId(), evento.timestamp(), evento.nombreTarjeta(), evento.etiqueta());
 
 			repoHistorial.guardar(entry);
 		} catch (Exception e) {
@@ -292,7 +293,7 @@ public class ManejadorEventosHistorial {
 	public void manejar(EtiquetaModificadaEnTarjeta evento) {
 		try {
 			EntryHistorial entry = EntryHistorial.etiquetaModificadaEnTarjeta(EntryHistorialId.of(), evento.tableroId(),
-					evento.usuarioId(), evento.timestamp(), evento.tarjetaId(), evento.etiquetaAnterior(),
+					evento.usuarioId(), evento.timestamp(), evento.nombreTarjeta(), evento.etiquetaAnterior(),
 					evento.etiquetaNueva());
 
 			repoHistorial.guardar(entry);

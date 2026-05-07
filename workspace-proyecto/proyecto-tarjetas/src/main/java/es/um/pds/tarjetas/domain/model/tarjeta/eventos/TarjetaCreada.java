@@ -9,6 +9,6 @@ import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
 public record TarjetaCreada(TarjetaId tarjetaId, ListaId listaId, TableroId tableroId, UsuarioId usuarioId,
-		LocalDateTime timestamp, String titulo) implements EventoDominio {
+		LocalDateTime timestamp, String nombreTarjeta, String nombreLista) implements EventoDominio {
 
 }

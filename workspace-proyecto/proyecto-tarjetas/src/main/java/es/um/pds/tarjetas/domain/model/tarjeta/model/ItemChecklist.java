@@ -19,7 +19,7 @@ public class ItemChecklist {
 		}
 		return new ItemChecklist(descripcion, false);
 	}
-	
+
 	// Método factoría que permita reconstruir el estado
 	public static ItemChecklist of(String descripcion, boolean completado) {
 		if (descripcion == null || descripcion.isBlank()) {
@@ -32,9 +32,6 @@ public class ItemChecklist {
 	public String getDescripcion() {
 		return descripcion;
 	}
-	
-	// No redefinimos equals y hashCode porque podemos tener ItemsChecklist con la misma
-	// descripción. Solo comparamos por oid
 
 	public boolean isCompletado() {
 		return completado;
@@ -47,5 +44,13 @@ public class ItemChecklist {
 
 	public void marcarComoPendiente() {
 		this.completado = false;
+	}
+
+	// No redefinimos equals y hashCode porque podemos tener ItemsChecklist con la
+	// misma descripción. Solo comparamos por oid
+	
+	@Override
+	public String toString() {
+		return descripcion + (completado ? " (completado)" : " (pendiente)");
 	}
 }

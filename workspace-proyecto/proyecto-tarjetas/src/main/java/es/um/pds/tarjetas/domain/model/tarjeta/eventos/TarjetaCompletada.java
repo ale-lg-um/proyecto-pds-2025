@@ -8,7 +8,7 @@ import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
 
-public record TarjetaCompletada(TarjetaId tarjetaId, ListaId listaId, TableroId tableroId, UsuarioId usuarioId,
+public record TarjetaCompletada(TarjetaId tarjetaId, ListaId listaId, String nombreLista, TableroId tableroId, UsuarioId usuarioId,
 		LocalDateTime timestamp, String nombreTarjeta) implements EventoDominio {
 
 }

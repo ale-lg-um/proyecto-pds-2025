@@ -169,8 +169,8 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 
 		// Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(
-				new TarjetaCompletada(idTarjeta, idListaEspecial, idTablero, idUsuario, timestamp, nombreTarjeta));
+		eventBus.publicar(new TarjetaCompletada(idTarjeta, idListaEspecial, listaEspecial.getNombreLista(), idTablero,
+				idUsuario, timestamp, nombreTarjeta));
 	}
 		
 	
@@ -179,7 +179,7 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	
 	/*
 	 * NO SE PUEDEN CLONAR TARJETAS, no se puede añadir una tarjeta a una lista que ya tenga esa tarjeta. Tarjetas únicas
-	 * Por tanto, no habrá problema con usar List<TarjetaId> en Lista, porque nos aseguramos de que no haya repetidos. Recomprobarlo igualmente
+	 * Por tanto, no habrá problema con usar List<TarjetaId> en Lista, porque nos aseguramos de que no haya repetidos.
 	 */
 	@Override
 	@Transactional
@@ -229,7 +229,7 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 
 		// 9. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaCreada(idTarjeta, idLista, idTablero, idUsuario, timestamp, nombre));
+		eventBus.publicar(new TarjetaCreada(idTarjeta, idLista, idTablero, idUsuario, timestamp, nombre, lista.getNombreLista()));
 
 		// 10. Devolver DTO
 		return new TarjetaDTO(nuevaTarjeta);
@@ -284,7 +284,7 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 
 		// 8. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaEditada(idTarjeta, idLista, idTablero, idUsuario, timestamp, contenidoAntiguo,
+		eventBus.publicar(new TarjetaEditada(idTarjeta, tarjeta.getTitulo(), idLista, idTablero, idUsuario, timestamp, contenidoAntiguo,
 				nuevoContenido));
 	}
 
@@ -428,7 +428,8 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 
 		// 8. Publicar evento de dominio
 		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaMovida(idTarjeta, idListaOrigen, idListaDestino, idTablero, idUsuario, timestamp, nombreTarjeta));
+		eventBus.publicar(new TarjetaMovida(idTarjeta, idListaOrigen, listaOrigen.getNombreLista(), idListaDestino,
+				listaDestino.getNombreLista(), idTablero, idUsuario, timestamp, nombreTarjeta));
 	}
 	
 	@Override

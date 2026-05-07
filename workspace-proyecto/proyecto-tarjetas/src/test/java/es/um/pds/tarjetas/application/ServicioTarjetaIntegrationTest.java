@@ -90,7 +90,7 @@ class ServicioTarjetaIntegrationTest {
 		ListaDTO done = servicioLista.crearLista(tablero.tableroId(), "DONE", EMAIL_USUARIO);
 
 		Set<String> prerrequisitos = Set.of(doing.id());
-		
+
 		servicioLista.configurarPrerrequisitosLista(tablero.tableroId(), done.id(), prerrequisitos, EMAIL_USUARIO);
 
 		TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(tablero.tableroId(), todo.id(), "Implementar login",
@@ -100,14 +100,15 @@ class ServicioTarjetaIntegrationTest {
 				tarjeta.id(), todo.id(), done.id(), EMAIL_USUARIO));
 
 		PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(tablero.tableroId(), 0, 20);
-		
+
 		String prerrequisitosStr = doing.nombre() + "(" + doing.id() + ")";
-		
+
+		String detalles = "Prerrequisitos lista configurados: " + done.id() + ", nombre: " + done.nombre()
+				+ ", prerrequisitos: " + prerrequisitosStr;
+
 		assertTrue(historial.contenido().stream()
 				.anyMatch(entry -> entry.tipo().equals(TipoEntryHistorial.PRERREQUISITOS_LISTA_CONFIGURADOS.name())
-						&& entry.usuario().equals(EMAIL_USUARIO)
-						&& entry.detalles().contains("Prerrequisitos lista configurados: " + done.id()
-								+ ", prerrequisitos: " + prerrequisitosStr)));
+						&& entry.usuario().equals(EMAIL_USUARIO) && entry.detalles().equals(detalles)));
 	}
 
 	@Test
@@ -139,22 +140,22 @@ class ServicioTarjetaIntegrationTest {
 
 		PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(tablero.tableroId(), 0, 20);
 
-		String detallesListaEspecial = "Lista especial definida: " + completadas.id() + ", especial: true";
-		
+		String detallesListaEspecial = "Lista especial definida: " + completadas.id() + ", nombre: "
+				+ completadas.nombre();
+
 		assertTrue(historial.contenido().stream()
 				.anyMatch(entry -> entry.tipo().equals(TipoEntryHistorial.LISTA_ESPECIAL_DEFINIDA.name())
-						&& entry.usuario().equals(EMAIL_USUARIO)
-						&& entry.detalles().contains(detallesListaEspecial)));
+						&& entry.usuario().equals(EMAIL_USUARIO) && entry.detalles().contains(detallesListaEspecial)));
 
-		String detallesTarjetaCreada = "Tarjeta creada: " + tarjeta.id() + " en la lista " + pendientes.id();
-		
+		String detallesTarjetaCreada = "Tarjeta creada: " + tarjeta.id() + ", nombre: " + tarjeta.titulo()
+				+ " en la lista " + pendientes.nombre();
+
 		assertTrue(historial.contenido().stream()
 				.anyMatch(entry -> entry.tipo().equals(TipoEntryHistorial.TARJETA_CREADA.name())
-						&& entry.usuario().equals(EMAIL_USUARIO)
-						&& entry.detalles().contains(detallesTarjetaCreada)));
+						&& entry.usuario().equals(EMAIL_USUARIO) && entry.detalles().contains(detallesTarjetaCreada)));
 
-		
-		String detallesTarjetaCompletada = "Tarjeta completada: " + tarjeta.id() + ", movida a la lista especial: " + completadas.id();
+		String detallesTarjetaCompletada = "Tarjeta completada: " + tarjeta.id() + ", nombre: " + tarjeta.titulo() + ", movida a la lista especial: "
+				+ completadas.nombre();
 
 		assertTrue(historial.contenido().stream()
 				.anyMatch(entry -> entry.tipo().equals(TipoEntryHistorial.TARJETA_COMPLETADA.name())
