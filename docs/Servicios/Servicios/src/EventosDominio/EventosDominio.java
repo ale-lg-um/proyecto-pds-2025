@@ -24,8 +24,7 @@ public class EventosDominio {
 	// Realmente es mover una tarjeta a la lista especial
 	TarjetaCompletada(TarjetaId tarjetaId, ListaId listaId, String nombreLista, TableroId tableroId, UsuarioId usuarioId, LocalDateTime timestamp, String nombreTarjeta);	
 	EtiquetaAnadidaATarjeta(TarjetaId tarjetaId, ListaId listaId, TableroId tableroId, UsuarioId usuarioId, LocalDateTime timestamp, Etiqueta etiqueta, String nombreTarjeta);
-	EtiquetaEliminadaDeTarjeta(tableroId, tarjetaId, actorEmail, nombre, color);
+	EtiquetaEliminadaDeTarjeta(TarjetaId tarjetaId, ListaId listaId, TableroId tableroId, UsuarioId usuarioId, LocalDateTime timestamp, Etiqueta etiqueta, String nombreTarjeta);
 	// Como son VO, realmente consta de una eliminación y una adición
-	EtiquetaModificadaEnTarjeta(tableroId, tarjetaId, actorEmail, 
-			nombreAntiguo, colorAntiguo, nombreNuevo, colorNuevo);
+	EtiquetaModificadaEnTarjeta(TarjetaId tarjetaId, ListaId listaId, TableroId tableroId, UsuarioId usuarioId, LocalDateTime timestamp, Etiqueta etiquetaAnterior, Etiqueta etiquetaNueva, String nombreTarjeta);
 }

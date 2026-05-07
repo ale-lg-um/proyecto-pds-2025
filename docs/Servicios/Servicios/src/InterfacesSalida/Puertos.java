@@ -68,11 +68,11 @@ interface RepositorioTarjetas {
     void eliminarPorTableroId(TableroId tableroId);
 
     // HG1 – Filtrado por etiquetas (consulta)
-    Page<Tarjeta> filtrarPorEtiquetas(
-            TableroId tableroId,
-            List<Etiqueta> etiquetas,
-            ModoFiltradoEtiquetas modo,
-            PageRequest pageRequest
+	Page<Tarjeta> filtrarPorEtiquetas(
+			TableroId tableroId,
+			List<String> nombresEtiquetas,
+			ModoFiltradoEtiquetas modo,
+			PageRequest pageRequest
     );
 }
 
