@@ -84,10 +84,13 @@ class ServicioTableroListaIntegrationTest {
 		assertFalse(historial.contenido().isEmpty());
 
 		EntryHistorialDTO entry = historial.contenido().get(0);
+		
+		String detalles = "Tablero creado. Nombre del tablero: " + resultado.nombre();
+		
 		assertEquals(TipoEntryHistorial.TABLERO_CREADO.name(), entry.tipo());
 		assertEquals(resultado.tableroId(), entry.tableroId());
 		assertEquals(EMAIL_USUARIO, entry.usuario());
-		assertTrue(entry.detalles().contains("nombreTablero=" + NOMBRE_TABLERO));
+		assertTrue(entry.detalles().equals(detalles));
 	}
 
 	@Test
@@ -132,11 +135,12 @@ class ServicioTableroListaIntegrationTest {
 
 		PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(resultado.tableroId(), 0, 20);
 
+		String detalles = "Lista creada con ID " + listaDTO.id() + ", nombre: " + listaDTO.nombre();
+		
 		assertTrue(historial.contenido().stream()
 				.anyMatch(entry -> entry.tipo().equals(TipoEntryHistorial.LISTA_CREADA.name())
 						&& entry.usuario().equals(EMAIL_USUARIO)
-						&& entry.detalles().contains("listaId=" + listaDTO.id())
-						&& entry.detalles().contains("nombre=REVIEW")));
+						&& entry.detalles().equals(detalles)));
 	}
 
 	@Test

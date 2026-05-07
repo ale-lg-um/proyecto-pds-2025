@@ -64,7 +64,7 @@ public class RepositorioListasAdapterJPA implements RepositorioListas {
 			if (id == null) {
 				throw new IllegalArgumentException("No puede haber identificadores nulos en el conjunto");
 			}
-			return id.toString();
+			return id.getId();
 		}).collect(Collectors.toSet());
 
 		return listaRepositoryJPA.findByIdIn(idsString).stream().map(ListaMapperJPA::toDomain)
