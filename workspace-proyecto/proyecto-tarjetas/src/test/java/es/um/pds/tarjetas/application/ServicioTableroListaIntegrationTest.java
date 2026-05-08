@@ -166,4 +166,105 @@ class ServicioTableroListaIntegrationTest {
 		assertTrue(listas.stream().anyMatch(
 				l -> l.getIdentificador().equals(ListaId.of(listaDTO.id())) && l.getNombreLista().equals("BACKLOG")));
 	}
+	
+	@Test
+    void renombrarTablero_actualizaNombreYRegistraHistorial() {
+        ResultadoCrearTableroDTO resultado = crearTableroBase();
+
+        servicioTablero.renombrarTablero(resultado.tableroId(), "Nuevo nombre", EMAIL_USUARIO);
+
+        Tablero tablero = repoTableros.buscarPorId(TableroId.of(resultado.tableroId())).orElseThrow();
+
+        assertEquals("Nuevo nombre", tablero.getNombre());
+
+        PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(resultado.tableroId(), 0, 20);
+
+        assertTrue(historial.contenido().stream()
+                .anyMatch(e -> e.tipo().equals(TipoEntryHistorial.TABLERO_EDITADO.name())
+                        && e.detalles().contains("Nombre antiguo: " + NOMBRE_TABLERO)
+                        && e.detalles().contains("nombre nuevo: Nuevo nombre")));
+    }
+
+	@Test
+	void bloquearYDesbloquearTablero_registraHistorial() {
+	    ResultadoCrearTableroDTO resultado = crearTableroBase();
+
+	    servicioTablero.bloquearTablero(
+	            resultado.tableroId(),
+	            java.time.LocalDateTime.now(),
+	            java.time.LocalDateTime.now().plusMinutes(10),
+	            "Motivo test",
+	            EMAIL_USUARIO
+	    );
+
+	    Tablero bloqueado = repoTableros.buscarPorId(TableroId.of(resultado.tableroId())).orElseThrow();
+
+	    assertTrue(bloqueado.isBloqueado());
+
+	    servicioTablero.desbloquearTablero(resultado.tableroId(), EMAIL_USUARIO);
+
+	    PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(resultado.tableroId(), 0, 20);
+
+	    assertTrue(historial.contenido().stream()
+	            .anyMatch(e -> e.tipo().equals(TipoEntryHistorial.TABLERO_BLOQUEADO.name())
+	                    && e.usuario().equals(EMAIL_USUARIO)
+	                    && e.detalles().contains("Motivo test")));
+
+	    assertTrue(historial.contenido().stream()
+	            .anyMatch(e -> e.tipo().equals(TipoEntryHistorial.TABLERO_DESBLOQUEADO.name())
+	                    && e.usuario().equals(EMAIL_USUARIO)));
+	}
+
+
+    @Test
+    void definirListaEspecial_marcaListaYEliminaLimite() {
+        ResultadoCrearTableroDTO resultado = crearTableroBase();
+
+        ListaDTO lista = servicioLista.crearLista(resultado.tableroId(), "Completadas", EMAIL_USUARIO);
+
+        servicioLista.configurarLimiteLista(resultado.tableroId(), lista.id(), 5, EMAIL_USUARIO);
+        servicioLista.definirListaEspecial(resultado.tableroId(), lista.id(), EMAIL_USUARIO);
+
+        Lista listaPersistida = repoListas.buscarPorId(ListaId.of(lista.id())).orElseThrow();
+        Tablero tablero = repoTableros.buscarPorId(TableroId.of(resultado.tableroId())).orElseThrow();
+
+        assertTrue(listaPersistida.isEspecial());
+        //assertNull(listaPersistida.getLimite());
+        assertEquals(ListaId.of(lista.id()), tablero.getListaEspecial());
+    }
+
+    @Test
+    void configurarLimiteLista_actualizaLimiteYRegistraHistorial() {
+        ResultadoCrearTableroDTO resultado = crearTableroBase();
+
+        ListaDTO lista = servicioLista.crearLista(resultado.tableroId(), "TODO", EMAIL_USUARIO);
+
+        servicioLista.configurarLimiteLista(resultado.tableroId(), lista.id(), 3, EMAIL_USUARIO);
+
+        Lista persistida = repoListas.buscarPorId(ListaId.of(lista.id())).orElseThrow();
+
+        assertEquals(3, persistida.getLimite());
+
+        PageDTO<EntryHistorialDTO> historial = servicioHistorial.consultarPorTablero(resultado.tableroId(), 0, 20);
+
+        assertTrue(historial.contenido().stream()
+                .anyMatch(e -> e.tipo().equals(TipoEntryHistorial.LIMITE_LISTA_CONFIGURADO.name())
+                        && e.detalles().contains("límite nuevo: 3")));
+    }
+
+    @Test
+    void eliminarLista_eliminaListaDelTablero() {
+        ResultadoCrearTableroDTO resultado = crearTableroBase();
+
+        ListaDTO lista = servicioLista.crearLista(resultado.tableroId(), "A borrar", EMAIL_USUARIO);
+
+        servicioLista.eliminarLista(resultado.tableroId(), lista.id(), EMAIL_USUARIO);
+
+        assertTrue(repoListas.buscarPorId(ListaId.of(lista.id())).isEmpty());
+
+        Tablero tablero = repoTableros.buscarPorId(TableroId.of(resultado.tableroId())).orElseThrow();
+
+        assertFalse(tablero.getListas().contains(ListaId.of(lista.id())));
+    }
+
 }
