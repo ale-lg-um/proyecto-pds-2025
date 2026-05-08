@@ -7,6 +7,8 @@ Proyecto final para la asignatura de Programación de Desarrollo de Software en 
 - Daniel Marín Sánchez -> [@skyscrabble](https://www.github.com/skyscrabble)
 - David Sergio Anishchenko Halkina -> [@davidanish](https://www.github.com/davidanish)
 
+- Profesor responsable: Jesús Sánchez Cuadrado
+
 ## Características de Tareax
 La versión actual de la aplicación contiene las siguientes funcionalidades:
 - Crear y modificar tableros donde hay listas de tareas. Una lista de tareas tiene tarjetas de manera que las tarjetas sirven para asignar tareas o para anotar información relevante.
@@ -19,7 +21,7 @@ La versión actual de la aplicación contiene las siguientes funcionalidades:
   - Una lista no puede tener más de N ítems (configurable).
   - Una lista define que una tarjeta tiene que haber pasado por otras listas antes de llegar a ella.
 - Filtrar tarjetas del tablero por el nombre de la etiqueta.
-- Creación de plantillas para crear tableros con listas y tarjetas predeterminadas. Las plantillas se definen como un fichero YAML. _(no implementado aún en frontend)_.
+- Creación de plantillas para crear tableros con listas y tarjetas predeterminadas. Las plantillas se crean a partir de un fichero YAML.
 - El acceso compartido simultáneo de un tablero por varios usuarios se realiza mediante URL que se genera al crear el tablero. Todos los usuarios con acceso a esa URL pueden trabajar sobre el tablero.
 - La autenticación a la aplicación se hace mediante el correo electrónico del usuario, el cual recibe un código en su bandeja y debe validarlo.
 
