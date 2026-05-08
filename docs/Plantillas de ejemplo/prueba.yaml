@@ -28,3 +28,6 @@ listas:
 
   - nombre: REVIEW
     limite: 2
+    prerrequisitos: []
+    especial: false
+    tarjetas: []
