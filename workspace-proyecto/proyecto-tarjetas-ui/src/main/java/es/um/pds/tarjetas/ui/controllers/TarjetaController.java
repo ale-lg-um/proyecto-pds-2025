@@ -7,15 +7,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
-import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.ItemChecklistDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import es.um.pds.tarjetas.application.dto.ChecklistDTO;
+import es.um.pds.tarjetas.application.dto.ContenidoTarjetaCmd;
+import es.um.pds.tarjetas.application.dto.EtiquetaDTO;
+import es.um.pds.tarjetas.application.dto.ItemChecklistDTO;
+import es.um.pds.tarjetas.application.dto.TareaDTO;
+import es.um.pds.tarjetas.application.dto.TarjetaDTO;
+import es.um.pds.tarjetas.application.dto.TipoContenidoTarjeta;
+import es.um.pds.tarjetas.ui.infrastructure.api.TarjetaApiClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -44,10 +43,11 @@ import javafx.util.Pair;
 @Controller
 @Scope("prototype")
 public class TarjetaController {
+
 	// Atributos
 	private final ApplicationContext contextoApp;
 	private final ContextoUsuario contextoUsuario;
-	private final ServicioTarjeta servicioTarjeta;
+	private final TarjetaApiClient tarjetaApi;
 	private final ObservableList<ItemChecklistDTO> checklistObservable = FXCollections.observableArrayList();
 	private final ObservableList<EtiquetaDTO> etiquetasObservable = FXCollections.observableArrayList();
 	private TarjetaDTO tarjeta;
@@ -60,10 +60,10 @@ public class TarjetaController {
 	@FXML private Button btnCompletar;
 	@FXML private Button btnChecklist;
 	
-	public TarjetaController(ApplicationContext contextoApp, ContextoUsuario contextoUsuario, ServicioTarjeta servicioTarjeta) {
+	public TarjetaController(ApplicationContext contextoApp, ContextoUsuario contextoUsuario, TarjetaApiClient tarjetaApi) {
 		this.contextoApp = contextoApp;
 		this.contextoUsuario = contextoUsuario;
-		this.servicioTarjeta = servicioTarjeta;
+		this.tarjetaApi = tarjetaApi;
 	}
 	
 	@FXML
@@ -140,10 +140,11 @@ public class TarjetaController {
 		
 		try {
 			ContenidoTarjetaCmd cmd = new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, nuevaDesc, List.of(), contextoUsuario.getEmail());
-			servicioTarjeta.editarContenidoTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), cmd);
+			tarjetaApi.editarTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), cmd, contextoUsuario.getTokenSesion());
 			descripcionActual = nuevaDesc;
 			
 			tarjeta = new TarjetaDTO(tarjeta.id(), tarjeta.titulo(), tarjeta.fechaCreacion(), tarjeta.listaActualId(), new TareaDTO(nuevaDesc), tarjeta.etiquetas(), tarjeta.listasVisitadas());
+			
 		} 
 		catch (Exception e) {
 	        txtDescripcion.setText(descripcionActual);
@@ -171,20 +172,20 @@ public class TarjetaController {
 
 	        try {
 	            if (nuevoEstado) {
-	                servicioTarjeta.completarItemChecklist(
+	                tarjetaApi.completarItemChecklist(
 	                    contextoUsuario.getIdTableroActual(),
 	                    tarjeta.listaActualId(),
 	                    tarjeta.id(),
 	                    indiceItem,
-	                    contextoUsuario.getEmail()
+	                    contextoUsuario.getTokenSesion()
 	                );
 	            } else {
-	                servicioTarjeta.marcarItemChecklistComoPendiente(
+	                tarjetaApi.pendienteItemChecklist(
 	                    contextoUsuario.getIdTableroActual(),
 	                    tarjeta.listaActualId(),
 	                    tarjeta.id(),
 	                    indiceItem,
-	                    contextoUsuario.getEmail()
+	                    contextoUsuario.getTokenSesion()
 	                );
 	            }
 
@@ -221,9 +222,8 @@ public class TarjetaController {
 		if(confirmacion.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
 			try {
 				String tableroId = contextoUsuario.getIdTableroActual();
-				String email = contextoUsuario.getEmail();
 				
-				servicioTarjeta.completarTarjeta(tableroId, tarjeta.listaActualId(), tarjeta.id(), email);
+				tarjetaApi.completarTarjeta(tableroId, tarjeta.listaActualId(), tarjeta.id(), contextoUsuario.getTokenSesion());
 				
 				Alert exito = new Alert(Alert.AlertType.INFORMATION);
 				exito.setContentText("La tarjeta se ha compeltado correctamente");
@@ -297,13 +297,13 @@ public class TarjetaController {
 
 				String colorHex = resultado.getValue();
 				
-				servicioTarjeta.addEtiquetaATarjeta(
+				tarjetaApi.etiquetarTarjeta(
 					contextoUsuario.getIdTableroActual(),
 					tarjeta.listaActualId(),
 					tarjeta.id(),
 					nombre,
 					colorHex,
-					contextoUsuario.getEmail()
+					contextoUsuario.getTokenSesion()
 				);
 				/*
 				Label lblEtiqueta = new Label(nombre);
@@ -362,19 +362,8 @@ public class TarjetaController {
 
 	            items.add(texto);
 
-	            ContenidoTarjetaCmd contenido = new ContenidoTarjetaCmd(
-	                TipoContenidoTarjeta.CHECKLIST,
-	                tarjeta.titulo(),
-	                items,
-	                contextoUsuario.getEmail()
-	            );
-
-	            servicioTarjeta.editarContenidoTarjeta(
-	                contextoUsuario.getIdTableroActual(),
-	                tarjeta.listaActualId(),
-	                tarjeta.id(),
-	                contenido
-	            );
+	            ContenidoTarjetaCmd cmd = new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, tarjeta.titulo(), items, contextoUsuario.getEmail());
+	            tarjetaApi.editarTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), cmd, contextoUsuario.getTokenSesion());
 
 	            checklistObservable.add(new ItemChecklistDTO(texto, false));
 
@@ -438,7 +427,7 @@ public class TarjetaController {
 				
 				for(EtiquetaDTO et : seleccion) {
 					System.out.println("Eliminando etiqueta: " + et.nombre());
-					servicioTarjeta.eliminarEtiquetaDeTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), contextoUsuario.getEmail());
+					tarjetaApi.eliminarEtiquetaTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), contextoUsuario.getTokenSesion());
 				}
 				etiquetasObservable.removeAll(seleccion);
 				
@@ -550,7 +539,7 @@ public class TarjetaController {
 
 						String colorHex = resultado.getValue();
 						EtiquetaDTO nueva = new EtiquetaDTO(nombre, colorHex);
-						servicioTarjeta.modificarEtiquetaEnTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), nombre, colorHex, contextoUsuario.getEmail());
+						tarjetaApi.modificarEtiquetaTarjeta(contextoUsuario.getIdTableroActual(), tarjeta.listaActualId(), tarjeta.id(), et.nombre(), et.color(), nombre, colorHex, contextoUsuario.getTokenSesion());
 						etiquetasObservable.set(indice, nueva); // Para que se actualice la vista
 						SceneManager manager = contextoApp.getBean(SceneManager.class);
 						manager.showTablero();

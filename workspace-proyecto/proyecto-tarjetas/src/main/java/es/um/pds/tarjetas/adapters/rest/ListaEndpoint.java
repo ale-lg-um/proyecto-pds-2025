@@ -1,24 +1,25 @@
 package es.um.pds.tarjetas.adapters.rest;
 
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.um.pds.tarjetas.adapters.rest.requests.CrearListaRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.LimiteRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.PrerrequisitoRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.RenombrarRequest;
+import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
 import es.um.pds.tarjetas.domain.model.lista.model.Lista;
 import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
 import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
@@ -28,7 +29,6 @@ import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
 import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
 
 @RestController
-@RequestMapping("/tableros/{tableroId}/listas")
 public class ListaEndpoint {
 
 	private final ServicioSesion servicioSesion;
@@ -42,7 +42,7 @@ public class ListaEndpoint {
 	}
 	
 	// GET http://localhost:8080/tableros/{tableroId}/listas
-	@GetMapping
+	@GetMapping("/tableros/{tableroId}/listas")
 	public ResponseEntity<?> obtener(@RequestHeader("Authorization") String token,
 									 @PathVariable TableroId tableroId) {
 		try {
@@ -52,7 +52,32 @@ public class ListaEndpoint {
 			Set<Lista> listas = repositorioListas.buscarPorTableroId(tableroId);
 			
 			return ResponseEntity.status(HttpStatus.OK)
-								 .body(listas);
+								 .body(listas.stream()
+										 	 .map(lista -> new ListaDTO(lista))
+										 	 .collect(Collectors.toSet()));
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+								 .body(e.getMessage());
+		}
+	}
+	
+	// GET http://localhost:8080/listas/{listaId}
+	@GetMapping("/listas/{listaId}")
+	public ResponseEntity<?> obtener(@RequestHeader("Authorization") String token,
+									 @PathVariable ListaId listaId) {
+		try {
+			String authToken = token.replace("Bearer ", "").trim();
+			servicioSesion.validarYRenovarToken(authToken);	
+			
+			Optional<Lista> listaOptional = repositorioListas.buscarPorId(listaId);
+			
+			if(listaOptional.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+									 .body("Lista no encontrada.");
+			}
+			
+			return ResponseEntity.status(HttpStatus.OK)
+								 .body(new ListaDTO(listaOptional.get()));
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 								 .body(e.getMessage());
@@ -60,7 +85,7 @@ public class ListaEndpoint {
 	}
 	
 	// POST http://localhost:8080/tableros/{tableroId}/listas
-	@PostMapping
+	@PostMapping("/tableros/{tableroId}/listas")
 	public ResponseEntity<?> crear(@RequestHeader("Authorization") String token,
 								   @PathVariable String tableroId,
 								   @RequestBody CrearListaRequest body) {
@@ -79,7 +104,7 @@ public class ListaEndpoint {
 	}
 	
 	// PUT http://localhost:8080/tableros/{tableroId}/listas/{listaId}/renombrar
-	@PutMapping("/{listaId}/renombrar")
+	@PutMapping("/tableros/{tableroId}/listas/{listaId}/renombrar")
 	public ResponseEntity<?> renombrar(@RequestHeader("Authorization") String token,
 									   @PathVariable String tableroId,
 									   @PathVariable String listaId,
@@ -99,7 +124,7 @@ public class ListaEndpoint {
 	}
 	
 	// DELETE http://localhost:8080/tableros/{tableroId}/listas/{listaId}
-	@DeleteMapping("/{listaId}")
+	@DeleteMapping("/tableros/{tableroId}/listas/{listaId}")
 	public ResponseEntity<?> eliminar(@RequestHeader("Authorization") String token,
 									  @PathVariable String tableroId,
 									  @PathVariable String listaId) {
@@ -118,7 +143,7 @@ public class ListaEndpoint {
 	}
 	
 	// PUT http://localhost:8080/tableros/{tableroId}/listas/{listaId}/especial
-	@PutMapping("/{listaId}/especial")
+	@PutMapping("/tableros/{tableroId}/listas/{listaId}/especial")
 	public ResponseEntity<?> definirEspecial(@RequestHeader("Authorization") String token,
 											 @PathVariable String tableroId,
 											 @PathVariable String listaId) {
@@ -136,8 +161,8 @@ public class ListaEndpoint {
 		}
 	}
 	
-	// PATCH http://localhost:8080/tableros/{tableroId}/listas/{listaId}/configurar
-	@PatchMapping("/{listaId}/configurar")
+	// PUT http://localhost:8080/tableros/{tableroId}/listas/{listaId}/configurar
+	@PutMapping("/tableros/{tableroId}/listas/{listaId}/configurar")
 	public ResponseEntity<?> configurarLimite(@RequestHeader("Authorization") String token,
 											  @PathVariable String tableroId,
 											  @PathVariable String listaId,
@@ -155,7 +180,7 @@ public class ListaEndpoint {
 	}
 	
 	// PUT http://localhost:8080/tableros/{tableroId}/listas/{listaId}/prerrequisitos
-	@PutMapping("/{listaId}/prerrequisitos")
+	@PutMapping("/tableros/{tableroId}/listas/{listaId}/prerrequisitos")
 	public ResponseEntity<?> configurarPrerrequisitos(@RequestHeader("Authorization") String token,
 													  @PathVariable String tableroId,
 													  @PathVariable String listaId,

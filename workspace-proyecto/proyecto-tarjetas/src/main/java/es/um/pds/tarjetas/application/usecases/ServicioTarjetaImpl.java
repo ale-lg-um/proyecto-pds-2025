@@ -184,55 +184,58 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	@Override
 	@Transactional
 	public TarjetaDTO crearTarjeta(String tableroId, String listaId, String nombre, ContenidoTarjetaCmd cmd) {
-
-		// 1. Validaciones de frontera
-		if (cmd == null) {
-			throw new IllegalArgumentException("El comando del contenido de la tarjeta no puede ser nulo");
+		try {
+			// 1. Validaciones de frontera
+			if (cmd == null) {
+				throw new IllegalArgumentException("El comando del contenido de la tarjeta no puede ser nulo");
+			}
+			
+			// El nombre no puede ser nulo, especialmente pensando de cara al historial. Podría ser nulo si se decidiera
+			if (nombre == null || nombre.isBlank()) {
+				throw new IllegalArgumentException("El nombre de la tarjeta no puede ser null o vacío");
+			}
+	
+			// 2. Validación y construcción de objetos del dominio
+			ContenidoTarjeta contenido = construirContenido(cmd);
+			
+			TableroId idTablero = construirTableroId(tableroId);
+			ListaId idLista = construirListaId(listaId);
+			TarjetaId idTarjeta = TarjetaId.of();
+			UsuarioId idUsuario = construirUsuarioId(cmd.emailUsuario());
+			Tarjeta nuevaTarjeta = Tarjeta.of(idTarjeta, nombre, idLista, contenido);
+	
+			// 3. Recuperar raíces de agregados
+			Tablero tablero = cargarTablero(idTablero);
+			Lista lista = cargarLista(idLista);
+	
+			// 4. Comprobar consistencia entre agregados
+			if (!tablero.getListas().contains(idLista)) {
+				throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
+			}
+	
+			// 5. Validar reglas de negocio de creación
+			politicaTarjetas.validarCreacion(tablero, lista);
+			
+			// 6. Asignar el tablero a la tarjeta
+			nuevaTarjeta.asignarATablero(idTablero);
+	
+			// 7. Actualizar la lista con la nueva tarjeta delegando la lógica en el dominio
+			// Se crea en la última posición de la lista
+			lista.anadirTarjeta(idTarjeta);
+	
+			// 8. Persistir cambios
+			repoTarjetas.guardar(nuevaTarjeta);
+			repoListas.guardar(lista);
+	
+			// 9. Publicar evento de dominio
+			LocalDateTime timestamp = LocalDateTime.now();
+			eventBus.publicar(new TarjetaCreada(idTarjeta, idLista, idTablero, idUsuario, timestamp, nombre, lista.getNombreLista()));
+	
+			// 10. Devolver DTO
+			return new TarjetaDTO(nuevaTarjeta);
+		} catch(Exception e) {
+			throw e;
 		}
-		
-		// El nombre no puede ser nulo, especialmente pensando de cara al historial. Podría ser nulo si se decidiera
-		if (nombre == null || nombre.isBlank()) {
-			throw new IllegalArgumentException("El nombre de la tarjeta no puede ser null o vacío");
-		}
-
-		// 2. Validación y construcción de objetos del dominio
-		ContenidoTarjeta contenido = construirContenido(cmd);
-		
-		TableroId idTablero = construirTableroId(tableroId);
-		ListaId idLista = construirListaId(listaId);
-		TarjetaId idTarjeta = TarjetaId.of();
-		UsuarioId idUsuario = construirUsuarioId(cmd.emailUsuario());
-		Tarjeta nuevaTarjeta = Tarjeta.of(idTarjeta, nombre, idLista, contenido);
-
-		// 3. Recuperar raíces de agregados
-		Tablero tablero = cargarTablero(idTablero);
-		Lista lista = cargarLista(idLista);
-
-		// 4. Comprobar consistencia entre agregados
-		if (!tablero.getListas().contains(idLista)) {
-			throw new IllegalArgumentException("La lista indicada no pertenece al tablero");
-		}
-
-		// 5. Validar reglas de negocio de creación
-		politicaTarjetas.validarCreacion(tablero, lista);
-		
-		// 6. Asignar el tablero a la tarjeta
-		nuevaTarjeta.asignarATablero(idTablero);
-
-		// 7. Actualizar la lista con la nueva tarjeta delegando la lógica en el dominio
-		// Se crea en la última posición de la lista
-		lista.anadirTarjeta(idTarjeta);
-
-		// 8. Persistir cambios
-		repoTarjetas.guardar(nuevaTarjeta);
-		repoListas.guardar(lista);
-
-		// 9. Publicar evento de dominio
-		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaCreada(idTarjeta, idLista, idTablero, idUsuario, timestamp, nombre, lista.getNombreLista()));
-
-		// 10. Devolver DTO
-		return new TarjetaDTO(nuevaTarjeta);
 	}
 	
 	@Override
@@ -379,57 +382,60 @@ public class ServicioTarjetaImpl implements ServicioTarjeta {
 	@Transactional
 	public void moverTarjeta(String tableroId, String tarjetaId, String listaOrigenId, String listaDestinoId,
 			String emailUsuario) {
-
-		// 1. Validación y construcción de objetos del dominio
-		TableroId idTablero = construirTableroId(tableroId);
-		TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
-		ListaId idListaOrigen = construirListaId(listaOrigenId);
-		ListaId idListaDestino = construirListaId(listaDestinoId);
-		UsuarioId idUsuario = construirUsuarioId(emailUsuario);
-
-		// 2. Recuperar raíces de agregados
-		Tablero tablero = cargarTablero(idTablero);
-		Lista listaOrigen = cargarLista(idListaOrigen);
-		Lista listaDestino = cargarLista(idListaDestino);
-		Tarjeta tarjeta = cargarTarjeta(idTarjeta);
-
-		// 3. Comprobar consistencia entre agregados
-		if (!tablero.getListas().contains(idListaOrigen)) {
-			throw new IllegalArgumentException("La lista origen no pertenece al tablero");
+		try {
+			// 1. Validación y construcción de objetos del dominio
+			TableroId idTablero = construirTableroId(tableroId);
+			TarjetaId idTarjeta = construirTarjetaId(tarjetaId);
+			ListaId idListaOrigen = construirListaId(listaOrigenId);
+			ListaId idListaDestino = construirListaId(listaDestinoId);
+			UsuarioId idUsuario = construirUsuarioId(emailUsuario);
+	
+			// 2. Recuperar raíces de agregados
+			Tablero tablero = cargarTablero(idTablero);
+			Lista listaOrigen = cargarLista(idListaOrigen);
+			Lista listaDestino = cargarLista(idListaDestino);
+			Tarjeta tarjeta = cargarTarjeta(idTarjeta);
+	
+			// 3. Comprobar consistencia entre agregados
+			if (!tablero.getListas().contains(idListaOrigen)) {
+				throw new IllegalArgumentException("La lista origen no pertenece al tablero");
+			}
+	
+			if (!tablero.getListas().contains(idListaDestino)) {
+				throw new IllegalArgumentException("La lista destino no pertenece al tablero");
+			}
+	
+			if (!tarjeta.getListaActual().equals(idListaOrigen)) {
+				throw new IllegalArgumentException("La tarjeta indicada no pertenece a la lista origen");
+			}
+	
+			if (!listaOrigen.getListaTarjetas().contains(idTarjeta)) {
+				throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista origen");
+			}
+	
+			// 4. Validar reglas de negocio del movimiento
+			politicaTarjetas.validarMovimientoEntreListas(tarjeta, listaDestino);
+	
+			// 5. Obtener datos necesarios para el evento
+			String nombreTarjeta = tarjeta.getTitulo();
+			
+			// 6. Ejecutar la operación delegando la lógica al dominio
+			listaOrigen.eliminarTarjeta(idTarjeta);
+			listaDestino.anadirTarjeta(idTarjeta);
+			tarjeta.cambiarListaActual(idListaDestino);
+	
+			// 7. Persistir cambios
+			repoListas.guardar(listaOrigen);
+			repoListas.guardar(listaDestino);
+			repoTarjetas.guardar(tarjeta);
+	
+			// 8. Publicar evento de dominio
+			LocalDateTime timestamp = LocalDateTime.now();
+			eventBus.publicar(new TarjetaMovida(idTarjeta, idListaOrigen, listaOrigen.getNombreLista(), idListaDestino,
+					listaDestino.getNombreLista(), idTablero, idUsuario, timestamp, nombreTarjeta));
+		} catch(Exception e) {
+			throw e;
 		}
-
-		if (!tablero.getListas().contains(idListaDestino)) {
-			throw new IllegalArgumentException("La lista destino no pertenece al tablero");
-		}
-
-		if (!tarjeta.getListaActual().equals(idListaOrigen)) {
-			throw new IllegalArgumentException("La tarjeta indicada no pertenece a la lista origen");
-		}
-
-		if (!listaOrigen.getListaTarjetas().contains(idTarjeta)) {
-			throw new IllegalArgumentException("La tarjeta indicada no está contenida en la lista origen");
-		}
-
-		// 4. Validar reglas de negocio del movimiento
-		politicaTarjetas.validarMovimientoEntreListas(tarjeta, listaDestino);
-
-		// 5. Obtener datos necesarios para el evento
-		String nombreTarjeta = tarjeta.getTitulo();
-		
-		// 6. Ejecutar la operación delegando la lógica al dominio
-		listaOrigen.eliminarTarjeta(idTarjeta);
-		listaDestino.anadirTarjeta(idTarjeta);
-		tarjeta.cambiarListaActual(idListaDestino);
-
-		// 7. Persistir cambios
-		repoListas.guardar(listaOrigen);
-		repoListas.guardar(listaDestino);
-		repoTarjetas.guardar(tarjeta);
-
-		// 8. Publicar evento de dominio
-		LocalDateTime timestamp = LocalDateTime.now();
-		eventBus.publicar(new TarjetaMovida(idTarjeta, idListaOrigen, listaOrigen.getNombreLista(), idListaDestino,
-				listaDestino.getNombreLista(), idTablero, idUsuario, timestamp, nombreTarjeta));
 	}
 	
 	@Override

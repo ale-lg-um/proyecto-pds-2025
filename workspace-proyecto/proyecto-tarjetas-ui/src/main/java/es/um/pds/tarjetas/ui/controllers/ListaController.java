@@ -10,23 +10,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
-import es.um.pds.tarjetas.domain.model.lista.model.Lista;
-import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
-import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
-import es.um.pds.tarjetas.domain.model.tarjeta.id.TarjetaId;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.ItemChecklist;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.Tarjeta;
-import es.um.pds.tarjetas.domain.model.tarjeta.model.TipoContenidoTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
-//import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
-import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.commands.ContenidoTarjetaCmd;
-import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioTarjetas;
+import es.um.pds.tarjetas.application.dto.ContenidoTarjetaCmd;
+import es.um.pds.tarjetas.application.dto.ListaDTO;
+import es.um.pds.tarjetas.application.dto.TarjetaDTO;
+import es.um.pds.tarjetas.application.dto.TipoContenidoTarjeta;
+import es.um.pds.tarjetas.ui.infrastructure.api.ListaApiClient;
+import es.um.pds.tarjetas.ui.infrastructure.api.TarjetaApiClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,12 +43,9 @@ import javafx.util.Pair;
 @Scope("prototype")
 public class ListaController {
 	// Atributos
-	private final ServicioTarjeta servicioTarjeta;
-	private final ServicioLista servicioLista;
+	private final ListaApiClient listaApi;
+	private final TarjetaApiClient tarjetaApi;
 	private final ApplicationContext contextoApp;
-	private final RepositorioTarjetas repoTarjetas;
-	private final RepositorioListas repoListas;
-	private final RepositorioTableros repoTableros;
 	private final ContextoUsuario contextoUsuario;
 	private final SceneManager sceneManager;
 	private ListaDTO listaDominio;		// Entidad real
@@ -75,17 +61,10 @@ public class ListaController {
 	@FXML private Button btnRenombrarLista;
 	
 	// Aquí se inyecta el servicio
-	public ListaController(ServicioTarjeta servicioTarjeta, 
-			ServicioLista servicioLista, ApplicationContext contextoApp, 
-			RepositorioTarjetas repoTarjetas, RepositorioListas repoListas,
-			RepositorioTableros repoTableros, ContextoUsuario contextoUsuario, 
-			SceneManager sceneManager) {
-		this.servicioTarjeta = servicioTarjeta;
-		this.servicioLista = servicioLista;
+	public ListaController(ListaApiClient listaApi, TarjetaApiClient tarjetaApi, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
+		this.listaApi = listaApi;
+		this.tarjetaApi = tarjetaApi;
 		this.contextoApp = contextoApp;
-		this.repoTarjetas = repoTarjetas;
-		this.repoListas = repoListas;
-		this.repoTableros = repoTableros;
 		this.contextoUsuario = contextoUsuario;
 		this.sceneManager = sceneManager;
 	}
@@ -141,16 +120,16 @@ public class ListaController {
 	        String listaId = this.listaDominio.id();
 	        System.out.println("   ListaId creado: " + listaId);
 	        
-	        List<Tarjeta> tarjetas = repoTarjetas.buscarPorListaId(ListaId.of(listaId));
+	        List<TarjetaDTO> tarjetas = tarjetaApi.obtenerPorLista(listaId, contextoUsuario.getTokenSesion());
 	        System.out.println("✅ Tarjetas encontradas: " + tarjetas.size());
 	        
 	        if (tarjetas.isEmpty()) {
 	            System.out.println("⚠️  No hay tarjetas para esta lista");
 	        }
 	        
-	        for(Tarjeta tarjeta : tarjetas) {
-	            System.out.println("   - Creando visual para tarjeta: " + tarjeta.getTitulo());
-	            instanciarTarjetaVisual(new TarjetaDTO(tarjeta));
+	        for(TarjetaDTO tarjeta : tarjetas) {
+	            System.out.println("   - Creando visual para tarjeta: " + tarjeta.titulo());
+	            instanciarTarjetaVisual(tarjeta);
 	        }
 	        
 	        System.out.println("✅ Se cargaron " + tarjetas.size() + " tarjetas en la UI");
@@ -223,7 +202,7 @@ public class ListaController {
 				}
 				
 				//TarjetaDTO nuevaTarjeta = servicioTablero.crearTarjeta(tableroId, listaDominio.getIdentificador().getId(), tarjetaDTO, "usuario@ejemplo.com");
-				TarjetaDTO nuevaTarjeta = servicioTarjeta.crearTarjeta(tableroId, listaDominio.id(), titulo, contenido);
+				TarjetaDTO nuevaTarjeta = tarjetaApi.crearTarjeta(tableroId, listaDominio.id(), titulo, contenido, contextoUsuario.getTokenSesion());
 				
 				// cargar el FXML del post-it con Spring
 				FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/MiniTarjetaView.fxml"));
@@ -255,7 +234,7 @@ public class ListaController {
 		
 		if(alerta.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
 			try {
-				servicioLista.eliminarLista(tableroId, listaDominio.id(), contextoUsuario.getEmail());
+				listaApi.eliminarLista(tableroId, listaDominio.id(), contextoUsuario.getTokenSesion());
 				
 				if(funcionEliminarDeLaVista != null) {
 					funcionEliminarDeLaVista.run();
@@ -288,7 +267,7 @@ public class ListaController {
 					}
 				}
 				
-				servicioLista.configurarLimiteLista(tableroId, listaDominio.id(), nuevoLimite, contextoUsuario.getEmail());
+				listaApi.configurarLimiteLista(tableroId, listaDominio.id(), nuevoLimite, contextoUsuario.getTokenSesion());
 				
 				sceneManager.showTablero();
 			} catch (NumberFormatException e) {
@@ -304,20 +283,8 @@ public class ListaController {
 	
 	@FXML
 	public void accionConfigurarPrerrequisitos(ActionEvent evento) {
-		try {
-			Tablero tab = repoTableros.buscarPorId(TableroId.of(tableroId)).orElseThrow(() -> new IllegalArgumentException("Tablero no encontrado"));
-			
-			List<Lista> listasDisp = tab.getListas().stream()
-					.filter(listaId -> !listaId.getId().equals(listaDominio.id()))
-					.map(listaId -> repoListas.buscarPorId(listaId))
-					.filter(opt -> opt.isPresent())
-					.map(opt -> opt.get())
-					.toList();
-			
-			if(listasDisp.isEmpty()) {
-				mostrarError("No hay listas", "Necesitaas al menos dos listas para poder configurar prerrequisitos");
-				return;
-			}
+		try {			
+			List<ListaDTO> listas = listaApi.obtenerListas(tableroId, contextoUsuario.getTokenSesion());
 			
 			Dialog<Set<String>> dialogo = new Dialog<>();
 			dialogo.setTitle("Configurar prerrequisitos");
@@ -331,10 +298,10 @@ public class ListaController {
 			contenedor.setPadding(new Insets(15));
 			
 			List<CheckBox> checks = new ArrayList<>();
-			for(Lista lista : listasDisp) {
-				CheckBox box = new CheckBox(lista.getNombreLista());
-				box.setUserData(lista.getIdentificador().getId());
-				box.setSelected(listaDominio.prerrequisitoIds().contains(lista.getIdentificador().getId()));
+			for(ListaDTO lista : listas) {
+				CheckBox box = new CheckBox(lista.nombre());
+				box.setUserData(lista.id());
+				box.setSelected(listaDominio.prerrequisitoIds().contains(lista.id()));
 				checks.add(box);
 				contenedor.getChildren().add(box);
 			}
@@ -355,7 +322,7 @@ public class ListaController {
 			
 			dialogo.showAndWait().ifPresent(prerreq -> {
 				try {
-					servicioLista.configurarPrerrequisitosLista(tableroId, listaDominio.id(), prerreq, contextoUsuario.getEmail());
+					listaApi.configurarPrerrequisitosLista(tableroId, listaDominio.id(), prerreq, contextoUsuario.getTokenSesion());
 					sceneManager.showTablero();
 				} catch(Exception e) {
 					mostrarError("Error", "No se pudieron configurar los prerrequisitos.");
@@ -393,25 +360,25 @@ public class ListaController {
 			}
 			
 			try {
-				System.out.println("Intentando mover tarjeta: " + tarjetaId + " a lista: " + listaOrigenId);
+				System.out.println("Intentando mover tarjeta: " + tarjetaId + " a lista: " + listaDominio.id());
 				
-				Tarjeta tarjeta = repoTarjetas.buscarPorId(TarjetaId.of(tarjetaId)).orElseThrow(() -> new IllegalArgumentException("Tarjeta no encontrada"));
+				TarjetaDTO tarjeta = tarjetaApi.obtenerTarjeta(tarjetaId, contextoUsuario.getTokenSesion());
 				
-				Lista dest = repoListas.buscarPorId(ListaId.of(listaDominio.id())).orElseThrow(() -> new IllegalArgumentException("Lista no encontrada"));
+				ListaDTO dest = listaApi.obtenerListaPorId(listaDominio.id(), contextoUsuario.getTokenSesion());
 				
-				System.out.println("Tarjeta encontrada: " + tarjeta.getTitulo());
-				System.out.println("Lista encontrada: " + dest.getNombreLista());
+				System.out.println("Tarjeta encontrada: " + tarjeta.titulo());
+				System.out.println("Lista encontrada: " + dest.nombre());
 				
-				if(!dest.getPrerrequisitos().isEmpty()) {
-					System.out.println("📋 Validando prerequisitos: " + dest.getPrerrequisitos().size());
+				if(!dest.prerrequisitoIds().isEmpty()) {
+					System.out.println("📋 Validando prerequisitos: " + dest.prerrequisitoIds().size());
 					
-					for(ListaId prerrequisito : dest.getPrerrequisitos()) {
-						if(!tarjeta.getListasVisitadas().contains(prerrequisito)) {
-							String nombreListaPrerrequisito = repoListas.buscarPorId(prerrequisito)
-									.map(Lista::getNombreLista)
-									.orElse(prerrequisito.getId());
+					for(String prerrequisito : dest.prerrequisitoIds()) {
+						if(!tarjeta.listasVisitadas().contains(prerrequisito)) {
+							ListaDTO listaDto = listaApi.obtenerListaPorId(prerrequisito, contextoUsuario.getTokenSesion());
+									
+							String nombreListaPrerrequisito = (listaDto != null) ? listaDto.nombre() : prerrequisito;
 							
-							mostrarError("Prerrequisitos incumplidos", "La tarjeta debe pasar por la lista '" + nombreListaPrerrequisito + "' antes de poder moverla a '" + dest.getNombreLista() + "'");
+							mostrarError("Prerrequisitos incumplidos", "La tarjeta debe pasar por la lista '" + nombreListaPrerrequisito + "' antes de poder moverla a '" + dest.nombre() + "'");
 							System.out.println("Prerrequisito no cumplido: " + nombreListaPrerrequisito);
 							evento.setDropCompleted(exito);
 							evento.consume();
@@ -421,7 +388,7 @@ public class ListaController {
 				}
 				
 				System.out.println("Todos los prerrequisitos se han cumplido. Moviendo tarjeta...");
-				servicioTarjeta.moverTarjeta(tableroId, tarjetaId, listaOrigenId, listaDominio.id(), contextoUsuario.getEmail());
+				tarjetaApi.moverTarjeta(tableroId, listaOrigenId, listaDominio.id(), tarjetaId, contextoUsuario.getTokenSesion());
 				exito = true;
 				System.out.println("Tarjeta movida con éxito");
 				sceneManager.showTablero();
@@ -444,7 +411,7 @@ public class ListaController {
 		dialogo.setContentText("Nuevo nombre:");
 		dialogo.showAndWait().ifPresent(nombre -> {
 			try {
-				servicioLista.renombrarLista(tableroId, listaDominio.id(), nombre, contextoUsuario.getEmail());
+				listaApi.renombrarLista(tableroId, listaDominio.id(), nombre, contextoUsuario.getTokenSesion());
 				lblNombreLista.setText(nombre);
 				sceneManager.showTablero();
 			} catch(Exception e) {
@@ -498,7 +465,6 @@ public class ListaController {
 		
 		dialogo.showAndWait().ifPresent(item -> {
 			try {
-				ItemChecklist i = ItemChecklist.of(item);
 				contenido.itemsChecklist().add(item);
 			} catch(Exception e) {
 				e.printStackTrace();

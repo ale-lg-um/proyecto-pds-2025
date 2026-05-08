@@ -4,11 +4,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.ports.input.ServicioTarjeta;
-import es.um.pds.tarjetas.domain.ports.input.dto.ChecklistDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.EtiquetaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TareaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.TarjetaDTO;
+import es.um.pds.tarjetas.application.dto.ChecklistDTO;
+import es.um.pds.tarjetas.application.dto.EtiquetaDTO;
+import es.um.pds.tarjetas.application.dto.TareaDTO;
+import es.um.pds.tarjetas.application.dto.TarjetaDTO;
+import es.um.pds.tarjetas.ui.infrastructure.api.TarjetaApiClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 public class MiniTarjetaController {
 	// Atributos
 	private final ApplicationContext contextoApp;
-	private final ServicioTarjeta servicioTarjeta;
+	private final TarjetaApiClient tarjetaApi;
 	private final ContextoUsuario contextoUsuario;
 	private TarjetaDTO tarjetaDominio;
 	private Runnable funcionEliminarDeLaVista;
@@ -40,9 +40,9 @@ public class MiniTarjetaController {
 	@FXML private Label lblIconoTipo;
 	@FXML private FlowPane contenedorEtiquetas;
 	
-	public MiniTarjetaController(ApplicationContext contextoApp, ServicioTarjeta servicioTarjeta, ContextoUsuario contextoUsuario) {
+	public MiniTarjetaController(ApplicationContext contextoApp, TarjetaApiClient tarjetaApi, ContextoUsuario contextoUsuario) {
 		this.contextoApp = contextoApp;
-		this.servicioTarjeta = servicioTarjeta;
+		this.tarjetaApi = tarjetaApi;
 		this.contextoUsuario = contextoUsuario;
 	}
 	
@@ -79,7 +79,7 @@ public class MiniTarjetaController {
 			
 			// recuperar el controlador de la vista de tarjeta
 			TarjetaController controlador = loader.getController();
-			TarjetaDTO actualizada = servicioTarjeta.obtenerTarjeta(tarjetaDominio.id());
+			TarjetaDTO actualizada = tarjetaApi.obtenerTarjeta(tarjetaDominio.id(), contextoUsuario.getTokenSesion());
 			controlador.configurarDetalleTarjeta(actualizada);
 			
 			// Crear ventana
@@ -134,7 +134,7 @@ public class MiniTarjetaController {
 		if(alerta.showAndWait().orElse(ButtonType.CANCEL) == ButtonType.OK) {
 			try {
 				// Borrar de la base de datos
-				servicioTarjeta.eliminarTarjeta(contextoUsuario.getIdTableroActual(), tarjetaDominio.listaActualId(), tarjetaDominio.id(), contextoUsuario.getEmail());
+				tarjetaApi.eliminarTarjeta(contextoUsuario.getIdTableroActual(), tarjetaDominio.listaActualId(), tarjetaDominio.id(), contextoUsuario.getTokenSesion());
 				
 				if(funcionEliminarDeLaVista != null) {
 					funcionEliminarDeLaVista.run();

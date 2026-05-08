@@ -9,15 +9,11 @@ import java.util.List;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.plantilla.model.Plantilla;
-import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
-import es.um.pds.tarjetas.domain.model.usuario.id.UsuarioId;
-import es.um.pds.tarjetas.domain.ports.input.ServicioPlantilla;
-import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
-import es.um.pds.tarjetas.domain.ports.input.commands.CrearTableroCmd;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
-import es.um.pds.tarjetas.domain.ports.input.dto.PlantillaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.ResultadoCrearTableroDTO;
+import es.um.pds.tarjetas.application.dto.PlantillaDTO;
+import es.um.pds.tarjetas.application.dto.ResultadoCrearTableroDTO;
+import es.um.pds.tarjetas.application.dto.TableroDTO;
+import es.um.pds.tarjetas.ui.infrastructure.api.DashboardApiClient;
+import es.um.pds.tarjetas.ui.infrastructure.api.PlantillaApiClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -42,9 +38,9 @@ import javafx.stage.FileChooser.ExtensionFilter;
 @Scope("prototype")
 public class DashboardController {
 	// Atributos
-	private final RepositorioTableros repoTableros;
-	private final ServicioTablero servicioTablero;
-	private final ServicioPlantilla servicioPlantilla;
+
+	private final PlantillaApiClient plantillaApi;
+	private final DashboardApiClient dashboardApi;
 	private final ContextoUsuario contextoUsuario;
 	private final SceneManager sceneManager;
 	
@@ -55,10 +51,10 @@ public class DashboardController {
 	@FXML private Button btnBorrar;
 	
 	// Constructor
-	public DashboardController(RepositorioTableros repoTableros, ServicioTablero servicioTablero, ServicioPlantilla servicioPlantilla, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
-		this.repoTableros = repoTableros;
-		this.servicioTablero = servicioTablero;
-		this.servicioPlantilla = servicioPlantilla;
+
+	public DashboardController(PlantillaApiClient plantillaApi, DashboardApiClient dashboardApi, ContextoUsuario contextoUsuario, SceneManager sceneManager) {
+		this.plantillaApi = plantillaApi;
+		this.dashboardApi = dashboardApi;
 		this.contextoUsuario = contextoUsuario;
 		this.sceneManager = sceneManager;
 	}
@@ -86,18 +82,21 @@ public class DashboardController {
 	}
 	
 	private void cargarTableros() {
+		try {
 		listaTableros.getItems().clear();
-		UsuarioId creador = UsuarioId.of(contextoUsuario.getEmail());
 		System.out.println("Buscando tableros para el usuario: " + contextoUsuario.getEmail());
 		
-		List<TableroId> ids = repoTableros.listarIdsPorUsuario(creador);
-		for(TableroId id : ids) {
-			repoTableros.buscarPorId(id).ifPresent(tablero -> {
-				listaTableros.getItems().add(new TableroItem(id.getId(), tablero.getNombre()));
-			});
-		}
+		List<TableroDTO> tablerosDto = dashboardApi.obtenerTableros(contextoUsuario.getTokenSesion());
 		
+		for(TableroDTO dto : tablerosDto) {
+			TableroItem item = new TableroItem(dto.id(), dto.nombre());
+			listaTableros.getItems().add(item);
+		}
+				
 		actualizarEstadoBotones();
+		} catch(Exception e) {
+			mostrarError("Error", "No se pueden obtener los tableros: " + e.getMessage());
+		}
 	}
 	
 	@FXML
@@ -109,9 +108,7 @@ public class DashboardController {
 		
 		dialogo.showAndWait().ifPresent(nombre -> {
 			try {
-				CrearTableroCmd cmd = new CrearTableroCmd(nombre, contextoUsuario.getEmail(), null, null, null);
-				
-				ResultadoCrearTableroDTO resultado = servicioTablero.crearTablero(cmd);
+				ResultadoCrearTableroDTO resultado = dashboardApi.crearTablero(nombre, contextoUsuario.getEmail(), null, null, null, contextoUsuario.getTokenSesion());
 				
 				Alert info = new Alert(AlertType.INFORMATION);
 				info.setTitle("Tablero Creado");
@@ -121,7 +118,7 @@ public class DashboardController {
 				
 				cargarTableros();
 			} catch(Exception e) {
-				mostrarError("Error", "No se pudo crear el tablero: " + e.getMessage());;
+				mostrarError("Error", "No se pudo crear el tablero: " + e.getMessage());
 			}
 		});
 	}
@@ -182,7 +179,7 @@ public class DashboardController {
 	
 	private void cargarPlantillasEnLista(ListView<PlantillaItem> listaPlantillas) {
 		try {
-			List<PlantillaDTO> plantillas = servicioPlantilla.listarPlantillas();
+			List<PlantillaDTO> plantillas = plantillaApi.obtenerTodas(contextoUsuario.getTokenSesion());
 			var items = FXCollections.<PlantillaItem>observableArrayList();
 			
 			for(PlantillaDTO plantilla : plantillas) {
@@ -208,10 +205,9 @@ public class DashboardController {
 					mostrarError("Error", "El nombre del tablero no puede estar vacío.");
                 	return;
 				}
-
-				CrearTableroCmd cmd = new CrearTableroCmd(nombre.trim(), contextoUsuario.getEmail(), plantilla.getId(), null, null);
 				
-				ResultadoCrearTableroDTO resultado = servicioTablero.crearTablero(cmd);
+				PlantillaDTO plantillaDto = plantillaApi.obtenerPorId(plantilla.getId(), contextoUsuario.getTokenSesion());
+				ResultadoCrearTableroDTO resultado = dashboardApi.crearTablero(nombre.trim(), contextoUsuario.getEmail(), plantilla.getId(), plantilla.getNombre(), plantillaDto, contextoUsuario.getTokenSesion());
 				
 
 				Alert info = new Alert(AlertType.INFORMATION);
@@ -247,7 +243,7 @@ public class DashboardController {
 		try {
 			String yaml = Files.readString(archivo.toPath(), StandardCharsets.UTF_8);
 			
-			PlantillaDTO plantilla = servicioPlantilla.crearPlantilla(yaml, contextoUsuario.getEmail());
+			PlantillaDTO plantilla = plantillaApi.crearPlantilla(yaml, contextoUsuario.getTokenSesion());
 			listaPlantillas.getItems().add(new PlantillaItem(plantilla.id(), plantilla.nombre()));
 			
 
@@ -272,7 +268,6 @@ public class DashboardController {
 		TableroItem seleccionado = listaTableros.getSelectionModel().getSelectedItem();
 		if(seleccionado != null) {
 			contextoUsuario.setIdTableroActual(seleccionado.getId());
-			contextoUsuario.setNombreTableroActual(seleccionado.getNombre());
 			sceneManager.showTablero();
 		}
 	}
@@ -289,18 +284,9 @@ public class DashboardController {
 				String tokenLimpio = token.trim();
 				System.out.println("Buscando token: [" + tokenLimpio + "]"); // DEBUG
 				
-				repoTableros.buscarPorURL(tokenLimpio).ifPresentOrElse(tablero -> {
-					
-					System.out.println("¡Tablero encontrado!: " + tablero.getNombre()); // DEBUG
-					
-					contextoUsuario.setIdTableroActual(tablero.getIdentificador().getId());
-					sceneManager.showTablero();
-					
-				}, () -> {
-					System.out.println("Fallo: Token no encontrado en la BD."); // DEBUG
-					mostrarError("Acceso Denegado", "El código introducido no existe.");
-				});
-				
+				TableroDTO tablero = dashboardApi.obtenerTableroPorUrl(tokenLimpio, token);
+				contextoUsuario.setIdTableroActual(tablero.id());
+				sceneManager.showTablero();	
 			} catch (Exception e) {
 				System.err.println("Error en la consulta: " + e.getMessage()); // DEBUG
 				e.printStackTrace();
@@ -311,12 +297,16 @@ public class DashboardController {
 	
 	@FXML
 	public void accionBorrarTableros() {
-		ObservableList<TableroItem> seleccionados = listaTableros.getSelectionModel().getSelectedItems();
-		for(TableroItem item : seleccionados) {
-			repoTableros.eliminarPorId(TableroId.of(item.getId()));
+		try {
+			ObservableList<TableroItem> seleccionados = listaTableros.getSelectionModel().getSelectedItems();
+			for(TableroItem item : seleccionados) {
+				dashboardApi.eliminarTablero(item.getId(), contextoUsuario.getTokenSesion());
+			}
+			
+			cargarTableros();
+		} catch(Exception e) {
+			mostrarError("Error", "Hubo un problema al eliminar un tablero: " + e.getMessage());
 		}
-		
-		cargarTableros();
 	}
 	
 	// Clase auxiliar
@@ -334,13 +324,9 @@ public class DashboardController {
 			return this.id;
 		}
 		
-		public String getNombre() {
-			return this.nombre;
-		}
-		
 		@Override
 		public String toString() {
-			return this.nombre; // para que no se raye al listar
+			return this.nombre;
 		}
 	}
 	

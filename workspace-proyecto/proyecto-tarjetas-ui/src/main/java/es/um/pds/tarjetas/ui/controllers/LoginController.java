@@ -1,8 +1,11 @@
 package es.um.pds.tarjetas.ui.controllers;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.ports.input.ServicioAutenticacion;
+import es.um.pds.tarjetas.ui.infrastructure.api.LoginApiClient;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -14,7 +17,7 @@ import javafx.scene.layout.VBox;
 @Controller
 public class LoginController {
 	// Atributos
-	private final ServicioAutenticacion servicioAutenticacion;
+	private final LoginApiClient loginApi;
 	private final SceneManager sceneManager;
 	private final ContextoUsuario contexto;
 	private String emailTemp; // Guardar el email
@@ -30,8 +33,8 @@ public class LoginController {
 	@FXML private Button btnVerificar;
 	
 	// Constructor
-	public LoginController(ServicioAutenticacion servicioAutenticacion, SceneManager sceneManager, ContextoUsuario contexto) {
-		this.servicioAutenticacion = servicioAutenticacion;
+	public LoginController(LoginApiClient loginApi, SceneManager sceneManager, ContextoUsuario contexto) {
+		this.loginApi = loginApi;
 		this.sceneManager = sceneManager;
 		this.contexto = contexto;
 	}
@@ -46,7 +49,7 @@ public class LoginController {
 		}
 		
 		try {
-			servicioAutenticacion.enviarCodigoLogin(email);
+			loginApi.loginUsuario(email);
 			emailTemp = email;
 			panelEmail.setVisible(false);
 			panelEmail.setManaged(false);
@@ -68,7 +71,14 @@ public class LoginController {
 		}
 		
 		try {
-			String tokenSesion = servicioAutenticacion.verificarCodigoLogin(emailTemp, codigo);
+			Optional<String> tokenOptional = loginApi.verificarCodigo(emailTemp, codigo);
+			
+			if(tokenOptional.isEmpty()) {
+				throw new NoSuchElementException("No se ha podido extraer el token.");
+			}
+			
+			String tokenSesion = tokenOptional.get();
+			
 			System.out.println("Inicio de sesión exitoso. Token generado: " + tokenSesion);
 			
 			contexto.setEmail(emailTemp);

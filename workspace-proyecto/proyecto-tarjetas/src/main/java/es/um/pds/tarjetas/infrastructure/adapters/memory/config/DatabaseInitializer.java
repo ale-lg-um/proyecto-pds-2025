@@ -1,4 +1,4 @@
-package es.um.pds.tarjetas.infrastructure.config;
+package es.um.pds.tarjetas.infrastructure.adapters.memory.config;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

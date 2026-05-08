@@ -1,5 +1,5 @@
 package es.um.pds.tarjetas.adapters.rest;
-
+	
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.um.pds.tarjetas.adapters.rest.requests.BloqueoRequest;
+import es.um.pds.tarjetas.adapters.rest.requests.CrearTableroRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.FiltradoRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.LimiteRequest;
 import es.um.pds.tarjetas.adapters.rest.requests.RenombrarRequest;
@@ -55,17 +56,17 @@ public class TableroEndpoint {
 		this.repositorioTableros = repositorioTableros;
 	}
 	
-	// GET http://localhost:8080/tableros?url={url}
+	// GET http://localhost:8080/tableros
 	@GetMapping
 	public ResponseEntity<?> obtener(@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String token,
-									 @RequestParam(required = false) String url) {
+					 				 @RequestParam(required = false) String url) {
 		try {	
 			String authToken = token != null ? token.replace("Bearer ", "") : "";
 			UsuarioId usuarioId = servicioSesion.validarYRenovarToken(authToken);
 			
 			if(url != null) {
 				Optional<Tablero> tableroOptional = repositorioTableros.buscarPorURL(url);
-				
+			
 				if(tableroOptional.isEmpty()) {
 					return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 				}
@@ -82,7 +83,30 @@ public class TableroEndpoint {
 												  .map(tablero -> new TableroDTO(tablero))
 												  .toList();
 			return ResponseEntity.status(HttpStatus.OK)
-								 .body(tableros);
+					 			 .body(tableros);
+		} catch(IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					 			 .body(e.getMessage());
+		}
+	}
+	
+	// GET http://localhost:8080/tableros/{tableroId}
+	@GetMapping("/{tableroId}")
+	public ResponseEntity<?> obtenerPorId(@RequestHeader("Authorization") String token,
+									 	  @PathVariable String tableroId) {
+		try {	
+			String authToken = token != null ? token.replace("Bearer ", "") : "";
+			servicioSesion.validarYRenovarToken(authToken);
+			
+			Optional<Tablero> tableroOptional = repositorioTableros.buscarPorId(TableroId.of(tableroId));
+			
+			if(tableroOptional.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			}
+				
+			TableroDTO tablero = new TableroDTO(tableroOptional.get());
+			return ResponseEntity.status(HttpStatus.OK)
+								 .body(tablero);
 		} catch(IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 								 .body(e.getMessage());
@@ -92,11 +116,11 @@ public class TableroEndpoint {
 	// POST http://localhost:8080/tableros
 	@PostMapping
 	public ResponseEntity<?> crear(@RequestHeader("Authorization") String token,
-								   @RequestBody CrearTableroCmd body) {
+								   @RequestBody CrearTableroRequest body) {
 		try {	
 			String authToken = token.replace("Bearer ", "").trim();
 			servicioSesion.validarYRenovarToken(authToken);
-			ResultadoCrearTableroDTO tablero = servicioTablero.crearTablero(body);
+			ResultadoCrearTableroDTO tablero = servicioTablero.crearTablero(new CrearTableroCmd(body.nombre(), body.email(), body.plantillaId(), body.nombrePlantilla(), body.plantillaCreacion()));
 			return ResponseEntity.status(HttpStatus.CREATED)
 								 .body(tablero);
 		} catch(IllegalArgumentException e) {
@@ -105,7 +129,7 @@ public class TableroEndpoint {
 		}
 	}
 	
-	// PUT http://localhost:8080/tableros/{talberoId}/renombrar
+	// PUT http://localhost:8080/tableros/{tableroId}/renombrar
 	@PutMapping("/{tableroId}/renombrar")
 	public ResponseEntity<?> renombrar(@RequestHeader("Authorization") String token,
 			  							  @PathVariable String tableroId,

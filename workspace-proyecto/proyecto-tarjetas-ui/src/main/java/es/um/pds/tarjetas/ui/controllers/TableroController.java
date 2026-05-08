@@ -4,27 +4,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 
-import es.um.pds.tarjetas.domain.model.lista.id.ListaId;
-import es.um.pds.tarjetas.domain.model.lista.model.Lista;
-import es.um.pds.tarjetas.domain.model.tablero.id.TableroId;
-import es.um.pds.tarjetas.domain.model.tablero.model.Tablero;
+import es.um.pds.tarjetas.application.dto.EntryHistorialDTO;
+import es.um.pds.tarjetas.application.dto.ListaDTO;
+import es.um.pds.tarjetas.application.dto.PageDTO;
+import es.um.pds.tarjetas.application.dto.TableroDTO;
 import es.um.pds.tarjetas.domain.model.tarjeta.eventos.TarjetaCompletada;
-import es.um.pds.tarjetas.domain.ports.input.ServicioHistorial;
-//import es.um.pds.tarjetas.domain.ports.input.ServicioGestionTablero;
-import es.um.pds.tarjetas.domain.ports.input.ServicioLista;
-import es.um.pds.tarjetas.domain.ports.input.ServicioTablero;
-import es.um.pds.tarjetas.domain.ports.input.dto.EntryHistorialDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.ListaDTO;
-import es.um.pds.tarjetas.domain.ports.input.dto.PageDTO;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioListas;
-import es.um.pds.tarjetas.domain.ports.output.RepositorioTableros;
+import es.um.pds.tarjetas.ui.infrastructure.api.DashboardApiClient;
+import es.um.pds.tarjetas.ui.infrastructure.api.ListaApiClient;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 //import es.um.pds.tarjetas.ui.Configuracion;
@@ -57,16 +50,12 @@ public class TableroController {
 	private final Map<String, VBox> nodosListas = new HashMap<>();
 	private final Map<String, VBox> nodosTarjetas = new HashMap<>();
 	
-	private final ServicioTablero servicioTablero;
-	private final ServicioLista servicioLista;
-	private final ServicioHistorial servicioHistorial;
-	private final RepositorioListas repoListas;
-	private final RepositorioTableros repoTableros;
+	private final DashboardApiClient dashboardApi;
+	private final ListaApiClient listaApi;
 	private final ApplicationContext contextoApp;
 	private final ContextoUsuario contextoUsuario;
 	private final SceneManager sceneManager;
 	private final TableroEventBridge eventBridge;
-	private int nListas = 0;
 	private String filtroActual = "";
 	
 	private String actual;
@@ -83,12 +72,9 @@ public class TableroController {
 	@FXML private Button btnAnadirLista;
 	
 	// Inyectar servicio y contexto
-	public TableroController(ServicioTablero servicioTablero, ServicioLista servicioLista, ServicioHistorial servicioHistorial, RepositorioListas repoListas, RepositorioTableros repoTableros, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
-		this.servicioTablero = servicioTablero;
-		this.servicioLista = servicioLista;
-		this.servicioHistorial = servicioHistorial;
-		this.repoListas = repoListas;
-		this.repoTableros = repoTableros;
+	public TableroController(DashboardApiClient dashboardApi, ListaApiClient listaApi, ApplicationContext contextoApp, ContextoUsuario contextoUsuario, SceneManager sceneManager, TableroEventBridge eventBridge) {
+		this.dashboardApi = dashboardApi;
+		this.listaApi = listaApi;
 		this.contextoApp = contextoApp;
 		this.contextoUsuario = contextoUsuario;
 		this.sceneManager = sceneManager;
@@ -132,58 +118,51 @@ public class TableroController {
 			return;
 		}
 		
-		TableroId id = TableroId.of(this.actual);
-		
 		try {
-			Optional<Tablero> tableroOpt = repoTableros.buscarPorId(id);
-			if(tableroOpt.isPresent()) {
-				Tablero tab = tableroOpt.get();
-				System.out.println("Tablero detectado: " + tab.getNombre());
-				this.lblTituloTablero.setText(tab.getNombre());
-				contextoUsuario.setNombreTableroActual(tab.getNombre());
+			TableroDTO tab = dashboardApi.obtenerTableroPorId(this.actual, contextoUsuario.getTokenSesion());
+			System.out.println("Tablero detectado: " + tab.nombre());
+			this.lblTituloTablero.setText(tab.nombre());
+			contextoUsuario.setNombreTableroActual(tab.nombre());
+			
+			// --- DEJAMOS QUE EL DOMINIO DECIDA EL ESTADO ---
+			boolean estaBloqueado = tab.bloqueado();
+			this.bloqueado = estaBloqueado;
+			
+			if (estaBloqueado) {
+				//btnBloquear.setText("🔒 Tablero Bloqueado");
+				//btnBloquear.setDisable(true);
+				btnBloquear.setText("Desbloquear");
+				btnAnadirLista.setText("Bloqueado");
+				btnAnadirLista.setDisable(true);
+				btnRenombrarTablero.setText("Bloqueado");
+				btnRenombrarTablero.setDisable(true);
 				
-				// --- DEJAMOS QUE EL DOMINIO DECIDA EL ESTADO ---
-				boolean estaBloqueado = tab.isBloqueado();
-				this.bloqueado = estaBloqueado;
-				
-				if (estaBloqueado) {
-					//btnBloquear.setText("🔒 Tablero Bloqueado");
-					//btnBloquear.setDisable(true);
-					btnBloquear.setText("Desbloquear");
-					btnAnadirLista.setText("Bloqueado");
-					btnAnadirLista.setDisable(true);
-					btnRenombrarTablero.setText("Bloqueado");
-					btnRenombrarTablero.setDisable(true);
-					
-					// Calculamos el temporizador para el F5 automático
-					LocalDateTime momentoFin = tab.getEstadoBloqueo().getHasta();
-					if (momentoFin != null) {
-						long milisRestantes = ChronoUnit.MILLIS.between(LocalDateTime.now(), momentoFin);
-						if (milisRestantes > 0) {
-							PauseTransition temporizador = new PauseTransition(Duration.millis(milisRestantes));
-							temporizador.setOnFinished(event -> {
-								System.out.println("⏰ Desbloqueo automático. Recargando...");
-								sceneManager.showTablero(); 
-							});
-							temporizador.play();
-						}
-					}
-				} else {
-					btnBloquear.setText("🔒 Bloquear Tablero");
-					btnBloquear.setDisable(false);
-					btnAnadirLista.setText("+ Añadir Lista...");
-					btnAnadirLista.setDisable(false);
-					btnRenombrarTablero.setText("Renombrar...");
-					btnRenombrarTablero.setDisable(false);
-				}
-				// -----------------------------------------------
-				
-				for(ListaId listaId : tab.getListas()) {
-					Optional<Lista> listaOpt = repoListas.buscarPorId(listaId);
-					if(listaOpt.isPresent()) {
-						instanciarListaVisual(new ListaDTO(listaOpt.get()), bloqueado);
+				// Calculamos el temporizador para el F5 automático
+				LocalDateTime momentoFin = LocalDateTime.parse(tab.estadoBloqueo().hasta());
+				if (momentoFin != null) {
+					long milisRestantes = ChronoUnit.MILLIS.between(LocalDateTime.now(), momentoFin);
+					if (milisRestantes > 0) {
+						PauseTransition temporizador = new PauseTransition(Duration.millis(milisRestantes));
+						temporizador.setOnFinished(event -> {
+							System.out.println("⏰ Desbloqueo automático. Recargando...");
+							sceneManager.showTablero(); 
+						});
+						temporizador.play();
 					}
 				}
+			} else {
+				btnBloquear.setText("🔒 Bloquear Tablero");
+				btnBloquear.setDisable(false);
+				btnAnadirLista.setText("+ Añadir Lista...");
+				btnAnadirLista.setDisable(false);
+				btnRenombrarTablero.setText("Renombrar...");
+				btnRenombrarTablero.setDisable(false);
+			}
+			
+			List<ListaDTO> listas = listaApi.obtenerListas(tab.id(), contextoUsuario.getTokenSesion());
+			
+			for(ListaDTO lista : listas) {
+				instanciarListaVisual(lista, bloqueado);
 			}
 			txtFiltroEtiqueta.textProperty().addListener((observable, valorAntiguo, valorNuevo) -> {
 				filtroActual = valorNuevo.trim().toLowerCase();
@@ -230,66 +209,71 @@ public class TableroController {
 		});*/
 		
 		// Buscar si hay una lista especial ya
-		boolean yaHayEspecial = repoListas.buscarPorTableroId(TableroId.of(this.actual)).stream()
-				.anyMatch(l -> l.isEspecial());
-		
-		Dialog<Pair<String, Boolean>> dialogo = new Dialog<>();
-		dialogo.setTitle("Nueva lista");
-		dialogo.setHeaderText("Crear una nueva lista");
-		
-		ButtonType btnAceptar = new ButtonType("Crear", ButtonData.OK_DONE);
-		dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
-		
-		GridPane grid = new GridPane();
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(20, 50, 10, 10));
-		
-		TextField txtNombre = new TextField();
-		txtNombre.setPromptText("Nombre de la lista");
-		
-		ComboBox<String> cbTipo = new ComboBox<>();
-		cbTipo.getItems().addAll("NORMAL", "ESPECIAL");
-		cbTipo.getSelectionModel().selectFirst();
-		
-		grid.add(new Label("Nombre: "), 0, 0);
-		grid.add(txtNombre, 1, 0);
-		
-		// Añadir la selección de tipo si no existe ya una lista especial
-		if(!yaHayEspecial) {
-			grid.add(new Label("Tipo: "), 0, 1);
-			grid.add(cbTipo, 1, 1);
-		}
-		
-		dialogo.getDialogPane().setContent(grid);
-		
-		dialogo.setResultConverter(dialogButton -> {
-			if(dialogButton == btnAceptar) {
-				boolean esEspecial = !yaHayEspecial && cbTipo.getValue().equals("ESPECIAL");
-				return new Pair<>(txtNombre.getText(), esEspecial);
+		try {		
+			boolean yaHayEspecial = listaApi.obtenerListas(this.actual, contextoUsuario.getTokenSesion())
+											.stream()
+											.anyMatch(l -> l.especial());
+			
+			Dialog<Pair<String, Boolean>> dialogo = new Dialog<>();
+			dialogo.setTitle("Nueva lista");
+			dialogo.setHeaderText("Crear una nueva lista");
+			
+			ButtonType btnAceptar = new ButtonType("Crear", ButtonData.OK_DONE);
+			dialogo.getDialogPane().getButtonTypes().addAll(btnAceptar, ButtonType.CANCEL);
+			
+			GridPane grid = new GridPane();
+			grid.setHgap(10);
+			grid.setVgap(10);
+			grid.setPadding(new Insets(20, 50, 10, 10));
+			
+			TextField txtNombre = new TextField();
+			txtNombre.setPromptText("Nombre de la lista");
+			
+			ComboBox<String> cbTipo = new ComboBox<>();
+			cbTipo.getItems().addAll("NORMAL", "ESPECIAL");
+			cbTipo.getSelectionModel().selectFirst();
+			
+			grid.add(new Label("Nombre: "), 0, 0);
+			grid.add(txtNombre, 1, 0);
+			
+			// Añadir la selección de tipo si no existe ya una lista especial
+			if(!yaHayEspecial) {
+				grid.add(new Label("Tipo: "), 0, 1);
+				grid.add(cbTipo, 1, 1);
 			}
-			return null;
-		});
-		
-		dialogo.showAndWait().ifPresent(resultado -> {
-			try {
-				String nombre = resultado.getKey();
-				boolean marcarComoEspecial = resultado.getValue();
-				String email = contextoUsuario.getEmail();
-				
-				ListaDTO nueva = servicioLista.crearLista(this.actual, nombre, email);
-				
-				if(marcarComoEspecial) {
-					servicioLista.definirListaEspecial(actual, nueva.id(), email);
-					// Recargar para que la vista sepa que la lista es especial
-					nueva = new ListaDTO(nueva.id(), nueva.nombre(), true, nueva.limite(), nueva.tarjetaIds(), nueva.prerrequisitoIds());
+			
+			dialogo.getDialogPane().setContent(grid);
+			
+			dialogo.setResultConverter(dialogButton -> {
+				if(dialogButton == btnAceptar) {
+					boolean esEspecial = !yaHayEspecial && cbTipo.getValue().equals("ESPECIAL");
+					return new Pair<>(txtNombre.getText(), esEspecial);
 				}
-				
-				instanciarListaVisual(nueva, bloqueado);
-			} catch(Exception e) {
-				mostrarError("Error", "No se pudo crear la lista: " + e.getMessage());
-			}
-		});
+				return null;
+			});
+			
+			dialogo.showAndWait().ifPresent(resultado -> {
+				try {
+					String nombre = resultado.getKey();
+					boolean marcarComoEspecial = resultado.getValue();
+					String email = contextoUsuario.getEmail();
+					
+					ListaDTO nueva = listaApi.crearLista(this.actual, nombre, email, contextoUsuario.getTokenSesion());
+					
+					if(marcarComoEspecial) {
+						listaApi.definirListaEspecial(actual, nueva.id(), contextoUsuario.getTokenSesion());
+						// Recargar para que la vista sepa que la lista es especial
+						nueva = new ListaDTO(nueva.id(), nueva.nombre(), true, nueva.limite(), nueva.tarjetaIds(), nueva.prerrequisitoIds());
+					}
+					
+					instanciarListaVisual(nueva, bloqueado);
+				} catch(Exception e) {
+					mostrarError("Error", "No se pudo crear la lista: " + e.getMessage());
+				}
+			});
+		} catch(Exception e) {
+			mostrarError("Error", "No se ha podido crear la lista: " + e.getMessage());
+		}
 	}
 	
 	// Fusión de JavaFX con Spring
@@ -401,16 +385,20 @@ public class TableroController {
 					LocalDateTime desde = LocalDateTime.now();
 					LocalDateTime hasta = desde.plusMinutes(minutos);
 				
-					servicioTablero.bloquearTablero(this.actual, desde, hasta, "Bloqueo por el usuario", contextoUsuario.getEmail());
+					dashboardApi.bloquearTablero(this.actual, desde, hasta, "Bloqueo por el usuario", contextoUsuario.getTokenSesion());
 					sceneManager.showTablero();
 				} catch (Exception e) {
 					mostrarError("Error al bloquear", e.getMessage());
 				}
 			});
 		} else {
-			this.btnBloquear.setText("Bloquear tablero...");
-			servicioTablero.desbloquearTablero(actual, contextoUsuario.getEmail());
-			sceneManager.showTablero();
+			try {
+				this.btnBloquear.setText("Bloquear tablero...");
+				dashboardApi.desbloquearTablero(actual, contextoUsuario.getTokenSesion());
+				sceneManager.showTablero();
+			} catch (Exception e) {
+				mostrarError("Error al desbloquear", e.getMessage());
+			}
 		}
 	}
 	
@@ -423,7 +411,7 @@ public class TableroController {
 			dialogo.setContentText("Nuevo nombre:");
 			dialogo.showAndWait().ifPresent(nombre -> {
 				try {
-					servicioTablero.renombrarTablero(this.actual, nombre, contextoUsuario.getEmail());
+					dashboardApi.renombrarTablero(this.actual, nombre, contextoUsuario.getTokenSesion());
 					contextoUsuario.setNombreTableroActual(nombre);
 					lblTituloTablero.setText(nombre);
 					sceneManager.showTablero();
@@ -439,9 +427,9 @@ public class TableroController {
 		listaHistorial.getItems().clear();
 		
 		try {
-			// Pedir página 0 con un máximo de 20 entradas
-			PageDTO<EntryHistorialDTO> pagina = servicioHistorial.consultarPorTablero(actual, 0, 20);
-			
+			// Pedir primera página con un máximo de 20 entradas
+			PageDTO<EntryHistorialDTO> pagina = dashboardApi.mostrarHistorialTablero(actual, 1, 20, contextoUsuario.getTokenSesion());
+		
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
 			
 			for(EntryHistorialDTO entrada : pagina.contenido()) {
@@ -450,7 +438,7 @@ public class TableroController {
 				listaHistorial.getItems().add(texto);
 			}
 		} catch(Exception e) {
-			System.err.println("Erorr al cargar el historial" + e.getMessage());
+			System.err.println("Error al cargar el historial" + e.getMessage());
 			e.printStackTrace();
 		}
 	}
