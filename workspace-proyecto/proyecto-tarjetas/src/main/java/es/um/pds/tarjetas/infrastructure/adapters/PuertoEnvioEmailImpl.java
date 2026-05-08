@@ -34,6 +34,7 @@ public class PuertoEnvioEmailImpl implements PuertoEnvioEmail {
 		mensaje.setFrom(from);
 		mensaje.setSubject(asunto);
 		mensaje.setText(cuerpo);
+		System.out.println(mensaje.getText());
 
 		try {
 			 mailSender.send(mensaje);
