@@ -63,18 +63,16 @@ xxxxxxxxxxxxxxxxxxxxxxx
 ## David Sergio Anishchenko Halkina – API REST e integración
 
 ### Responsabilidades principales
-- Diseño e implementación de la API REST (Spring Boot)
+- Diseño, implementación y documentación de la API REST (Spring Boot)
 - Controladores REST
 - Serialización/deserialización (DTOs)
 - Integración entre frontend y backend de la API
 - Gestión de endpoints y comunicación HTTP
+- Implementación del servicio de envío de correos electrónicos.
 
 ### Evidencias
 
 - Commits relevantes:
-  - `<link commit>` – xxx
-  - `<link commit>` – yyy
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/051cc3be4cc8aa87ad5fdbfebcdcb670a860ced2>` - Creadas e implementadas las clases de la API REST.
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/1794b13f7eff56a0fe04489cb7d59d501ced3ea0>` - Integrada la API REST en el frontend de la aplicación e implementada la clase PlantillaEndpoint, así como el servicio de envío de correos electrónicos.
   - `<link commit>` – zzz
-
-### Comentarios
-xxxxxxxxxxxxxxxxxxxxxxxx
