@@ -195,8 +195,8 @@ public class TableroEndpoint {
 		}
 	}
 	
-	// PATCH http://localhost:8080/tableros/{tableroId}/configurar
-	@PatchMapping("/{tableroId}/configurar")
+	// PUT http://localhost:8080/tableros/{tableroId}/configurar
+	@PutMapping("/{tableroId}/configurar")
 	public ResponseEntity<?> configurar(@RequestHeader("Authorization") String token,
 										@PathVariable String tableroId,
 										@RequestBody LimiteRequest body) {
