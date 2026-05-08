@@ -46,13 +46,15 @@ Este documento describe la contribución de cada miembro del equipo al desarroll
 - Navegación y experiencia de usuario
 - Integración con backend (llamadas a servicios)
 - Implementación parcial de repositorios en memoria para pruebas
+- Tests del dominio y tests de integración de los servicios
 
 ### Evidencias
 
-- Commits relevantes:
-  - `<link commit>` – xxx
-  - `<link commit>` – yyy
-  - `<link commit>` – zzz
+- Commits relevantes (hechos con dos cuentas por trabajar en dos ordenadores diferentes. Cuentas: ale-lg-um y SpiderYoda11):
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/0c4684db31b7b5112764bf662f09b4fdf82e896a>` – Limite y prerrequisitos de las listas hechos en interfaz
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/a3de4810a9e2f7d7c44e6f072609df22435f98b7>` – Bloqueo de tableros completado en la interfaz
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/016f59c7153a4822aca31738cc491c7eaa26bd14>` – Corregir fallos checklist, modificar tarea, errores pequeños
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/3856d24212472fdfd08a0f48e1bb1278916b67ef>` – Implementación de varios tests
 
 
 ### Comentarios
@@ -63,18 +65,16 @@ xxxxxxxxxxxxxxxxxxxxxxx
 ## David Sergio Anishchenko Halkina – API REST e integración
 
 ### Responsabilidades principales
-- Diseño e implementación de la API REST (Spring Boot)
+- Diseño, implementación y documentación de la API REST (Spring Boot)
 - Controladores REST
 - Serialización/deserialización (DTOs)
 - Integración entre frontend y backend de la API
 - Gestión de endpoints y comunicación HTTP
+- Implementación del servicio de envío de correos electrónicos.
 
 ### Evidencias
 
 - Commits relevantes:
-  - `<link commit>` – xxx
-  - `<link commit>` – yyy
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/051cc3be4cc8aa87ad5fdbfebcdcb670a860ced2>` - Creadas e implementadas las clases de la API REST.
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/1794b13f7eff56a0fe04489cb7d59d501ced3ea0>` - Integrada la API REST en el frontend de la aplicación e implementada la clase PlantillaEndpoint, así como el servicio de envío de correos electrónicos.
   - `<link commit>` – zzz
-
-### Comentarios
-xxxxxxxxxxxxxxxxxxxxxxxx

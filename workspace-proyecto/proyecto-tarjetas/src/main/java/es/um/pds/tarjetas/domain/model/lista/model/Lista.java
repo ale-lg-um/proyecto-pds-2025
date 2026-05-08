@@ -67,18 +67,22 @@ public class Lista {
 			throw new ListaInvalidaException("La lista de tarjetas no puede ser nula");
 		}
 
-		if (listaTarjetas.contains(null)) {
-			throw new ListaInvalidaException("La lista no puede contener identificadores de tarjeta nulos");
+		if (listaTarjetas.stream().anyMatch(Objects::isNull)) {
+		    throw new ListaInvalidaException("La lista no puede contener identificadores de tarjeta nulos");
 		}
-
+		
 		if (prerrequisitos == null) {
 			throw new ListaInvalidaException("Los prerrequisitos no pueden ser nulos");
 		}
 
+		if (prerrequisitos.stream().anyMatch(Objects::isNull)) {
+		    throw new ListaInvalidaException("La lista no puede contener prerrequisitos nulos");
+		}
+/*
 		if (prerrequisitos.contains(null)) {
 			throw new ListaInvalidaException("La lista no puede contener prerrequisitos nulos");
 		}
-
+*/
 		if (especial && limite != null) {
 			throw new ListaInvalidaException("Una lista especial no puede tener límite");
 		}

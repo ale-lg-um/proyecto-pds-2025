@@ -201,4 +201,171 @@ class ServicioTarjetaIntegrationTest {
 
 		assertEquals(3, etiquetasCreadas);
 	}
+	
+	@Test
+    void crearObtenerRenombrarEditarYEliminarTarjeta() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+        ListaDTO lista = servicioLista.crearLista(tablero.tableroId(), "TODO", EMAIL_USUARIO);
+
+        TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(
+                tablero.tableroId(),
+                lista.id(),
+                "Tarea inicial",
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion inicial", null, EMAIL_USUARIO));
+
+        TarjetaDTO obtenida = servicioTarjeta.obtenerTarjeta(tarjeta.id());
+
+        assertEquals("Tarea inicial", obtenida.titulo());
+
+        servicioTarjeta.renombrarTarjeta(tablero.tableroId(), lista.id(), tarjeta.id(), "Tarea renombrada",
+                EMAIL_USUARIO);
+
+        Tarjeta renombrada = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertEquals("Tarea renombrada", renombrada.getTitulo());
+
+        servicioTarjeta.editarContenidoTarjeta(
+                tablero.tableroId(),
+                lista.id(),
+                tarjeta.id(),
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion nueva", null, EMAIL_USUARIO));
+
+        Tarjeta editada = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertTrue(editada.getContenido().toString().contains("Descripcion nueva"));
+
+        servicioTarjeta.eliminarTarjeta(tablero.tableroId(), lista.id(), tarjeta.id(), EMAIL_USUARIO);
+
+        assertTrue(repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).isEmpty());
+    }
+
+    @Test
+    void moverTarjeta_cambiaListaActualYListasVisitadas() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+        ListaDTO origen = servicioLista.crearLista(tablero.tableroId(), "Origen", EMAIL_USUARIO);
+        ListaDTO destino = servicioLista.crearLista(tablero.tableroId(), "Destino", EMAIL_USUARIO);
+
+        TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(
+                tablero.tableroId(),
+                origen.id(),
+                "Tarea",
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion", null, EMAIL_USUARIO));
+
+        servicioTarjeta.moverTarjeta(tablero.tableroId(), tarjeta.id(), origen.id(), destino.id(), EMAIL_USUARIO);
+
+        Tarjeta movida = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertEquals(destino.id(), movida.getListaActual().getId());
+        assertTrue(movida.getListasVisitadas().stream().anyMatch(id -> id.getId().equals(destino.id())));
+    }
+
+    @Test
+    void completarTarjeta_manual_mueveAListaEspecial() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+
+        ListaDTO pendientes = servicioLista.crearLista(tablero.tableroId(), "Pendientes", EMAIL_USUARIO);
+        ListaDTO completadas = servicioLista.crearLista(tablero.tableroId(), "Completadas", EMAIL_USUARIO);
+
+        servicioLista.definirListaEspecial(tablero.tableroId(), completadas.id(), EMAIL_USUARIO);
+
+        TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(
+                tablero.tableroId(),
+                pendientes.id(),
+                "Tarea",
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion", null, EMAIL_USUARIO));
+
+        servicioTarjeta.completarTarjeta(tablero.tableroId(), pendientes.id(), tarjeta.id(), EMAIL_USUARIO);
+
+        Tarjeta completada = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertTrue(completada.isCompletada());
+        assertEquals(completadas.id(), completada.getListaActual().getId());
+    }
+
+    @Test
+    void completarTarjeta_sinListaEspecial_falla() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+        ListaDTO pendientes = servicioLista.crearLista(tablero.tableroId(), "Pendientes", EMAIL_USUARIO);
+
+        TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(
+                tablero.tableroId(),
+                pendientes.id(),
+                "Tarea",
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion", null, EMAIL_USUARIO));
+
+        assertThrows(IllegalStateException.class,
+                () -> servicioTarjeta.completarTarjeta(tablero.tableroId(), pendientes.id(), tarjeta.id(),
+                        EMAIL_USUARIO));
+    }
+
+    @Test
+    void etiquetas_anadirModificarEliminar() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+        ListaDTO lista = servicioLista.crearLista(tablero.tableroId(), "TODO", EMAIL_USUARIO);
+
+        TarjetaDTO tarjeta = servicioTarjeta.crearTarjeta(
+                tablero.tableroId(),
+                lista.id(),
+                "Tarea",
+                new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "Descripcion", null, EMAIL_USUARIO));
+
+        servicioTarjeta.addEtiquetaATarjeta(tablero.tableroId(), lista.id(), tarjeta.id(), "bug", "rojo",
+                EMAIL_USUARIO);
+
+        Tarjeta conEtiqueta = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertEquals(1, conEtiqueta.getEtiquetas().size());
+        assertEquals("bug", conEtiqueta.getEtiquetas().get(0).nombre());
+
+        servicioTarjeta.modificarEtiquetaEnTarjeta(
+                tablero.tableroId(),
+                lista.id(),
+                tarjeta.id(),
+                "bug",
+                "rojo",
+                "feature",
+                "verde",
+                EMAIL_USUARIO);
+
+        Tarjeta modificada = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertEquals("feature", modificada.getEtiquetas().get(0).nombre());
+
+        servicioTarjeta.eliminarEtiquetaDeTarjeta(
+                tablero.tableroId(),
+                lista.id(),
+                tarjeta.id(),
+                "feature",
+                "verde",
+                EMAIL_USUARIO);
+
+        Tarjeta sinEtiqueta = repoTarjetas.buscarPorId(TarjetaId.of(tarjeta.id())).orElseThrow();
+
+        assertTrue(sinEtiqueta.getEtiquetas().isEmpty());
+    }
+
+    @Test
+    void crearTarjeta_conDatosInvalidos_falla() {
+        ResultadoCrearTableroDTO tablero = crearTablero();
+        ListaDTO lista = servicioLista.crearLista(tablero.tableroId(), "TODO", EMAIL_USUARIO);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioTarjeta.crearTarjeta(tablero.tableroId(), lista.id(), "T", null));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioTarjeta.crearTarjeta(tablero.tableroId(), lista.id(), " ",
+                        new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, "D", null, EMAIL_USUARIO)));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioTarjeta.crearTarjeta(tablero.tableroId(), lista.id(), "Tarea",
+                        new ContenidoTarjetaCmd(TipoContenidoTarjeta.TAREA, " ", null, EMAIL_USUARIO)));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioTarjeta.crearTarjeta(tablero.tableroId(), lista.id(), "Checklist",
+                        new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, null, List.of(), EMAIL_USUARIO)));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> servicioTarjeta.crearTarjeta(tablero.tableroId(), lista.id(), "Checklist",
+                        new ContenidoTarjetaCmd(TipoContenidoTarjeta.CHECKLIST, null, List.of(" "), EMAIL_USUARIO)));
+    }
 }

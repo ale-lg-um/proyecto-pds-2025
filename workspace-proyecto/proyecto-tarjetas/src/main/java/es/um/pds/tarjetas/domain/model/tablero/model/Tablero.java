@@ -61,7 +61,7 @@ public class Tablero {
 			throw new TableroInvalidoException("Las listas del tablero no pueden ser nulas");
 		}
 
-		if (listas.contains(null)) {
+		if (listas.stream().anyMatch(Objects::isNull)) {
 			throw new TableroInvalidoException("El tablero no puede contener identificadores de lista nulos");
 		}
 
