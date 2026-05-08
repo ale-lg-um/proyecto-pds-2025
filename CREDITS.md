@@ -77,4 +77,4 @@ xxxxxxxxxxxxxxxxxxxxxxx
 - Commits relevantes:
   - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/051cc3be4cc8aa87ad5fdbfebcdcb670a860ced2>` - Creadas e implementadas las clases de la API REST.
   - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/1794b13f7eff56a0fe04489cb7d59d501ced3ea0>` - Integrada la API REST en el frontend de la aplicación e implementada la clase PlantillaEndpoint, así como el servicio de envío de correos electrónicos.
-  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/bfc540ab73e7dfb4cfe90fd09ea34cbe044dd3fc>` – Imprimir código de autenticación por consola e implementación parcial ListaEndpointTest.
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/83c08489cf0f7bc80559515b3ea4c666de6cf547>` – Implementación tests API REST.
