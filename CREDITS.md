@@ -46,13 +46,15 @@ Este documento describe la contribución de cada miembro del equipo al desarroll
 - Navegación y experiencia de usuario
 - Integración con backend (llamadas a servicios)
 - Implementación parcial de repositorios en memoria para pruebas
+- Tests del dominio y tests de integración de los servicios
 
 ### Evidencias
 
-- Commits relevantes:
-  - `<link commit>` – xxx
-  - `<link commit>` – yyy
-  - `<link commit>` – zzz
+- Commits relevantes (hechos con dos cuentas por trabajar en dos ordenadores diferentes. Cuentas: ale-lg-um y SpiderYoda11):
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/0c4684db31b7b5112764bf662f09b4fdf82e896a>` – Limite y prerrequisitos de las listas hechos en interfaz
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/a3de4810a9e2f7d7c44e6f072609df22435f98b7>` – Bloqueo de tableros completado en la interfaz
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/016f59c7153a4822aca31738cc491c7eaa26bd14>` – Corregir fallos checklist, modificar tarea, errores pequeños
+  - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/3856d24212472fdfd08a0f48e1bb1278916b67ef>` – Implementación de varios tests
 
 
 ### Comentarios
