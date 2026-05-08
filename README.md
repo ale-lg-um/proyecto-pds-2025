@@ -80,4 +80,4 @@ En el fichero [CREDITOS.md](CREDITOS.md) se presenta información sobre en qué 
 
 ## Anexo
 
-Para información más detallada, características concretas de la arquitectura, documentación de los puertos y servicios y otras reglas de negocio, revisar la carpeta [docs](docs) y el [Domain Driven Design](docs/Domain%20Driven%20Design.pdf) dentro del repositorio.
+Para información más detallada, características concretas de la arquitectura, documentación de los puertos y servicios y otras reglas de negocio, revisar la carpeta [docs](docs) y tanto el [Domain Driven Design](docs/Domain%20Driven%20Design.pdf) como la [documentación de la API REST](docs/Tareax%20-%20API%20REST.pdf) dentro del repositorio.
