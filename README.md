@@ -76,7 +76,7 @@ La aplicación usa una base de datos H2 en fichero. Se creará automáticamente 
 - No se permite crear listas con nombres duplicados.
 
 ## Créditos
-En el fichero [CREDITOS.md](CREDITOS.md) se presenta información sobre en qué ha participado cada componente del grupo para reflejar la participación de todos los miembros del equipo.
+En el fichero [CREDITS.md](CREDITS.md) se presenta información sobre en qué ha participado cada componente del grupo para reflejar la participación de todos los miembros del equipo.
 
 ## Anexo
 
