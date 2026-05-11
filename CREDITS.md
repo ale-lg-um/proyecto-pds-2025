@@ -56,10 +56,6 @@ Este documento describe la contribución de cada miembro del equipo al desarroll
   - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/016f59c7153a4822aca31738cc491c7eaa26bd14>` – Corregir fallos checklist, modificar tarea, errores pequeños
   - `<https://github.com/ale-lg-um/proyecto-pds-2025/commit/3856d24212472fdfd08a0f48e1bb1278916b67ef>` – Implementación de varios tests
 
-
-### Comentarios
-xxxxxxxxxxxxxxxxxxxxxxx
-
 ---
 
 ## David Sergio Anishchenko Halkina – API REST e integración
