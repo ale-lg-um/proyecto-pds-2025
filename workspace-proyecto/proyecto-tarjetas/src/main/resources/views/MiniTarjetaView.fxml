@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="250.0" style="-fx-background-radius: 5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.MiniTarjetaController">
+   <children>
+      <FlowPane fx:id="contenedorEtiquetas" prefWidth="200.0" VBox.vgrow="NEVER" />
+      <Label fx:id="lblTitulo" text="Titulo" wrapText="true" />
+      <Label fx:id="lblIconoTipo" text="Icono tipo" />
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</VBox>

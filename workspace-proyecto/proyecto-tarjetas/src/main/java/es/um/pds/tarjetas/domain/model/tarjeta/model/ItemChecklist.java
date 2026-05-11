@@ -1,0 +1,56 @@
+package es.um.pds.tarjetas.domain.model.tarjeta.model;
+
+public class ItemChecklist {
+
+	// Atributos
+	private final String descripcion;
+	private boolean completado;
+
+	// Constructor
+	private ItemChecklist(String descripcion, boolean completado) {
+		this.descripcion = descripcion;
+		this.completado = completado;
+	}
+
+	// Método factoría
+	public static ItemChecklist of(String descripcion) {
+		if (descripcion == null || descripcion.isBlank()) {
+			throw new IllegalArgumentException("La descripción del ítem no puede estar vacía");
+		}
+		return new ItemChecklist(descripcion, false);
+	}
+
+	// Método factoría que permita reconstruir el estado
+	public static ItemChecklist of(String descripcion, boolean completado) {
+		if (descripcion == null || descripcion.isBlank()) {
+			throw new IllegalArgumentException("La descripción del ítem no puede estar vacía");
+		}
+		return new ItemChecklist(descripcion, completado);
+	}
+
+	// Getters
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public boolean isCompletado() {
+		return completado;
+	}
+
+	// Comportamiento de dominio
+	public void marcarComoCompletado() {
+		this.completado = true;
+	}
+
+	public void marcarComoPendiente() {
+		this.completado = false;
+	}
+
+	// No redefinimos equals y hashCode porque podemos tener ItemsChecklist con la
+	// misma descripción. Solo comparamos por oid
+	
+	@Override
+	public String toString() {
+		return descripcion + (completado ? " (completado)" : " (pendiente)");
+	}
+}

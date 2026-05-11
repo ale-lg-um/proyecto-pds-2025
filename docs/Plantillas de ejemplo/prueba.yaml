@@ -1,0 +1,33 @@
+nombrePlantilla: Plantilla Scrum Basica
+
+listas:
+  - nombre: TODO
+    limite: 5
+    prerrequisitos: []
+    especial: false
+    tarjetas:
+      - titulo: Preparar backlog inicial
+        tipoContenido: TAREA
+        descripcionTarea: Definir historias de usuario iniciales
+        itemsChecklist: []
+
+      - titulo: Checklist de arranque
+        tipoContenido: CHECKLIST
+        descripcionTarea: null
+        itemsChecklist:
+          - Crear repositorio
+          - Configurar Maven
+          - Preparar README
+
+  - nombre: DOING
+    limite: 3
+    prerrequisitos:
+      - TODO
+    especial: false
+    tarjetas: []
+
+  - nombre: REVIEW
+    limite: 2
+    prerrequisitos: []
+    especial: false
+    tarjetas: []

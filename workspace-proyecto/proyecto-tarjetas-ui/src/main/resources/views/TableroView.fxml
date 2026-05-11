@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="es.um.pds.tarjetas.ui.controllers.TableroController">
+   <top>
+      <HBox alignment="CENTER_LEFT" prefHeight="47.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="lblTituloTablero" text="Título del tablero">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Button fx:id="btnRenombrarTablero" mnemonicParsing="false" onAction="#accionRenombrarTablero" style="-fx-cursor: hand;" text="Renombrar..." />
+            <TextField fx:id="txtFiltroEtiqueta" promptText="Filtrar por etiqueta..." prefWidth="200.0" />
+      		<Separator orientation="VERTICAL" />
+            
+            <Region HBox.hgrow="ALWAYS" />
+            
+            <Button fx:id="btnBloquear" mnemonicParsing="false" onAction="#accionBloquearTablero" style="-fx-cursor: hand;" text="Bloquear tablero..." />
+            <Button fx:id="btnToggleHistorial" mnemonicParsing="false" onAction="#accionToggleHistorial" style="-fx-cursor: hand;" text="Ver historial" />
+            <Button fx:id="btnVolver" mnemonicParsing="false" onAction="#accionVolverDashboard" style="-fx-font-weight: bold; -fx-cursor: hand;" text="Volver a mis tableros ➡" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding>
+      </HBox>
+   </top>
+   <center>
+      <ScrollPane fitToHeight="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" BorderPane.alignment="CENTER">
+         <content>
+            <HBox fx:id="contenedorListas" prefHeight="100.0" prefWidth="200.0" spacing="15.0">
+               <children>
+                  <Button fx:id="btnAnadirLista" minWidth="280.0" mnemonicParsing="false" onAction="#accionAnadirLista" prefWidth="280.0" text="+ Añadir Lista..." />
+               </children>
+            </HBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <right>
+      <VBox fx:id="panelHistorial" managed="false" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;" visible="false" BorderPane.alignment="CENTER">
+          <padding>
+              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <children>
+              <Label text="Historial de Actividad">
+                  <font>
+                      <Font name="System Bold" size="16.0" />
+                  </font>
+              </Label>
+              <ListView fx:id="listaHistorial" prefHeight="200.0" prefWidth="200.0" style="-fx-font-size: 12px;" VBox.vgrow="ALWAYS" />
+          </children>
+      </VBox>
+   </right>
+</BorderPane>

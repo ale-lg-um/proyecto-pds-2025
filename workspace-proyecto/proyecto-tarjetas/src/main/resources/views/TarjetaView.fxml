@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="15.0" HBox.hgrow="ALWAYS">
+         <children>
+            <Label fx:id="lblTitulo" text="Label">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+            </Label>
+            <FlowPane fx:id="contenedorEtiquetas" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="NEVER" />
+            <Label fx:id="lblDescripcionChecklist" text="Descripcion/checklist" />
+            <TextArea fx:id="txtDescripcion" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+            <VBox fx:id="contenedorChecklist" prefHeight="200.0" prefWidth="100.0" spacing="8.0" />
+         </children>
+      </VBox>
+      <VBox prefHeight="200.0" prefWidth="150.0" spacing="10.0">
+         <children>
+            <Label fx:id="lblAnadir" text="Añadir a la tarjeta" />
+            <Button fx:id="btnEtiquetas" mnemonicParsing="false" prefWidth="150.0" text="Etiquetas" />
+            <Button fx:id="btnChecklist" mnemonicParsing="false" prefWidth="150.0" text="Checklist" />
+            <Button fx:id="btnFechas" mnemonicParsing="false" prefWidth="150.0" text="Fechas" />
+            <Button mnemonicParsing="false" prefWidth="150.0" text="..." />
+         </children>
+      </VBox>
+   </children>
+</HBox>

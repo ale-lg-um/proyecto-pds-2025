@@ -1,0 +1,28 @@
+nombre: Tablero base scrum
+
+listas:
+  - nombre: TODO
+    limite: 5
+    especial: false
+    prerrequisitos: []
+    tarjetas:
+      - titulo: Preparar backlog inicial
+        tipo: TAREA
+        descripcion: Definir historias de usuario iniciales
+
+      - titulo: Checklist de arranque
+        tipo: CHECKLIST
+        itemsChecklist:
+          - Crear repositorio
+          - Configurar Maven
+          - Preparar README
+
+  - nombre: DOING
+    especial: false
+    prerrequisitos: [TODO]
+    tarjetas: []
+
+  - nombre: DONE
+    especial: true
+    prerrequisitos: [DOING]
+    tarjetas: []
